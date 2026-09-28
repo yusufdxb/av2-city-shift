@@ -25,13 +25,25 @@ OUTPUTS = ("traj", "prob", "emb")
 
 
 class Deployable(nn.Module):
-    """Engine-friendly signature: float and int32 inputs only, softmax applied."""
+    """Engine-friendly signature: float and int32 inputs only, softmax applied.
+
+    Padded lane slots (all-zero points) are replaced by a 1 m straight dummy
+    polyline. They are masked out of attention either way, but zero-length lanes
+    make the model compute 0 / (0 + 1e-6) for the lane direction; in FP16 fused
+    TensorRT kernels 1e-6 flushes to zero, the 0/0 NaN enters attention as a value
+    vector (0 weight x NaN = NaN) and poisoned 94% of scenes.
+    """
 
     def __init__(self, model: nn.Module):
         super().__init__()
         self.model = model
+        dummy = torch.zeros(LANE_PTS, 2)
+        dummy[:, 0] = torch.linspace(0.0, 1.0, LANE_PTS)
+        self.register_buffer("dummy_lane", dummy, persistent=False)
 
     def forward(self, agent_hist, agent_valid, agent_type, lane_pts, lane_attr):
+        padded = (lane_attr[..., 0] < 0).unsqueeze(-1).unsqueeze(-1)
+        lane_pts = torch.where(padded, self.dummy_lane.to(lane_pts.dtype), lane_pts)
         traj, logits, emb = self.model(agent_hist, agent_valid > 0.5, agent_type, lane_pts, lane_attr)
         return traj, logits.softmax(-1), emb
 
@@ -58,7 +70,7 @@ def export_onnx(model: nn.Module, path: str) -> None:
     )
     dummy = tuple(t.cuda() for t in dummy)
     torch.onnx.export(
-        Deployable(model).eval(),
+        Deployable(model).cuda().eval(),
         dummy,
         path,
         input_names=list(INPUTS),
@@ -153,7 +165,7 @@ def main() -> None:
     idx = np.random.default_rng(0).choice(len(val), size=args.n, replace=False)
     idx.sort()
     target = torch.from_numpy(np.ascontiguousarray(val.arrays["target"][idx])).cuda()
-    ref_mod = Deployable(model).eval()
+    ref_mod = Deployable(model).cuda().eval()
     report: dict = {"n": args.n}
 
     def run_batched(fn, bs=128):
