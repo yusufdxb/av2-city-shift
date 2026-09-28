@@ -125,4 +125,26 @@ reported with the same prominence as a positive.
 
 ## Deviations
 
-(none yet)
+All made during harness development on the train split's dev slice, before any
+Stage 2 run on val, under the A9 clause.
+
+1. **Agent selection.** Registered: the 12 nearest agents to the ego. Changed to:
+   up to 16 agents within 60 m, ranked by how close their nearest edge (centre
+   distance minus half length) comes to the ego's route over the next 80 m.
+   Reason: with oracle forecasts the planner still hit 3/200 dev scenarios; in the
+   traced case a stopped 12 m bus was outside the 12-nearest set (centre-distance
+   ranking, crowded scene) until it was 12 m away at 13 m/s.
+2. **Speed cap.** Registered: max(v0 + 5, 1.2 * v_max_logged). Changed to
+   max(v0, v_max_logged) + 1 m/s, to keep the ego near the human's pace, a partial
+   proxy for traffic controls the planner cannot see.
+3. **Logged hard brake.** Registered: logged speed finite difference over 0.5 s.
+   The raw velocity channel flagged 41% of logged drives (200 dev scenarios);
+   changed to speed from positions, 0.5 s moving average, decel over 1 s windows
+   (0.2% of 1,000 dev scenarios). The planner's hard brake is the realised speed
+   change over each executed 1 s segment, <= -4 m/s^2.
+4. Front clearance (exploratory) is computed as centre distance minus the two
+   half lengths, over agents in the front half-plane.
+
+Dev-slice check after these changes (1,000 scenarios, analytic arms only):
+at-fault collision LOG 0.5%, ORACLE 0.2%, CV 2.5%, STATIC 3.1%; the ego still
+drives 1.55 to 1.73x the logged distance, recorded as a harness limitation.
