@@ -83,6 +83,7 @@ def main() -> None:
     wins = torch.zeros(model.k, device=device)
     run = {"loss": 0.0, "reg": 0.0, "cls": 0.0, "n": 0}
     spread_sum, spread_n = 0.0, 0
+    gn_sum, gn_max, traj_max, tok_rms_sum = 0.0, 0.0, 0.0, 0.0
     while step < args.steps:
         for b in loader(train, tr_idx, args.batch, shuffle=True, seed=args.seed * 100003 + epoch, workers=args.workers):
             if step >= args.steps:
@@ -91,11 +92,15 @@ def main() -> None:
             for g in opt.param_groups:
                 g["lr"] = lr_at(step)
             with torch.autocast("cuda", dtype=torch.bfloat16):
-                traj, logits, _ = model(b["agent_hist"], b["agent_valid"], b["agent_type"], b["lane_pts"], b["lane_attr"])
+                traj, logits, focal_tok = model(b["agent_hist"], b["agent_valid"], b["agent_type"], b["lane_pts"], b["lane_attr"])
             loss, parts = wta_loss(traj.float(), logits.float(), b["target"])
             opt.zero_grad(set_to_none=True)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+            gn = torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0).item()
+            gn_max = max(gn_max, gn)
+            gn_sum += gn
+            traj_max = max(traj_max, traj.detach().abs().max().float().item())
+            tok_rms_sum += focal_tok.detach().float().pow(2).mean().sqrt().item()
             opt.step()
             with torch.no_grad():
                 err = (traj.float() - b["target"].unsqueeze(1)).norm(dim=-1).mean(-1)
@@ -119,6 +124,11 @@ def main() -> None:
                     "mode_entropy": round(ent, 4),
                     # mean pairwise endpoint distance between modes: ~0 means the modes collapsed
                     "mode_spread_m": round(spread_sum / max(1, spread_n), 3),
+                    "grad_norm_mean": round(gn_sum / run["n"], 3),
+                    "grad_norm_max": round(gn_max, 3),
+                    "traj_abs_max_m": round(traj_max, 1),
+                    # RMS of the encoder's focal-token output (the decoder's query offset)
+                    "focal_token_rms": round(tok_rms_sum / run["n"], 3),
                     "sec": round(time.time() - t0, 1),
                 }
                 log.write(json.dumps(rec) + "\n")
@@ -126,6 +136,7 @@ def main() -> None:
                 print(json.dumps(rec), flush=True)
                 wins.zero_()
                 spread_sum, spread_n = 0.0, 0
+                gn_sum, gn_max, traj_max, tok_rms_sum = 0.0, 0.0, 0.0, 0.0
                 run = {"loss": 0.0, "reg": 0.0, "cls": 0.0, "n": 0}
             if step % args.eval_every == 0 or step == args.steps:
                 dm = evaluate(model, train, dev_idx, device)

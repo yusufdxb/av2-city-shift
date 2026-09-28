@@ -73,18 +73,23 @@ class PosEnc(nn.Module):
 
 
 class Predictor(nn.Module):
-    def __init__(self, d: int = 128, k: int = 6, enc_layers: int = 3, dec_layers: int = 2, heads: int = 4, use_map: bool = True):
+    def __init__(self, d: int = 128, k: int = 6, enc_layers: int = 3, dec_layers: int = 2, heads: int = 4, use_map: bool = True, query_std: float = 1.0, dropout: float = 0.1):
         super().__init__()
         self.k = k
         self.use_map = use_map
         self.agent_enc = AgentEncoder(d)
         self.lane_enc = PolylineEncoder(d)
         self.pos = PosEnc(d)
-        layer = nn.TransformerEncoderLayer(d, heads, 4 * d, dropout=0.1, batch_first=True, norm_first=True)
-        self.encoder = nn.TransformerEncoder(layer, enc_layers, enable_nested_tensor=False)
-        dlayer = nn.TransformerDecoderLayer(d, heads, 4 * d, dropout=0.1, batch_first=True, norm_first=True)
-        self.decoder = nn.TransformerDecoder(dlayer, dec_layers)
-        self.queries = nn.Parameter(torch.randn(k, d) * 0.02)
+        layer = nn.TransformerEncoderLayer(d, heads, 4 * d, dropout=dropout, batch_first=True, norm_first=True)
+        # Pre-LN stacks need a final norm, or the residual stream grows without bound
+        # (observed: focal-token RMS 1.7 -> 17 in 5k steps, then gradient blow-up).
+        self.encoder = nn.TransformerEncoder(layer, enc_layers, norm=nn.LayerNorm(d), enable_nested_tensor=False)
+        dlayer = nn.TransformerDecoderLayer(d, heads, 4 * d, dropout=dropout, batch_first=True, norm_first=True)
+        self.decoder = nn.TransformerDecoder(dlayer, dec_layers, norm=nn.LayerNorm(d))
+        # Mode queries must be on the scale of the focal token they are added to (RMS ~1).
+        # At std 0.02 the modes were near-identical under dropout noise, the winner was
+        # arbitrary, and the probability head stayed at log(K) (overfit test, 512 scenes).
+        self.queries = nn.Parameter(torch.randn(k, d) * query_std)
         self.traj_head = mlp(d, 2 * d, FUT * 2)
         self.logit_head = mlp(d, d, 1)
         self.d = d

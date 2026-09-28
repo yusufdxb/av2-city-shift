@@ -144,3 +144,13 @@ batch 1 and 32 (p50/p99), with GPU class only described generically.
    were used only to find bugs (an FP16 NaN, TF32 in the FP32 engine). No
    hyperparameter, threshold, metric, or analysis choice was made from them. All
    later pipeline checks use the train split.
+2. 2026-09-28, pilot bug fixes (allowed by the A9 clause; no val data used):
+   (a) pre-LN encoder and decoder had no final LayerNorm; the focal-token RMS grew
+   1.7 -> 17.5 over 5.6k steps and the gradient norm blew up to ~5e7 near step
+   5.8k (pilot v1 diverged, loss 4.0 -> 10.5). Added final LayerNorms.
+   (b) mode queries were initialised at std 0.02 against a scene token of RMS ~1,
+   so the six modes were near-identical under dropout and the probability head
+   stayed at log(6) even when memorising 512 training scenarios. Query init set to
+   std 1.0 (512-scene overfit test, single seed: probability CE 1.79 -> 1.46,
+   minFDE 1.79 -> 1.47 m). Dropout unchanged at 0.1.
+   Both judged on the train split and the dev slice only.
