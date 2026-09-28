@@ -1,0 +1,23 @@
+[project]
+name = "cityshift"
+version = "0.1.0"
+description = "Does a trajectory predictor know when it is in a new city? Leave-one-city-out study on Argoverse 2."
+requires-python = ">=3.10"
+dependencies = ["torch>=2.3", "numpy", "pandas", "pyarrow"]
+
+[project.optional-dependencies]
+deploy = ["onnx", "tensorrt>=10"]
+dev = ["pytest", "ruff"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 130
