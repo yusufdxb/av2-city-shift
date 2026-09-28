@@ -318,8 +318,8 @@ def predict(models: dict[str, torch.nn.Module], batch: list[tuple[str, dict]], d
     keys = sorted({k for k, _ in batch})
     for key in keys:
         idx = [i for i, (k, _) in enumerate(batch) if k == key]
-        for s in range(0, len(idx), 2048):
-            ii = idx[s : s + 2048]
+        for s in range(0, len(idx), 512):
+            ii = idx[s : s + 512]
             x = {n: torch.from_numpy(np.stack([batch[i][1][n] for i in ii])).to(device) for n in ("agent_hist", "agent_valid", "agent_type", "lane_pts", "lane_attr")}
             traj, logits, _ = models[key](x["agent_hist"], x["agent_valid"], x["agent_type"], x["lane_pts"], x["lane_attr"])
             traj, prob = traj.float().cpu().numpy(), logits.float().softmax(-1).cpu().numpy()

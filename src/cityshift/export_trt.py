@@ -141,6 +141,10 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=2000)
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
+    # cuDNN convolutions default to TF32 on this GPU class, which moved the "FP32"
+    # PyTorch reference 14 cm away from a CPU FP32 reference. Compare against true FP32.
+    torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cuda.matmul.allow_tf32 = False
 
     model, _ = load_model(args.ckpt, torch.device("cuda"))
     onnx_path = os.path.join(args.out, "predictor.onnx")
