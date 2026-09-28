@@ -138,4 +138,9 @@ batch 1 and 32 (p50/p99), with GPU class only described generically.
 
 ## Deviations
 
-(none yet)
+1. 2026-09-28, disclosed rather than a change: before registration, throwaway smoke
+   runs used the val split as *training* data (the train split was still
+   downloading) to debug the pipeline and the TensorRT export. Their val numbers
+   were used only to find bugs (an FP16 NaN, TF32 in the FP32 engine). No
+   hyperparameter, threshold, metric, or analysis choice was made from them. All
+   later pipeline checks use the train split.
