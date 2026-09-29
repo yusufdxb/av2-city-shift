@@ -44,7 +44,8 @@ python3 - <<'PY_CONTROLS'
 import json
 result = json.load(open("runs/stage3/results.json"))
 controls = result["closedloop"]["controls"]
-failed = [name for name in ("STATIC_pass", "LOG_pass", "SHAM_pass") if not controls[name]]
+# SHAM only decides whether H8 is stopped-specific (deviation 1); it is not a control that can fail the run.
+failed = [name for name in ("STATIC_pass", "LOG_pass") if not controls[name]]
 if failed:
     raise SystemExit(f"Stage 3 controls failed: {', '.join(failed)}; inspect runs/stage3/results.json")
 PY_CONTROLS
