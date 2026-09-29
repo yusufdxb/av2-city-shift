@@ -1,0 +1,8 @@
+# Python 3.10, Linux x86_64. Install torch from https://download.pytorch.org/whl/cpu first.
+torch==2.11.0+cpu
+numpy==2.2.6
+pandas==2.3.3
+pyarrow==23.0.1
+matplotlib==3.10.8
+pytest==9.0.3
+ruff==0.15.8

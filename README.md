@@ -1,5 +1,7 @@
 # City Shift
 
+[![CI](https://github.com/yusufdxb/av2-city-shift/actions/workflows/ci.yml/badge.svg)](https://github.com/yusufdxb/av2-city-shift/actions/workflows/ci.yml)
+
 **Does a learned trajectory predictor get worse in a city it has never seen, does it know when it is wrong there, and does any of that reach the car's driving?**
 
 A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.

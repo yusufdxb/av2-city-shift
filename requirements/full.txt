@@ -1,0 +1,14 @@
+# Versions observed in the local environment used to document the published results.
+# Python: 3.10.12
+# PyTorch CUDA runtime (torch.version.cuda): 12.8
+# TensorRT: 10.13.3.9.post1
+# NVIDIA driver: 570.211.01
+# Install torch from https://download.pytorch.org/whl/cu128 when recreating this environment.
+torch==2.11.0+cu128
+numpy==2.2.6
+pandas==2.3.3
+pyarrow==23.0.1
+onnx==1.21.0
+onnxruntime==1.23.2
+tensorrt==10.13.3.9.post1
+matplotlib==3.10.8

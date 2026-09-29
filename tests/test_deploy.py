@@ -1,4 +1,7 @@
+import pytest
 import torch
+
+pytest.importorskip("tensorrt")
 
 from cityshift.export_trt import Deployable
 from cityshift.model import Predictor
