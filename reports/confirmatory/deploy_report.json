@@ -1,0 +1,58 @@
+{
+  "n": 2000,
+  "pytorch_fp32": {
+    "minFDE": 1.5570112466812134,
+    "MR": 0.23400001227855682,
+    "latency_bs1_ms": {
+      "p50": 1.3219930115155876,
+      "p99": 1.4161513588624075
+    },
+    "latency_bs32_ms": {
+      "p50": 3.350946994032711,
+      "p99": 3.3794379769824445
+    }
+  },
+  "trt_fp32": {
+    "max_abs_traj_diff_m": 0.0001354217529296875,
+    "max_abs_prob_diff": 1.1771917343139648e-06,
+    "minFDE": 1.557011604309082,
+    "MR": 0.23400001227855682,
+    "minFDE_rel_change": 2.2968868673700626e-07,
+    "MR_rel_change": 0.0,
+    "latency_bs1_ms": {
+      "p50": 0.5919919931329787,
+      "p99": 0.6068634131224826
+    },
+    "latency_bs32_ms": {
+      "p50": 1.9702199788298458,
+      "p99": 2.0519658562261602
+    }
+  },
+  "trt_fp16": {
+    "max_abs_traj_diff_m": 1.4525022506713867,
+    "max_abs_prob_diff": 0.011911742389202118,
+    "minFDE": 1.5590218305587769,
+    "MR": 0.23250001668930054,
+    "minFDE_rel_change": 0.0012913097974398546,
+    "MR_rel_change": -0.006410237224563353,
+    "latency_bs1_ms": {
+      "p50": 0.3909445076715201,
+      "p99": 0.43927147518843396
+    },
+    "latency_bs32_ms": {
+      "p50": 0.9665580000728369,
+      "p99": 0.9798174165189266
+    }
+  },
+  "gate": {
+    "fp32_parity_lt_1cm": true,
+    "fp16_minFDE_lt_1pct": true,
+    "fp16_MR_lt_1pct": true,
+    "pass": true
+  },
+  "versions": {
+    "tensorrt": "10.13.3.9.post1",
+    "torch": "2.11.0+cu128"
+  },
+  "note": "Confirmatory ALL seed-0 model; 2,000 val scenarios; GPU idle during measurement."
+}

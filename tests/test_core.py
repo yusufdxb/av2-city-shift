@@ -107,3 +107,12 @@ def test_sign_flip_floor():
 def test_auroc():
     assert auroc(np.array([2.0, 3.0]), np.array([0.0, 1.0])) == 1.0
     assert auroc(np.array([1.0]), np.array([1.0])) == 0.5
+
+
+def test_seed_cols_exact_match():
+    import pandas as pd
+
+    from cityshift.analysis import seed_cols
+
+    df = pd.DataFrame(columns=["s0_min_fde", "s1_min_fde", "s0_brier_min_fde", "s10_min_fde", "x_min_fde"])
+    assert seed_cols(df, "min_fde") == ["s0_min_fde", "s10_min_fde", "s1_min_fde"]

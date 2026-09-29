@@ -12,6 +12,7 @@ import argparse
 import itertools
 import json
 import os
+import re
 
 import numpy as np
 import pandas as pd
@@ -29,7 +30,9 @@ CI_BONF = (100 * 0.05 / N_TESTS / 2, 100 * (1 - 0.05 / N_TESTS / 2))  # 98.75% i
 
 
 def seed_cols(df: pd.DataFrame, name: str) -> list[str]:
-    return sorted(c for c in df.columns if c.startswith("s") and c.endswith(f"_{name}") and c[1:].split("_")[0].isdigit())
+    # exact match: a suffix match on "min_fde" would also take "brier_min_fde" (post-run audit finding)
+    pat = re.compile(rf"^s\d+_{re.escape(name)}$")
+    return sorted(c for c in df.columns if pat.match(c))
 
 
 def seed_mean(df: pd.DataFrame, name: str) -> np.ndarray:

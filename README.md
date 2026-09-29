@@ -4,7 +4,9 @@
 
 A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.
 
-> **Status: confirmatory runs in progress.** The hypotheses, arms, and kill criteria were committed before any confirmatory model was scored on the validation split. (Throwaway smoke runs used validation data for pipeline debugging before registration; that is disclosed as deviation 1 and no design choice came from it.) The results table stays empty until every run finishes and a manual post-run audit recomputes each number from the saved artifacts. Negative results will be reported with the same prominence as positive ones.
+> **Status: complete.** 22 training runs, both stages, and the deployment gate ran as pre-registered; the post-run audit recomputed every headline number independently ([`scripts/audit_recompute.py`](scripts/audit_recompute.py)). The hypotheses, arms, and kill criteria were committed before any confirmatory model was scored on the validation split. (Throwaway smoke runs used validation data for pipeline debugging before registration; that is disclosed as deviation 1 and no design choice came from it.)
+
+**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there, as well as it does at home, yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
 ## The questions
 
@@ -63,33 +65,64 @@ Development-slice numbers for every control are in [`reports/pilot/stage2_dev_su
 
 ## Deployment
 
-The model exports to ONNX and TensorRT. The check compares engines against a true FP32 reference on 2,000 scenarios. Pilot model, development data, desktop GPU shared with a training run (source: [`reports/pilot/deploy_report.json`](reports/pilot/deploy_report.json)):
+The model exports to ONNX and TensorRT. The gate compares engines against a true FP32 reference on 2,000 validation scenarios, using the confirmatory all-city seed-0 model on an idle desktop GPU (source: [`reports/confirmatory/deploy_report.json`](reports/confirmatory/deploy_report.json)):
 
-| | minFDE change | Miss rate change | Batch-32 latency (p50) |
-|---|---|---|---|
-| PyTorch FP32 | reference | reference | 7.8 ms |
-| TensorRT FP32 | 0.0% (paths within 0.18 mm) | 0.0% | 4.1 ms |
-| TensorRT FP16 | +0.18% | -1.0% | 3.2 ms |
+| | minFDE change | Miss rate change | Batch 1 (p50) | Batch 32 (p50) |
+|---|---|---|---|---|
+| PyTorch FP32 | reference | reference | 1.32 ms | 3.35 ms |
+| TensorRT FP32 | 0.0% (paths within 0.14 mm) | 0.0% | 0.59 ms | 1.97 ms |
+| TensorRT FP16 | +0.13% | -0.64% | 0.39 ms | 0.97 ms |
 
-The pre-registered gate (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate) is re-run on the confirmatory model as part of the pipeline.
+Gate: pass (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate). FP16 is 3.4x faster than PyTorch at batch 1 and 3.5x at batch 32.
 
 ## Results
 
-*Pending. Filled in only after the post-run audit.*
+All numbers are on the 24,988 validation scenarios; per-arm outcomes average the three seeds. Source files: [`reports/confirmatory/`](reports/confirmatory/).
 
-| | Result | 98.75% CI | Fold consistency | Verdict |
+| | Result | 98.75% CI | Fold consistency | Registered verdict |
 |---|---|---|---|---|
-| H1 accuracy gap | | | | |
-| H2 capture fraction | | | | |
-| H3 capture difference | | | | |
-| H4 planning failures | | | | |
-| PC1 no-map control | | | | |
-| PC2 map-swap control | | | | |
-| PC3 static-forecast control | | | | |
+| **H1** accuracy gap (miss rate, unseen vs seen city) | **+5.3%** relative | [+3.3%, +7.2%] | 6/6 folds positive (p = 0.031, floor) | supported: CI excludes 0 and point estimate clears the +5% bar, but the CI's lower end does not |
+| **H2** capture fraction of ensemble disagreement, unseen city | **0.333** (random rejection: 0.000) | [0.311, 0.356] | 6/6 folds (p = 0.016, floor) | supported, above the 0.25 useful bar |
+| **H3** capture fraction, unseen minus seen cities | +0.005 | [-0.018, +0.030] | p = 0.56 | no detectable difference |
+| **H4** planning-failure rate, unseen-city vs all-city predictor | **+4.3%** relative | [+0.1%, +9.1%] | 4/6 folds positive (p = 0.22) | **dead**: CI excludes 0, but the point estimate is below the +10% bar |
+| PC1 no-map model | miss rate 0.355 vs 0.228 (+56%) | | | pass (needs +10%) |
+| PC2 map-swap val set | miss rate 0.635 vs 0.228; disagreement AUROC 0.63 | | | pass (needs +10%, AUROC > 0.6) |
+| PC3 "everyone stands still" planner | collisions 3.2% vs 1.3% | | | pass (needs 2x) |
+| Collision-checker calibration (human drive replayed) | 0.42% at-fault collisions | | | pass (needs < 1%) |
+
+The fold-consistency p-values sit at the 6-fold floor and are descriptive only; decisions use the Bonferroni-level bootstrap CI (see Statistics).
+
+**H1 by city** (miss rate, all-city model vs the model that never saw the city):
+
+| City | Scenarios | Seen | Unseen | Relative change |
+|---|---|---|---|---|
+| Austin | 5,324 | 0.239 | 0.243 | +1.6% |
+| Dearborn | 3,066 | 0.265 | 0.275 | +4.1% |
+| Miami | 6,654 | 0.224 | 0.234 | +4.2% |
+| Palo Alto | 1,413 | 0.220 | 0.237 | +8.1% |
+| Pittsburgh | 5,329 | 0.204 | 0.217 | +6.5% |
+| Washington DC | 3,202 | 0.229 | 0.245 | +7.1% |
+
+**Closed loop, pooled over all validation scenarios:**
+
+| Planner forecasts from | Failure | At-fault collision | Unnecessary hard brake | Distance vs human |
+|---|---|---|---|---|
+| Oracle (true futures) | 1.1% | 0.4% | 0.7% | 1.76x |
+| All-city model | 6.7% | 1.3% | 6.0% | 1.45x |
+| Unseen-city model | 7.0% | 1.2% | 6.2% | 1.46x |
+| Constant velocity | 4.3% | 2.1% | 2.4% | 1.71x |
+| Everyone stands still | 5.1% | 3.2% | 2.4% | 1.57x |
+| Human drive replayed | 0.4% | 0.4% | n/a | 1.00x |
+
+### Exploratory findings (not registered, labelled permanently)
+
+- **Knowing it is wrong is not knowing it is somewhere new.** No uncertainty signal separates unseen-city scenarios from seen-city ones (mean AUROC 0.505 to 0.518 across the four signals, chance is 0.5), even though the same signals rank that city's errors as well as at home (H3).
+- **A single model's mode spread beats the three-seed ensemble** at catching misses in the unseen city (capture fraction 0.40 vs 0.33), at a third of the inference cost. Mode entropy (0.24) and Mahalanobis distance of the scene embedding (0.17) are weaker.
+- **The learned predictor phantom-brakes.** It collides less than constant velocity (1.3% vs 2.1%) but fails more overall (6.7% vs 4.3%), because the registered planner brakes for any predicted mode that crosses its path, even at a few percent probability. The unseen-city predictor's extra failures are extra hard brakes (6.2% vs 6.0%), not collisions (1.2% vs 1.3%). The planner was deliberately not retuned after this was first seen on development data.
 
 ## What broke along the way
 
-Every one of these was found by a diagnostic before any change was made, and each is recorded in the pre-registration's deviations log.
+Every one of these was found by a diagnostic before any change was made, and each is recorded in the pre-registration's deviations log. The last one was found after the results were in.
 
 1. **Training diverged at about step 6,000.** The loss jumped from 4.0 to 10.5 and never recovered. Logging showed the gradient norm climbing from about 20 to 5e7, and the focal token's RMS growing from 1.7 to 17.5 over 5,600 steps. Cause: pre-LN transformer stacks were built without a final LayerNorm, so the residual stream grew without bound. After adding one, the RMS stays at 1.0.
 2. **The six modes were interchangeable.** The mode-probability loss sat at log 6 even when memorising 512 scenarios. The mode queries were initialised at std 0.02 against scene tokens of RMS about 1, so dropout noise swamped mode identity. A single-seed ablation on the overfit test isolated it. Raising the query init to std 1.0 took development miss rate from 0.68 to 0.43 at 10k steps.
@@ -101,6 +134,7 @@ Every one of these was found by a diagnostic before any change was made, and eac
    - Fix: padded lanes get a dummy 1 m polyline before inference. Outputs are unchanged in FP32 (0.0 m difference).
 5. **The oracle planner crashed.** Given perfect futures, it still hit 3 of 200 scenarios. A trace showed a stopped 12 m bus outside the 12 agents nearest the car (ranked by centre distance) until it was 12 m away at 13 m/s. Ranking agents by distance to the car's route instead brought oracle collisions from 1.5% to 0.2%.
 6. **The human driver "hard braked" in 41% of drives.** This was noise in the logged velocity channel. Speed derived from smoothed positions flags 0.2%.
+7. **The post-run audit caught an analysis bug.** An independent recomputation matched every headline number except H2 and H3 (0.3338 vs 0.3330). The per-seed column matcher selected columns by suffix, so asking for `min_fde` also picked up `brier_min_fde`, and the oracle ranking was a blend of the two. With an exact match and a regression test, H2 is 0.3330 and H3 is +0.0052; no decision changed. Both outputs are kept (deviation 4).
 
 ## Limitations
 
@@ -123,7 +157,8 @@ ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs
 ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
-pytest -q                                           # 18 tests; 40 more are generated when raw data is present
+python scripts/audit_recompute.py evals             # independent recomputation of the headline numbers
+pytest -q                                           # 19 tests; 40 more are generated when raw data is present
 ```
 
 | Path | What it is |

@@ -175,3 +175,12 @@ batch 1 and 32 (p50/p99), with GPU class only described generically.
    the verdict in code (`decisions` in results.json) instead of only being
    recorded. Every confirmatory checkpoint is validated (finite weights, losses
    and dev metrics) before any evaluation (`validate_runs.py`).
+4. 2026-09-29, post-run audit finding (after results). The independent
+   recomputation (`scripts/audit_recompute.py`) matched H1, H4 and the controls
+   but not H2/H3 (0.3338 vs 0.3330). Cause: `seed_cols` matched columns by
+   suffix, so the oracle ranking for H2/H3 averaged `min_fde` with
+   `brier_min_fde`, and the per-city minFDE figures were contaminated the same
+   way. Fixed with an exact-name match and a regression test; the analysis was
+   rerun unchanged otherwise. Before/after: H2 0.3338 -> 0.3330, H3 0.0053 ->
+   0.0052; all three decisions identical. Both outputs are kept
+   (`reports/confirmatory/stage1_results_before_audit_fix.json`).
