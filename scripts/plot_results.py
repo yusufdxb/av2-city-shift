@@ -222,7 +222,7 @@ def fig_stage3(stage3: str, out: str) -> None:
     import json
 
     r = json.load(open(f"{stage3}/results.json"))["closedloop"]["rates"]
-    arms = [("oracle", "Oracle (true futures)"), ("ALL", "Focal-only model"), ("MULTI", "All-agent model (MULTI)"),
+    arms = [("oracle", "Oracle (true futures)"), ("ALL", "Focal-only model"), ("MULTI", "Focal + scored-agent model (MULTI)"),
             ("PATCH", "Focal-only + CV for stopped agents"), ("SHAM", "Sham: CV for moving agents"),
             ("cv", "Constant velocity"), ("static", "Everyone stands still")]  # fmt: skip
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.8), sharey=True)

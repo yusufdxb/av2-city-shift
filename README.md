@@ -6,11 +6,13 @@
 
 A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.
 
-> **Status: complete.** 22 training runs, both stages, and the deployment gate ran as pre-registered; the post-run audit recomputed every headline number independently ([`scripts/audit_recompute.py`](scripts/audit_recompute.py)). The hypotheses, arms, and kill criteria were committed before any confirmatory model was scored on the validation split. (Throwaway smoke runs used validation data for pipeline debugging before registration; that is disclosed as deviation 1 and no design choice came from it.)
+> **Status: Stages 1 to 3 complete and audited; Stage 4 registered and running.** 22 confirmatory training runs, Stages 1, 2, 3a and 3, and the deployment gate ran as pre-registered, and every headline number is independently recomputable from the released per-row tables ([`scripts/audit_recompute.py`](scripts/audit_recompute.py), [`scripts/audit_stage3.py`](scripts/audit_stage3.py)). Each stage's hypotheses, arms, and kill criteria were committed before that stage's scoring. (Throwaway smoke runs used validation data for pipeline debugging before the Stage 1 registration; that is disclosed as deviation 1 and no design choice came from it.) [Stage 4](docs/preregistration/stage4-replication.md), an independent, dose-matched replication on 8,140 training scenes that no compared model trained on, was registered before any of its scoring; its results will be added here, whatever they show.
 
-**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
+**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet it shows no useful ability to tell that it is in a new city (mean AUROC 0.505 to 0.518; no equivalence test was run). In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
-**The follow-up found the cause of the phantom braking.** The model was trained on Argoverse's *focal* agents, which are chosen for being interesting: a stopped focal agent is almost always about to move. On the parked cars around the self-driving car, it therefore predicts motion that never happens (miss rate 0.52 vs 0.09 for constant velocity), and the planner brakes for it. Giving stopped agents a constant-velocity forecast cuts unnecessary hard brakes by **38%** with collisions inside the registered margin. Retraining on all agents fixes the open-loop error but **not** the braking, because this planner still reacts to the small probability the new model leaves on moving modes.
+**On the agents the planner actually uses, the learned model misses more often than constant velocity.** Across all 304,988 planner-relevant agents (Stage 3a, one snapshot at the t=49 handoff), the all-city model's miss rate is 0.424, against 0.281 for constant velocity and 0.440 for lane following. Its mean errors are lower than constant velocity's (minFDE 2.36 vs 2.62 m, minADE 0.94 vs 1.24 m): it is closer on average but more often more than 2 m off.
+
+**The follow-ups point to stopped agents as the main source of the phantom braking.** The model was trained on Argoverse's *focal* agents, which are chosen for being interesting: a stopped focal agent is almost always about to move. On the parked cars around the self-driving car, it predicts motion that never happens (miss rate 0.52 vs 0.09 for constant velocity), and the planner brakes for it. Giving stopped agents a constant-velocity forecast cuts unnecessary hard brakes by **38%** with collisions inside the registered margin. This strongly implicates how stopped agents' forecasts enter the planner, but it does not isolate focal-selection bias as the only cause: the sham control reached only 43% of that fix's dose, and the fix changes both the forecast trajectory and its probability. Stage 3 is also a sequential follow-up on the same validation scenes, not an independent confirmation. A dose-matched replication on fresh scenes (Stage 4) is registered and in progress. Retraining on focal plus scored agents fixes the open-loop error but **not** the braking; an exploratory check suggests this planner still reacts to the small probability the new model leaves on moving modes.
 
 ![Two Palo Alto validation scenarios: the model trained with Palo Alto vs the model that never saw it](docs/figures/example_scenarios.png)
 
@@ -24,9 +26,9 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 | **H4** | Does the accuracy loss reach driving outcomes? | Planner failure rate (at-fault collision or unnecessary hard brake) using the unseen-city vs all-city predictor | at least +10% relative |
 | **H5** | Does the model beat a same-data map baseline on the agents the planner uses? | Miss rate vs lane following, planner-relevant agents | at least 10% lower |
 | **H6** | Is there a stopped-agent failure? | Miss rate vs constant velocity: stopped (a) and moving (b) non-focal planner agents | (a) at least +0.15 worse; (b) at least 30% better |
-| **H7** | Does training on all agents fix the phantom braking? | Unnecessary hard brakes, all-agent model vs focal-only, closed loop v2 | at least 30% fewer, collisions within +0.3 pp |
+| **H7** | Does training on focal plus scored agents fix the phantom braking? | Unnecessary hard brakes, focal + scored-agent model (MULTI) vs focal-only, closed loop v2 | at least 30% fewer, collisions within +0.3 pp |
 | **H8** | Does constant velocity for stopped agents fix it? | Same, focal-only model with CV for stopped agents | at least 30% fewer, collisions within +0.3 pp |
-| **H9** | Does the all-agent model fix the open-loop error without hurting focal agents? | Miss rate, stopped non-focal and focal agents | at least 0.15 lower; focal no worse than +0.02 |
+| **H9** | Does the focal + scored-agent model fix the open-loop error without hurting focal agents? | Miss rate, stopped non-focal and focal agents | at least 0.15 lower; focal no worse than +0.02 |
 
 Pre-registrations, including every deviation and the reason for it:
 [Stage 1](docs/preregistration/stage1-city-shift.md) (H1 to H3),
@@ -163,25 +165,37 @@ A review asked two things: how the model compares with simple baselines on the s
 | **H6a** stopped non-focal agents, model minus constant velocity | **+0.43** miss rate (0.52 vs 0.09; 4.7x to 6.5x worse in every city) | [+0.424, +0.436] | supported |
 | **H6b** moving non-focal agents, model vs constant velocity | **57% fewer misses** | [56.1%, 57.5%] | supported |
 
+**All planner-relevant agents, one snapshot at the t=49 handoff** (descriptive, all 304,988 agents; [results](reports/stage3a/results.json), `descriptive_tables`, set `planner_relevant`, stratum `arm`):
+
+| Forecast | minADE (m) | minFDE (m) | Miss rate | brier-minFDE |
+|---|---|---|---|---|
+| All-city model (ALL) | 0.94 | 2.36 | 0.424 | 2.93 |
+| Unseen-city model (LOCO) | 0.94 | 2.39 | 0.431 | 2.98 |
+| Constant velocity | 1.24 | 2.62 | 0.281 | 3.34 |
+| Lane following | 2.01 | 3.93 | 0.440 | 4.23 |
+| Everyone stands still | 6.41 | 12.44 | 0.397 | 12.44 |
+
+The learned model has lower mean errors than constant velocity but a higher miss rate on the agents the planner uses. H6 splits the non-focal agents by whether they are stopped or moving.
+
 Why: 13.1% of training focal agents are stopped at the prediction time, but only 3.5% stay within 2 m over the next 6 s. The model learned that stopped means about to move. That is right for focal agents and wrong for parked cars.
 
-**Stage 3** tested two fixes in a less privileged closed loop (no future speed cap, contact-based at-fault attribution), with 99.17% CIs across six comparisons ([results](reports/stage3/results.json)):
+**Stage 3** is a sequential follow-up on the same 24,988 validation scenes that Stage 3a had already scored. It was registered after Stage 3a's results were known, so it is not an independent confirmation. It tested two fixes in a less privileged closed loop (no future speed cap, contact-based at-fault attribution), with 99.17% CIs across six comparisons ([results](reports/stage3/results.json)):
 
 ![Stage 3 closed loop](docs/figures/stage3_closed_loop.png)
 
 | | Result | 99.17% CI | Verdict |
 |---|---|---|---|
-| **H7** all-agent model (same recipe, samples centred on all 763k fully observed agents): fewer unnecessary hard brakes | -1.1% (no reduction) | [-6.3%, +3.6%] | killed |
+| **H7** focal + scored-agent model (MULTI; same recipe, 128,000 samples drawn from 763,037 eligible fully observed focal and SCORED training tracks): fewer unnecessary hard brakes | -1.1% (no reduction) | [-6.3%, +3.6%] | killed |
 | **H8** focal-only model with CV forecasts for stopped agents: fewer unnecessary hard brakes | **38.4% fewer** | [34.1%, 42.4%] | supported |
 | H8 collision change (non-inferiority margin +0.3 pp) | +0.09 pp | [-0.03, +0.20] pp | passes |
-| **H9** all-agent model, stopped non-focal miss rate | **-0.48** | [-0.490, -0.479] | passes |
-| H9 all-agent model, focal miss rate (must be within +0.02) | +0.06 (0.288 vs 0.228) | [+0.056, +0.067] | fails, so H9 killed |
+| **H9** MULTI, stopped non-focal miss rate | **-0.48** | [-0.490, -0.479] | passes |
+| H9 MULTI, focal miss rate (must be within +0.02) | +0.06 (0.288 vs 0.228) | [+0.056, +0.067] | fails, so H9 killed |
 
 Controls: the stand-still forecast collides 5.6x as often as the model (pass); the replayed human drive has 0.35% at-fault collisions under the new rule (pass).
 
-**Honest caveat on the sham.** The dose-matched sham gives constant-velocity forecasts to randomly chosen *moving* agents. Because the planner's agent set is dominated by parked cars, it could only reach 43% of PATCH's dose ([audit](reports/stage3/audit_dose.json), deviation 3). The sham increased braking (-12.4%) and collisions (+1.2 pp), the opposite of PATCH, which supports a stopped-specific effect by direction, but it is not a matched comparison.
+**Honest caveat on the sham.** The dose-matched sham gives constant-velocity forecasts to randomly chosen *moving* agents. Because the planner's agent set is dominated by parked cars, it could only reach 43% of PATCH's dose ([audit](reports/stage3/audit_dose.json), deviation 3). The sham increased braking (-12.4%) and collisions (+1.2 pp), the opposite of PATCH, which supports a stopped-specific effect by direction, but it is not a matched comparison. PATCH also changes both the forecast trajectory and its probability. Together with H6, H8 points to how stopped agents' forecasts enter the planner, but Stage 3 does not isolate focal-selection bias as the only cause. A properly dose-matched replication on fresh scenes (Stage 4) is registered and in progress.
 
-**Exploratory, not registered** ([numbers](reports/stage3/exploratory_moving_mode_mass.json), development slice): why does retraining fix the open-loop error but not the braking? On stopped non-focal agents the focal-only model puts 95% of its probability on moving modes; the all-agent model puts 10%. But about a quarter of truly parked cars still get more than 5% probability on a moving mode, and the registered planner weights risk at 100x probability, so a 5% mode crossing its path outweighs the whole progress term. The PATCH arm sets that probability to exactly zero. Best-of-6 miss rate cannot see this: a forecast can be "right" by the benchmark and still make the planner brake.
+**Exploratory, not registered** ([numbers](reports/stage3/exploratory_moving_mode_mass.json), development slice): why does retraining fix the open-loop error but not the braking? On stopped non-focal agents the focal-only model puts 95% of its probability on moving modes; the focal + scored-agent model (MULTI) puts 10%. But about a quarter of truly parked cars still get more than 5% probability on a moving mode, and the registered planner weights risk at 100x probability, so a 5% mode crossing its path outweighs the whole progress term. The PATCH arm sets that probability to exactly zero. Best-of-6 miss rate cannot see this: a forecast can be "right" by the benchmark and still make the planner brake.
 
 ## What broke along the way
 
@@ -201,14 +215,29 @@ Every one of these was found by a diagnostic before any change was made, and eac
 
 ## Limitations
 
-- **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times, whose accuracy is not separately reported.
+- **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times. Stage 3a scores those agents at one handoff snapshot (t=49) only, not at every replan, so the accuracy of the forecasts at later replans (with the simulated car) is not reported.
 - **At-fault attribution is centre-based:** a collision counts when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles.
 - **Stage 2 agents do not react to the simulated car.** The planner is longitudinal only and has no traffic-light or stop-sign awareness, so it drives about 1.5 to 1.7x the human's distance. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the comparison needs, but they bound what the absolute failure rates mean.
+- **Confidence intervals are conditional on these six cities and these trained checkpoints.** The bootstrap resamples scenarios, so it does not capture the variance from drawing new cities or from retraining the models.
 - **One dataset, six US cities.** No left-hand traffic and no weather split.
 - **The model is small.** City effects could differ at leaderboard scale.
 - **Before registration, throwaway smoke runs used the validation split as training data** to debug the pipeline. No design choice was made from their scores; this is disclosed as deviation 1.
 
 ## Reproduce
+
+**Check the published numbers without retraining.** The row-level tables are attached to GitHub releases. They are derived from Argoverse 2 and carry its CC BY-NC-SA 4.0 license, not the code's MIT license. Each audit script is an independent plain pandas/numpy recomputation that imports nothing from `cityshift`.
+
+```bash
+pip install -e ".[dev]"
+# Stage 1 and 2 (H1 to H4, positive controls): per-scenario tables, release v1.0
+gh release download v1.0 -R yusufdxb/av2-city-shift -p per-scenario-results.tar.gz && tar xzf per-scenario-results.tar.gz
+python scripts/audit_recompute.py evals
+# Stage 3a and 3 (H5 to H9, closed-loop controls): per-agent and per-scenario tables, release v1.1
+gh release download v1.1 -R yusufdxb/av2-city-shift -p stage3-per-row-results.tar.gz && tar xzf stage3-per-row-results.tar.gz
+python scripts/audit_stage3.py      # verifies reports/stage3/SHA256SUMS, exits non-zero on any mismatch > 1e-9
+```
+
+**Full rerun.**
 
 ```bash
 pip install -e ".[dev,deploy,figures]"   # plus s5cmd (https://github.com/peak/s5cmd) for the download
@@ -218,15 +247,23 @@ s5cmd --no-sign-request cp "s3://argoverse/datasets/av2/motion-forecasting/val/*
 python -m cityshift.preprocess --raw data/raw --out data/pp --split train
 python -m cityshift.preprocess --raw data/raw --out data/pp --split val
 
-ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs
+ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs; exits non-zero if any run failed
 ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
+# Stage 3a: every validation agent, baselines + ALL + LOCO checkpoints, then the H5/H6 analysis
+PYTHONPATH=src python -m cityshift.multiagent_eval --root data/pp --raw data/raw/val --split val \
+  --baseline CV LANE STATIC \
+  $(for s in 0 1 2; do echo --checkpoint ALL_s$s=runs/ALL/seed$s/model.pt; \
+    for c in austin dearborn miami palo-alto pittsburgh washington-dc; do \
+      echo --checkpoint LOCO-${c}_s$s=runs/LOCO-$c/seed$s/model.pt; done; done) \
+  --out evals/stage3a/per_agent.parquet
+PYTHONPATH=src python -m cityshift.analysis_stage3a --parquet evals/stage3a/per_agent.parquet --out evals/stage3a/results.json
+scripts/run_stage3.sh data/raw/train data/raw/val data/pp data/pp_multi   # Stage 3: MULTI training, H7 to H9
+scripts/run_stage4.sh data/raw/train data/pp data/pp_multi                # Stage 4: MIX training, H10 to H13
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
-# check the published numbers without retraining: per-scenario tables from release v1.0
-gh release download v1.0 -R yusufdxb/av2-city-shift -p per-scenario-results.tar.gz && tar xzf per-scenario-results.tar.gz
-python scripts/audit_recompute.py evals             # independent recomputation of the headline numbers
+python scripts/bench_serving.py --help                                  # serving-path benchmark (see reports/serving)
 python scripts/plot_results.py --root data/pp        # the figures in docs/figures
-pytest -q                                           # 19 tests; 40 more are generated when raw data is present
+pytest -q   # the 40 scene-builder checks are generated only when the raw training data is present
 ```
 
 | Path | What it is |
@@ -237,7 +274,7 @@ pytest -q                                           # 19 tests; 40 more are gene
 | `src/cityshift/evaluate.py`, `analysis.py` | Stage 1 scoring, uncertainty signals, pre-registered statistics |
 | `src/cityshift/closedloop.py`, `analysis_stage2.py` | Stage 2 harness and statistics |
 | `src/cityshift/export_trt.py` | ONNX and TensorRT export with the parity gate |
-| `docs/preregistration/` | both registrations and their deviation logs |
+| `docs/preregistration/` | the five registrations (Stages 1, 2, 3a, 3, 4) and their deviation logs |
 
 ## Data and license
 
