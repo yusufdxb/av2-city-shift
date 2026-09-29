@@ -8,6 +8,8 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 
 **Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there, as well as it does at home, yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
+![Two Palo Alto validation scenarios: the model trained with Palo Alto vs the model that never saw it](docs/figures/example_scenarios.png)
+
 ## The questions
 
 | | Question | Primary measure | Pre-set bar |
@@ -92,6 +94,8 @@ All numbers are on the 24,988 validation scenarios; per-arm outcomes average the
 
 The fold-consistency p-values sit at the 6-fold floor and are descriptive only; decisions use the Bonferroni-level bootstrap CI (see Statistics).
 
+![H1 per city](docs/figures/h1_per_city.png)
+
 **H1 by city** (miss rate, all-city model vs the model that never saw the city):
 
 | City | Scenarios | Seen | Unseen | Relative change |
@@ -103,7 +107,11 @@ The fold-consistency p-values sit at the 6-fold floor and are descriptive only; 
 | Pittsburgh | 5,329 | 0.204 | 0.217 | +6.5% |
 | Washington DC | 3,202 | 0.229 | 0.245 | +7.1% |
 
+![H2 risk-coverage curve](docs/figures/h2_risk_coverage.png)
+
 **Closed loop, pooled over all validation scenarios:**
+
+![Closed-loop planning failures by forecast source](docs/figures/closed_loop_failures.png)
 
 | Planner forecasts from | Failure | At-fault collision | Unnecessary hard brake | Distance vs human |
 |---|---|---|---|---|
@@ -158,6 +166,7 @@ ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
 python scripts/audit_recompute.py evals             # independent recomputation of the headline numbers
+python scripts/plot_results.py --root data/pp        # the figures in docs/figures
 pytest -q                                           # 19 tests; 40 more are generated when raw data is present
 ```
 

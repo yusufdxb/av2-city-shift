@@ -1,0 +1,233 @@
+"""Render the README figures from the evaluation outputs and two checkpoints.
+
+Usage: PYTHONPATH=src python scripts/plot_results.py --evals evals --runs runs --root <preprocessed data> --out docs/figures
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import torch  # noqa: E402
+
+from cityshift.data import CITIES, Split  # noqa: E402
+from cityshift.evaluate import load_model, run_model  # noqa: E402
+
+# Validated categorical slots (light surface), plus neutrals.
+BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
+SURFACE, INK, INK2, MUTED, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#a3a29b", "#e6e5e0"
+CITY_NAMES = {"austin": "Austin", "dearborn": "Dearborn", "miami": "Miami", "palo-alto": "Palo Alto",
+              "pittsburgh": "Pittsburgh", "washington-dc": "Washington DC"}  # fmt: skip
+
+plt.rcParams.update({
+    "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
+    "axes.edgecolor": GRID, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
+    "text.color": INK, "font.size": 10, "axes.titlesize": 11, "axes.titleweight": "bold",
+    "axes.spines.top": False, "axes.spines.right": False, "axes.grid": False,
+    "grid.color": GRID, "grid.linewidth": 0.8, "legend.frameon": False,
+})  # fmt: skip
+
+
+def seed_mean(df: pd.DataFrame, m: str) -> np.ndarray:
+    return df[[f"s{i}_{m}" for i in range(3)]].to_numpy(float).mean(1)
+
+
+def fig_h1(evals: str, out: str) -> None:
+    A = pd.read_parquet(f"{evals}/ALL.parquet")
+    rng = np.random.default_rng(0)
+    rows = []
+    for c in CITIES:
+        L = pd.read_parquet(f"{evals}/LOCO-{c}.parquet")
+        m = (A.city == c).to_numpy()
+        a, lo = seed_mean(A, "miss")[m], seed_mean(L, "miss")[m]
+        ii = rng.integers(0, m.sum(), size=(4000, m.sum()))
+        b = lo[ii].mean(1) / a[ii].mean(1) - 1
+        rows.append((CITY_NAMES[c], lo.mean() / a.mean() - 1, *np.percentile(b, [2.5, 97.5])))
+    import json
+
+    h1 = json.load(open(f"{evals}/results.json"))["H1"]
+    rows.sort(key=lambda r: r[1])
+    fig, ax = plt.subplots(figsize=(7.2, 3.6))
+    y = np.arange(len(rows))
+    ax.axvline(0, color=MUTED, lw=1)
+    ax.axvline(5, color=MUTED, lw=1, ls=(0, (3, 3)))
+    ax.text(5.15, len(rows) + 0.35, "registered bar +5%", color=INK2, fontsize=8.5, va="center")
+    for yi, (name, v, lo, hi) in zip(y, rows):
+        ax.plot([lo * 100, hi * 100], [yi, yi], color=BLUE, lw=2, solid_capstyle="round")
+        ax.plot(v * 100, yi, "o", color=BLUE, ms=8, mec=SURFACE, mew=2)
+        ax.text(hi * 100 + 0.4, yi, f"{v * 100:+.1f}%", va="center", fontsize=9, color=INK)
+    yp = len(rows) + 0.35 - 1.2 + 0.25
+    yp = -1.2
+    lo, hi = h1["ci_bonferroni"]
+    ax.plot([lo * 100, hi * 100], [yp, yp], color=INK, lw=2, solid_capstyle="round")
+    ax.plot(h1["pooled_rel_change"] * 100, yp, "D", color=INK, ms=8, mec=SURFACE, mew=2)
+    ax.text(hi * 100 + 0.4, yp, f"{h1['pooled_rel_change'] * 100:+.1f}%", va="center", fontsize=9, fontweight="bold")
+    ax.set_yticks(list(y) + [yp], [r[0] for r in rows] + ["Pooled (98.75% CI)"])
+    ax.get_yticklabels()[-1].set_fontweight("bold")
+    ax.set_ylim(-1.8, len(rows) + 0.7)
+    ax.set_xlabel("Change in miss rate when the city was never seen in training (relative, %)")
+    ax.set_title("H1: miss rate rises in all six cities when the city is unseen", loc="left")
+    ax.grid(axis="x")
+    ax.set_axisbelow(True)
+    fig.text(0.01, 0.01, "Point estimates are positive in every city; Austin's 95% interval crosses zero. Per-city bars: 95% scenario bootstrap; seeds averaged.", color=INK2, fontsize=7.6)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    fig.savefig(f"{out}/h1_per_city.png", dpi=200)
+    plt.close(fig)
+
+
+def fig_h2(evals: str, out: str) -> None:
+    cov = np.linspace(0.5, 1.0, 51)
+    curves = {"disagree": [], "random": [], "oracle": []}
+    for c in CITIES:
+        L = pd.read_parquet(f"{evals}/LOCO-{c}.parquet")
+        m = (L.city == c).to_numpy()
+        miss, err, dis = seed_mean(L, "miss")[m], seed_mean(L, "min_fde")[m], L.disagree.to_numpy()[m]
+        for key, score in (("disagree", dis), ("oracle", err)):
+            order = np.argsort(score, kind="stable")
+            curves[key].append([miss[order[: int(round(k * len(miss)))]].mean() for k in cov])
+        curves["random"].append([miss.mean()] * len(cov))
+    fig, ax = plt.subplots(figsize=(7.2, 3.9))
+    style = {"random": (MUTED, "Random rejection (sham)", (0, (4, 3))), "disagree": (BLUE, "Reject where 3 seeds disagree", "-"),
+             "oracle": (AQUA, "Oracle (knows the true error)", "-")}  # fmt: skip
+    for key in ("random", "disagree", "oracle"):
+        col, lab, ls = style[key]
+        yv = np.mean(curves[key], 0) * 100
+        ax.plot(cov * 100, yv, color=col, lw=2, ls=ls)
+        ax.text(cov[0] * 100 - 1.2, yv[0], lab, color=INK, fontsize=8.5, ha="left", va="center")
+        ax.plot(cov[0] * 100, yv[0], "o", color=col, ms=6, mec=SURFACE, mew=1.5)
+    ax.axvline(80, color=MUTED, lw=1, ls=(0, (2, 3)))
+    ax.text(79.4, 1.0, "registered\n80% coverage", fontsize=8, color=INK2, va="bottom", ha="left")
+    ax.set_xlim(22, 101)
+    ax.set_xticks([50, 60, 70, 80, 90, 100])
+    ax.invert_xaxis()
+    ax.set_xlabel("Share of scenarios the predictor keeps (%)")
+    ax.set_ylabel("Miss rate of kept scenarios (%)")
+    ax.set_title("H2: disagreement catches a third of the misses an oracle could remove", loc="left")
+    ax.grid(axis="y")
+    ax.set_axisbelow(True)
+    fig.text(0.01, 0.01, "Held-out-city validation scenarios, mean of the six leave-one-city-out folds.", color=INK2, fontsize=8)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    fig.savefig(f"{out}/h2_risk_coverage.png", dpi=200)
+    plt.close(fig)
+
+
+def fig_closed_loop(evals: str, out: str) -> None:
+    D = pd.read_parquet(f"{evals}/stage2_closedloop.parquet")
+
+    def rate(arm, m):
+        if arm in ("ALL", "LOCO"):
+            return D[[f"{arm}_s{i}_{m}" for i in range(3)]].astype(float).mean(1).mean() * 100
+        return D[f"{arm}_{m}"].astype(float).mean() * 100
+
+    arms = [("oracle", "Oracle (true futures)"), ("ALL", "All-city model"), ("LOCO", "Unseen-city model"),
+            ("cv", "Constant velocity"), ("static", "Everyone stands still")]  # fmt: skip
+    fig, ax = plt.subplots(figsize=(7.2, 3.4))
+    for yi, (arm, name) in enumerate(arms[::-1]):
+        c, h = rate(arm, "collision"), rate(arm, "unnecessary_hard_brake")
+        ax.barh(yi, c, height=0.56, color=ORANGE, edgecolor=SURFACE, linewidth=2)
+        ax.barh(yi, h, left=c, height=0.56, color=BLUE, edgecolor=SURFACE, linewidth=2)
+        ax.text(c + h + 0.12, yi, f"{rate(arm, 'failure'):.1f}%", va="center", fontsize=9, fontweight="bold")
+    ax.set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
+    ax.set_xlabel("Share of drives with a planning failure (%)")
+    ax.set_title("Closed loop: learned forecasts crash less, phantom-brake more", loc="left")
+    ax.bar(0, 0, color=ORANGE, label="At-fault collision")
+    ax.bar(0, 0, color=BLUE, label="Unnecessary hard brake")
+    ax.legend(loc="upper right", fontsize=8.5)
+    ax.grid(axis="x")
+    ax.set_axisbelow(True)
+    ax.set_xlim(0, 8.2)
+    fig.text(0.01, 0.01, "24,988 validation drives; human drive replayed: 0.4% (collision-checker calibration).", color=INK2, fontsize=8)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    fig.savefig(f"{out}/closed_loop_failures.png", dpi=200)
+    plt.close(fig)
+
+
+def fig_examples(evals: str, runs: str, root: str, out: str, city: str = "palo-alto") -> None:
+    """Two held-out-city scenarios, seen vs unseen model (seed 0). Selection rule is in the caption."""
+    A, L = pd.read_parquet(f"{evals}/ALL.parquet"), pd.read_parquet(f"{evals}/LOCO-{city}.parquet")
+    m = ((A.city == city) & (A.focal_type == "vehicle")).to_numpy()
+    diff = L.s0_min_fde.to_numpy() - A.s0_min_fde.to_numpy()
+    cand = np.where(m)[0]
+    worst = cand[np.argmax(diff[cand])]
+    typical = cand[np.argsort(A.s0_min_fde.to_numpy()[cand])[len(cand) // 2]]
+    idx = np.array(sorted([typical, worst]))
+    val = Split(root, "val")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    preds = {}
+    for key, path in (("seen", f"{runs}/ALL/seed0/model.pt"), ("unseen", f"{runs}/LOCO-{city}/seed0/model.pt")):
+        model, _ = load_model(path, device)
+        preds[key] = run_model(model, val, idx, device)
+    fig, axes = plt.subplots(2, 2, figsize=(9.0, 9.2))
+    for r, vi in enumerate([typical, worst]):
+        j = int(np.where(idx == vi)[0][0])
+        hist = np.asarray(val.arrays["agent_hist"][vi])
+        valid = np.asarray(val.arrays["agent_valid"][vi])
+        lanes = np.asarray(val.arrays["lane_pts"][vi])
+        lattr = np.asarray(val.arrays["lane_attr"][vi])
+        tgt = np.asarray(val.arrays["target"][vi])
+        for cidx, (key, col, title) in enumerate((("seen", BLUE, "Trained with Palo Alto"), ("unseen", ORANGE, "Never saw Palo Alto"))):
+            ax = axes[r, cidx]
+            for ln, la in zip(lanes, lattr):
+                if la[0] >= 0:
+                    ax.plot(ln[:, 0], ln[:, 1], color=GRID, lw=1.2, zorder=1)
+            for a in range(1, hist.shape[0]):
+                v = valid[a]
+                if v.any():
+                    ax.plot(hist[a, v, 0], hist[a, v, 1], color=MUTED, lw=1, zorder=2)
+                    last = np.where(v)[0][-1]
+                    ax.plot(hist[a, last, 0], hist[a, last, 1], "s", color=MUTED, ms=3, zorder=2)
+            traj = preds[key]["traj"][j].numpy()
+            prob = preds[key]["prob"][j].numpy()
+            for k in np.argsort(prob):
+                ax.plot(traj[k, :, 0], traj[k, :, 1], color=col, lw=1.2 + 2.5 * prob[k], alpha=0.35 + 0.65 * prob[k] / prob.max(), zorder=3)
+                ax.plot(traj[k, -1, 0], traj[k, -1, 1], "o", color=col, ms=4, zorder=3)
+            ax.plot(hist[0, :, 0], hist[0, :, 1], color=INK, lw=2, zorder=4)
+            ax.plot(tgt[:, 0], tgt[:, 1], color=INK, lw=2, ls=(0, (2, 2)), zorder=4)
+            ax.plot(tgt[-1, 0], tgt[-1, 1], "*", color=INK, ms=11, mec=SURFACE, zorder=5)
+            fde = np.linalg.norm(traj[:, -1] - tgt[-1], axis=1).min()
+            pts = np.vstack([tgt, hist[0][valid[0]][:, :2], traj.reshape(-1, 2)])
+            cx, cy = (pts.min(0) + pts.max(0)) / 2
+            half = max(np.ptp(pts[:, 0]), np.ptp(pts[:, 1])) / 2 + 12
+            ax.set_xlim(cx - half, cx + half)
+            ax.set_ylim(cy - half, cy + half)
+            ax.set_aspect("equal")
+            ax.set_xticks([])
+            ax.set_yticks([])
+            for sp in ax.spines.values():
+                sp.set_visible(False)
+            ax.set_title(f"{title}: best-of-6 endpoint error {fde:.1f} m", loc="left", fontsize=9.5, color=col)
+            if cidx == 0:
+                ax.text(-0.02, 0.5, "Typical scenario" if r == 0 else "Largest gap", transform=ax.transAxes, rotation=90,
+                        ha="right", va="center", fontsize=10, fontweight="bold", color=INK)
+    fig.text(0.02, 0.012, "Black: focal vehicle history (solid) and true future (dashed, star). Colour: the 6 predicted futures, thicker = more\n"
+             "probable. Grey: other agents and lanes. Seed-0 models, Palo Alto validation vehicles. Top: the median-error scenario for\n"
+             "the trained-with model. Bottom: selected as the scenario where the unseen-city model does worst relative to the other.",
+             color=INK2, fontsize=7.8)  # fmt: skip
+    fig.tight_layout(rect=(0.02, 0.07, 1, 1))
+    fig.savefig(f"{out}/example_scenarios.png", dpi=170)
+    plt.close(fig)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--evals", default="evals")
+    ap.add_argument("--runs", default="runs")
+    ap.add_argument("--root", required=True)
+    ap.add_argument("--out", default="docs/figures")
+    args = ap.parse_args()
+    os.makedirs(args.out, exist_ok=True)
+    fig_h1(args.evals, args.out)
+    fig_h2(args.evals, args.out)
+    fig_closed_loop(args.evals, args.out)
+    fig_examples(args.evals, args.runs, args.root, args.out)
+    print("wrote", sorted(os.listdir(args.out)))
+
+
+if __name__ == "__main__":
+    main()
