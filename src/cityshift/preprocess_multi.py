@@ -71,6 +71,24 @@ def _process(path: str) -> list[dict]:
     return rows
 
 
+_OPEN: dict[str, dict[str, np.memmap]] = {}
+
+
+def _process_into(job: tuple[str, str, int, int]) -> list[dict]:
+    """Write one scenario's samples into the split's memmaps at a fixed offset; return their metadata."""
+    path, split_dir, offset, expected = job
+    rows = _process(path)
+    if len(rows) != expected:
+        raise RuntimeError(f"sample count changed for {path}")
+    if split_dir not in _OPEN:
+        _OPEN[split_dir] = {k: np.load(os.path.join(split_dir, f"{k}.npy"), mmap_mode="r+") for k in ARRAY_KEYS}
+    arrs = _OPEN[split_dir]
+    for r, row in enumerate(rows):
+        for name in ARRAY_KEYS:
+            arrs[name][offset + r] = row[name]
+    return [row["meta"] for row in rows]
+
+
 def _arrays(out: str, n: int) -> dict[str, np.memmap]:
     os.makedirs(out, exist_ok=True)
     shapes = {
@@ -110,24 +128,27 @@ def main() -> None:
     for path, n in counts:
         totals["dev" if os.path.basename(path) in dev_ids else "train"] += n
     arrays = {split: _arrays(os.path.join(args.out, split), n) for split, n in totals.items() if n}
-    metas: dict[str, list[dict]] = {split: [] for split in arrays}
-    written = {split: 0 for split in arrays}
-    with ProcessPoolExecutor(args.workers) as ex:
-        for j, (path, rows) in enumerate(zip(dirs, ex.map(_process, dirs, chunksize=1)), 1):
-            split = "dev" if os.path.basename(path) in dev_ids else "train"
-            if len(rows) != counts[j - 1][1]:
-                raise RuntimeError(f"sample count changed for {path}")
-            for row in rows:
-                k = written[split]
-                for name in ARRAY_KEYS:
-                    arrays[split][name][k] = row[name]
-                metas[split].append(row["meta"])
-                written[split] += 1
-            if j % 10000 == 0:
-                print(f"{j}/{len(dirs)} scenarios", flush=True)
-    for split, arrs in arrays.items():
+    for arrs in arrays.values():
         for arr in arrs.values():
             arr.flush()
+    del arrays
+    # Workers write their samples straight into the memory-mapped outputs at offsets fixed by the count pass and
+    # return only metadata. Streaming ~1 MB results per scenario through ProcessPoolExecutor's result pipe, with
+    # one task per scenario, deadlocked on the full 199,908-scenario split (Python 3.10: a worker blocked writing
+    # its result while the parent's main thread was blocked on the executor's wakeup pipe).
+    offsets, written = [], {"train": 0, "dev": 0}
+    for path, n in counts:
+        split = "dev" if os.path.basename(path) in dev_ids else "train"
+        offsets.append((path, os.path.join(args.out, split), written[split], n))
+        written[split] += n
+    metas: dict[str, list[dict]] = {split: [] for split in ("train", "dev") if totals[split]}
+    with ProcessPoolExecutor(args.workers) as ex:
+        for j, (job, meta_rows) in enumerate(zip(offsets, ex.map(_process_into, offsets, chunksize=64)), 1):
+            split = "dev" if job[1].endswith(os.sep + "dev") else "train"
+            metas[split].extend(meta_rows)
+            if j % 10000 == 0:
+                print(f"{j}/{len(dirs)} scenarios", flush=True)
+    for split in metas:
         pd.DataFrame(metas[split]).to_parquet(os.path.join(args.out, split, "meta.parquet"))
     report = {"scenarios": len(dirs), "samples": written,
               "city_counts": {s: pd.Series([m["city"] for m in rows]).value_counts().to_dict() for s, rows in metas.items()},

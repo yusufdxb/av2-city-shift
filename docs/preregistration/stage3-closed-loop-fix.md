@@ -66,3 +66,8 @@ Stop after exactly one scoring pass over all 24,988 validation scenarios and one
    not a sham). Replaced by a dose-matched sham: constant-velocity substitution on an equal number of randomly chosen
    moving agents per replan. The analysis now uses SHAM only to decide whether H8 is stopped-specific, and no longer
    gates H7 on it.
+2. 2026-09-29, before any MULTI training or validation scoring (engineering only): the multi-agent preprocessing
+   deadlocked on the full training split (Python 3.10 ProcessPoolExecutor: a worker blocked writing a ~1 MB result
+   while the parent was blocked on the executor's wakeup pipe). Workers now write samples directly into the
+   memory-mapped outputs at offsets fixed by the count pass. Verified byte-identical to the previous code on a
+   150-scenario subset (574 train and 34 dev samples, arrays and metadata). No design change.
