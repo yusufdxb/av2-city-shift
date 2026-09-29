@@ -24,7 +24,7 @@ import torch
 from .preprocess import OBJECT_TYPES
 from .scene import DYNAMIC, Scene, build_input, load_scene
 
-# ---- registered constants (docs/preregistration/2026-09-28-stage2-closed-loop.md) ----
+# ---- registered constants (docs/preregistration/stage2-closed-loop.md) ----
 DT = 0.1
 HANDOFF = 49
 REPLANS = (49, 59, 69, 79, 89, 99)

@@ -1,4 +1,4 @@
-"""Pre-registered analysis (docs/preregistration/2026-09-28-city-shift.md).
+"""Pre-registered analysis (docs/preregistration/stage1-city-shift.md).
 
 Inputs: evaluation parquets from ``evaluate.py``:
     <evals>/ALL.parquet, <evals>/LOCO-<city>.parquet, <evals>/NOMAP.parquet,

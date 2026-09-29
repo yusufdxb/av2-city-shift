@@ -1,4 +1,4 @@
-"""Stage 2 pre-registered analysis (docs/preregistration/2026-09-28-stage2-closed-loop.md).
+"""Stage 2 pre-registered analysis (docs/preregistration/stage2-closed-loop.md).
 
 Input: the closed-loop parquet from ``closedloop.py`` run with arms
 log,oracle,cv,static,ALL,LOCO on the val split. Output: <out>.json.

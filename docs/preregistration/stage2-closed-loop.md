@@ -1,7 +1,7 @@
 # Pre-registration, Stage 2: does the city shift reach driving outcomes?
 
 Registered 2026-09-28 (late evening), before any Stage 2 run on the validation split. Stage 1
-(`2026-09-28-city-shift.md`) asks whether prediction error rises in an unseen
+(`stage1-city-shift.md`) asks whether prediction error rises in an unseen
 city. Stage 2 asks whether a planner that consumes those predictions drives
 worse there. Harness development and debugging use only scenarios from the
 **train** split's dev slice; the validation split is touched once, for the
@@ -156,5 +156,7 @@ drives 1.55 to 1.73x the logged distance, recorded as a harness limitation.
    in the output as `folds_undefined`. A fold is also excluded if its ratio is
    undefined in more than 1% of its bootstrap resamples, so the pooled interval is
    not conditioned on non-zero-event draws (share reported per city) (previously a NaN could reach the sign-flip
-   test and yield a spurious p = 0). The file was also renamed from a 09-29 date
-   to 09-28, the date it was actually written and committed.
+   test and yield a spurious p = 0). The file was also renamed: it first carried a 09-29 date
+   in its name although it was written and committed on 09-28, and both
+   registrations now use undated file names; the registration date is stated at
+   the top of each.

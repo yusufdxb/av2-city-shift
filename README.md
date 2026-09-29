@@ -16,8 +16,8 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 | **H4** | Does the accuracy loss reach driving outcomes? | Planner failure rate (at-fault collision or unnecessary hard brake) using the unseen-city vs all-city predictor | at least +10% relative |
 
 Pre-registrations, including every deviation and the reason for it:
-[Stage 1](docs/preregistration/2026-09-28-city-shift.md) (H1 to H3) and
-[Stage 2](docs/preregistration/2026-09-28-stage2-closed-loop.md) (H4).
+[Stage 1](docs/preregistration/stage1-city-shift.md) (H1 to H3) and
+[Stage 2](docs/preregistration/stage2-closed-loop.md) (H4).
 
 ## Design
 
