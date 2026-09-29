@@ -20,4 +20,7 @@ for seed in 0 1 2; do
   for c in $CITIES; do mkdir -p "$RUNS/LOCO-$c"; train "LOCO-$c" $seed --exclude-city "$c"; done
 done
 mkdir -p "$RUNS/NOMAP"; train NOMAP 0 --no-map
+if [ -s "$RUNS/failures.txt" ]; then
+  echo "training failures:" >&2; cat "$RUNS/failures.txt" >&2; exit 1
+fi
 echo ALL_RUNS_DONE

@@ -28,7 +28,8 @@ from .model import Predictor
 
 
 def load_model(path: str, device) -> tuple[Predictor, dict]:
-    ck = torch.load(path, map_location="cpu", weights_only=False)
+    # checkpoints hold only tensors and a plain config dict, so refuse arbitrary pickled objects
+    ck = torch.load(path, map_location="cpu", weights_only=True)
     cfg = ck["config"]
     m = Predictor(use_map=not cfg.get("no_map", False))
     m.load_state_dict(ck["model"])
