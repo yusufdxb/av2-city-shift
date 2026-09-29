@@ -71,3 +71,11 @@ Stop after exactly one scoring pass over all 24,988 validation scenarios and one
    while the parent was blocked on the executor's wakeup pipe). Workers now write samples directly into the
    memory-mapped outputs at offsets fixed by the count pass. Verified byte-identical to the previous code on a
    150-scenario subset (574 train and 34 dev samples, arrays and metadata). No design change.
+3. 2026-09-29, post-run audit (after results; nothing re-run or changed). A7 dose check: PATCH substituted 46.4 agents
+   per scenario on average, SHAM only 19.8 (43% of PATCH's dose). SHAM draws from the selected agents that are
+   moving, and in 20,021 of 24,988 scenarios some replan had more stopped than moving agents, so the registered cap
+   ("fewer only when a replan has fewer moving than stopped agents") bound far more often than anticipated. SHAM is
+   therefore NOT dose-matched. The registered SHAM rule still passes (SHAM's brake reduction, -12.4%, is below half of
+   PATCH's), but the stopped-specific reading of H8 rests on the direction of the sham effect (CV substitution on
+   moving agents increased braking and collisions), not on a matched comparison. Reported as a limitation.
+   Independent recomputation reproduced H7, H8 and H9 point estimates exactly.

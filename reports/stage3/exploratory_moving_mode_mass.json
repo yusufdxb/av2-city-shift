@@ -1,0 +1,19 @@
+{
+  "_note": "EXPLORATORY, not registered. Train-split dev slice, stopped (< 0.5 m/s) non-focal agents from the multi-agent dev split, seed-0 checkpoints. Moving mode = endpoint displacement > 2 m.",
+  "n_agents": 9065,
+  "share_truly_staying_within_2m": 0.901,
+  "ALL": {
+    "mean_prob_on_moving_modes": 0.951,
+    "share_with_moving_mass_over_5pct": 0.995,
+    "share_top_mode_moves": 0.947,
+    "truly_staying_mean_moving_mass": 0.95,
+    "truly_staying_share_over_5pct": 0.995
+  },
+  "MULTI": {
+    "mean_prob_on_moving_modes": 0.097,
+    "share_with_moving_mass_over_5pct": 0.322,
+    "share_top_mode_moves": 0.027,
+    "truly_staying_mean_moving_mass": 0.058,
+    "truly_staying_share_over_5pct": 0.263
+  }
+}

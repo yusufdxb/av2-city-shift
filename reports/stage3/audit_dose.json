@@ -1,0 +1,16 @@
+{
+  "_note": "Post-run audit, Stage 3. Realised substitution dose per scenario (mean over validation scenarios, seeds 0-2).",
+  "PATCH_substituted_per_scenario": [
+    46.425,
+    46.426,
+    46.429
+  ],
+  "SHAM_substituted_per_scenario": [
+    19.803,
+    19.808,
+    19.817
+  ],
+  "SHAM_share_of_PATCH_dose": 0.427,
+  "scenarios_where_SHAM_below_PATCH_seed0": 20021,
+  "n_scenarios": 24988
+}

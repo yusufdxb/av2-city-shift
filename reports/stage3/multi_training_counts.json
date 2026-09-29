@@ -1,0 +1,59 @@
+{
+  "scenarios": 199908,
+  "samples": {
+    "train": 763037,
+    "dev": 15583
+  },
+  "city_counts": {
+    "train": {
+      "miami": 245676,
+      "pittsburgh": 157071,
+      "austin": 137599,
+      "washington-dc": 129658,
+      "dearborn": 57940,
+      "palo-alto": 35093
+    },
+    "dev": {
+      "miami": 4912,
+      "pittsburgh": 3126,
+      "austin": 2848,
+      "washington-dc": 2800,
+      "dearborn": 1156,
+      "palo-alto": 741
+    }
+  },
+  "type_counts": {
+    "train": {
+      "vehicle": 669299,
+      "pedestrian": 35257,
+      "static": 16372,
+      "bus": 12360,
+      "background": 9984,
+      "construction": 6999,
+      "riderless_bicycle": 6131,
+      "cyclist": 4399,
+      "motorcyclist": 2006,
+      "unknown": 230
+    },
+    "dev": {
+      "vehicle": 13708,
+      "pedestrian": 675,
+      "static": 383,
+      "bus": 220,
+      "background": 208,
+      "riderless_bicycle": 135,
+      "construction": 107,
+      "cyclist": 96,
+      "motorcyclist": 43,
+      "unknown": 8
+    }
+  },
+  "focal": {
+    "train": 195910,
+    "dev": 3998
+  },
+  "non_focal": {
+    "train": 567127,
+    "dev": 11585
+  }
+}

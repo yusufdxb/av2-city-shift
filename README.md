@@ -10,6 +10,8 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 
 **Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
+**The follow-up found the cause of the phantom braking.** The model was trained on Argoverse's *focal* agents, which are chosen for being interesting: a stopped focal agent is almost always about to move. On the parked cars around the self-driving car, it therefore predicts motion that never happens (miss rate 0.52 vs 0.09 for constant velocity), and the planner brakes for it. Giving stopped agents a constant-velocity forecast cuts unnecessary hard brakes by **38%** with collisions inside the registered margin. Retraining on all agents fixes the open-loop error but **not** the braking, because this planner still reacts to the small probability the new model leaves on moving modes.
+
 ![Two Palo Alto validation scenarios: the model trained with Palo Alto vs the model that never saw it](docs/figures/example_scenarios.png)
 
 ## The questions
@@ -20,10 +22,17 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 | **H2** | Does the model know which predictions are wrong there? | Share of oracle-removable misses caught by rejecting the 20% of scenarios where 3 seeds disagree most | capture fraction > 0 (useful at 0.25) |
 | **H3** | Does that self-knowledge survive the shift? | Capture fraction, unseen city minus seen cities | two-sided, no direction registered |
 | **H4** | Does the accuracy loss reach driving outcomes? | Planner failure rate (at-fault collision or unnecessary hard brake) using the unseen-city vs all-city predictor | at least +10% relative |
+| **H5** | Does the model beat a same-data map baseline on the agents the planner uses? | Miss rate vs lane following, planner-relevant agents | at least 10% lower |
+| **H6** | Is there a stopped-agent failure? | Miss rate vs constant velocity: stopped (a) and moving (b) non-focal planner agents | (a) at least +0.15 worse; (b) at least 30% better |
+| **H7** | Does training on all agents fix the phantom braking? | Unnecessary hard brakes, all-agent model vs focal-only, closed loop v2 | at least 30% fewer, collisions within +0.3 pp |
+| **H8** | Does constant velocity for stopped agents fix it? | Same, focal-only model with CV for stopped agents | at least 30% fewer, collisions within +0.3 pp |
+| **H9** | Does the all-agent model fix the open-loop error without hurting focal agents? | Miss rate, stopped non-focal and focal agents | at least 0.15 lower; focal no worse than +0.02 |
 
 Pre-registrations, including every deviation and the reason for it:
-[Stage 1](docs/preregistration/stage1-city-shift.md) (H1 to H3) and
-[Stage 2](docs/preregistration/stage2-closed-loop.md) (H4).
+[Stage 1](docs/preregistration/stage1-city-shift.md) (H1 to H3),
+[Stage 2](docs/preregistration/stage2-closed-loop.md) (H4),
+[Stage 3a](docs/preregistration/stage3a-baselines.md) (H5, H6) and
+[Stage 3](docs/preregistration/stage3-closed-loop-fix.md) (H7 to H9). Stages 3a and 3 were registered and pushed publicly after the Stage 1 and 2 results, in response to a review, and before any of their own validation scoring.
 
 ## Design
 
@@ -130,6 +139,38 @@ The fold-consistency p-values sit at the 6-fold floor and are descriptive only; 
 - **Knowing it is wrong is not knowing it is somewhere new.** No uncertainty signal separates unseen-city scenarios from seen-city ones (mean AUROC 0.505 to 0.518 across the four signals, chance is 0.5), even though ensemble disagreement ranks that city's errors with no detectable difference from the seen cities (H3; not a proof of equivalence).
 - **A single model's mode spread beats the three-seed ensemble** at catching misses in the unseen city (capture fraction 0.40 vs 0.33), at a third of the inference cost. Mode entropy (0.24) and Mahalanobis distance of the scene embedding (0.17) are weaker.
 - **The learned predictor phantom-brakes.** It collides less than constant velocity (1.3% vs 2.1%) but fails more overall (6.7% vs 4.3%), because the registered planner brakes for any predicted mode that crosses its path, even at a few percent probability. The unseen-city predictor's extra failures are extra hard brakes (6.2% vs 6.0%), not collisions (1.2% vs 1.3%). The planner was deliberately not retuned after this was first seen on development data.
+
+## Follow-up studies: why the planner phantom-brakes
+
+A review asked two things: how the model compares with simple baselines on the same data, and how accurate the forecasts the planner actually consumes are (Stage 1 scored only the focal agent; the planner forecasts up to 16 surrounding agents). A development-slice smoke test answered the second question in an unexpected way, and the finding was registered as H6 before any validation scoring.
+
+**Stage 3a** (2.87M agent forecasts on validation; decisions by 98.75% scenario-cluster bootstrap; [results](reports/stage3a/results.json)):
+
+| | Result | 98.75% CI | Verdict |
+|---|---|---|---|
+| **H5** model vs lane following, planner agents | 3.3% fewer misses | [1.9%, 4.6%] | killed (bar 10%) |
+| **H6a** stopped non-focal agents, model minus constant velocity | **+0.43** miss rate (0.52 vs 0.09; 4.7x to 6.5x worse in every city) | [+0.424, +0.436] | supported |
+| **H6b** moving non-focal agents, model vs constant velocity | **57% fewer misses** | [56.1%, 57.5%] | supported |
+
+Why: 13.1% of training focal agents are stopped at the prediction time, but only 3.5% stay within 2 m over the next 6 s. The model learned that stopped means about to move. That is right for focal agents and wrong for parked cars.
+
+**Stage 3** tested two fixes in a less privileged closed loop (no future speed cap, contact-based at-fault attribution), with 99.17% CIs across six comparisons ([results](reports/stage3/results.json)):
+
+![Stage 3 closed loop](docs/figures/stage3_closed_loop.png)
+
+| | Result | 99.17% CI | Verdict |
+|---|---|---|---|
+| **H7** all-agent model (same recipe, samples centred on all 763k fully observed agents): fewer unnecessary hard brakes | -1.1% (no reduction) | [-6.3%, +3.6%] | killed |
+| **H8** focal-only model with CV forecasts for stopped agents: fewer unnecessary hard brakes | **38.4% fewer** | [34.1%, 42.4%] | supported |
+| H8 collision change (non-inferiority margin +0.3 pp) | +0.09 pp | [-0.03, +0.20] pp | passes |
+| **H9** all-agent model, stopped non-focal miss rate | **-0.48** | [-0.490, -0.479] | passes |
+| H9 all-agent model, focal miss rate (must be within +0.02) | +0.06 (0.288 vs 0.228) | [+0.056, +0.067] | fails, so H9 killed |
+
+Controls: the stand-still forecast collides 5.6x as often as the model (pass); the replayed human drive has 0.35% at-fault collisions under the new rule (pass).
+
+**Honest caveat on the sham.** The dose-matched sham gives constant-velocity forecasts to randomly chosen *moving* agents. Because the planner's agent set is dominated by parked cars, it could only reach 43% of PATCH's dose ([audit](reports/stage3/audit_dose.json), deviation 3). The sham increased braking (-12.4%) and collisions (+1.2 pp), the opposite of PATCH, which supports a stopped-specific effect by direction, but it is not a matched comparison.
+
+**Exploratory, not registered** ([numbers](reports/stage3/exploratory_moving_mode_mass.json), development slice): why does retraining fix the open-loop error but not the braking? On stopped non-focal agents the focal-only model puts 95% of its probability on moving modes; the all-agent model puts 10%. But about a quarter of truly parked cars still get more than 5% probability on a moving mode, and the registered planner weights risk at 100x probability, so a 5% mode crossing its path outweighs the whole progress term. The PATCH arm sets that probability to exactly zero. Best-of-6 miss rate cannot see this: a forecast can be "right" by the benchmark and still make the planner brake.
 
 ## What broke along the way
 

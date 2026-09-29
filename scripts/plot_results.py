@@ -217,18 +217,50 @@ def fig_examples(evals: str, runs: str, root: str, out: str, city: str = "palo-a
     plt.close(fig)
 
 
+def fig_stage3(stage3: str, out: str) -> None:
+    """Closed loop v2: unnecessary hard brakes vs at-fault collisions per forecast source (two panels, one axis each)."""
+    import json
+
+    r = json.load(open(f"{stage3}/results.json"))["closedloop"]["rates"]
+    arms = [("oracle", "Oracle (true futures)"), ("ALL", "Focal-only model"), ("MULTI", "All-agent model (MULTI)"),
+            ("PATCH", "Focal-only + CV for stopped agents"), ("SHAM", "Sham: CV for moving agents"),
+            ("cv", "Constant velocity"), ("static", "Everyone stands still")]  # fmt: skip
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.8), sharey=True)
+    for ax, key, title in ((axes[0], "brake", "Unnecessary hard brakes"), (axes[1], "collision", "At-fault collisions")):
+        for yi, (arm, _) in enumerate(arms[::-1]):
+            v = r[key][arm] * 100
+            col = ORANGE if arm == "PATCH" else (BLUE if arm in ("ALL", "MULTI") else MUTED)
+            ax.barh(yi, v, height=0.56, color=col, edgecolor=SURFACE, linewidth=2)
+            ax.text(v + 0.1, yi, f"{v:.1f}%", va="center", fontsize=8.5, fontweight="bold" if arm == "PATCH" else "normal")
+        ax.set_title(title, loc="left", fontsize=10)
+        ax.grid(axis="x")
+        ax.set_axisbelow(True)
+        ax.set_xlim(0, max(r[key].values()) * 100 * 1.25)
+        ax.set_xlabel("Share of validation drives (%)")
+    axes[0].set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
+    fig.suptitle("Stage 3: CV for stopped agents cuts phantom brakes 38%, collisions within the registered margin",
+                 x=0.01, ha="left", fontsize=11, fontweight="bold")
+    fig.text(0.01, 0.01, "Closed loop v2 (no future speed cap, contact-based fault), 24,988 validation drives, model arms averaged "
+             "over 3 seeds. Sham substituted 43% of PATCH's dose (see audit).", color=INK2, fontsize=7.6)
+    fig.tight_layout(rect=(0, 0.05, 1, 0.94))
+    fig.savefig(f"{out}/stage3_closed_loop.png", dpi=200)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--evals", default="evals")
     ap.add_argument("--runs", default="runs")
     ap.add_argument("--root", required=True)
     ap.add_argument("--out", default="docs/figures")
+    ap.add_argument("--stage3", default="reports/stage3", help="directory with the Stage 3 results.json")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     fig_h1(args.evals, args.out)
     fig_h2(args.evals, args.out)
     fig_closed_loop(args.evals, args.out)
     fig_examples(args.evals, args.runs, args.root, args.out)
+    fig_stage3(args.stage3, args.out)
     print("wrote", sorted(os.listdir(args.out)))
 
 
