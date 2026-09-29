@@ -87,16 +87,27 @@ def main() -> None:
             raise ValueError("MULTI uses all cities and the fixed 2% dev scenarios")
         return sample_indices(meta, dev_ids, n, seed)[0]
 
+    # preprocess_multi stores the dev scenarios in a separate "dev" split, so the training split never contains
+    # them. train.main evaluates dev rows of the split it trains on; point that evaluation at the dev split instead.
+    root = rest[rest.index("--root") + 1]
+    dev_split = train.Split(root, "dev")
+    if not len(dev_split):
+        raise ValueError("multi-agent data has no dev samples")
+    if not set(dev_split.meta.scenario_id.astype(str)) <= dev_ids:
+        raise ValueError("dev split contains non-dev scenarios")
+    evaluate = train.evaluate
+
     def dev_indices(meta, dev_frac):
         if dev_frac != 0.02:
             raise ValueError("MULTI uses the fixed 2% dev scenarios")
-        dev = sample_indices(meta, dev_ids, 0, 0)[1]
-        if not len(dev):
-            raise ValueError("multi-agent data has no dev samples")
-        return dev
+        return np.arange(len(dev_split))
+
+    def evaluate_on_dev(model, split, idx, device, batch_size=256):
+        return evaluate(model, dev_split, idx, device, batch_size)
 
     train.training_indices = training_indices
     train.dev_indices = dev_indices
+    train.evaluate = evaluate_on_dev
     sys.argv = [sys.argv[0], *rest]
     train.main()
 

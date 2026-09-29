@@ -13,7 +13,11 @@ for path in "$RAW_TRAIN" "$RAW_VAL" "$FOCAL_ROOT/train/meta.parquet" runs/dev_sc
   if [ ! -e "$path" ]; then echo "missing required input: $path" >&2; exit 1; fi
 done
 mkdir -p runs/MULTI
-PYTHONPATH=src python3 -m cityshift.preprocess_multi --raw "$RAW_TRAIN" --focal-root "$FOCAL_ROOT" --out "$MULTI_ROOT"
+if [ -s "$MULTI_ROOT/counts.json" ] && [ -s "$MULTI_ROOT/train/meta.parquet" ] && [ -s "$MULTI_ROOT/dev/meta.parquet" ]; then
+  echo "multi-agent preprocessing already complete: $MULTI_ROOT"
+else
+  PYTHONPATH=src python3 -m cityshift.preprocess_multi --raw "$RAW_TRAIN" --focal-root "$FOCAL_ROOT" --out "$MULTI_ROOT"
+fi
 for seed in 0 1 2; do
   out="runs/MULTI/seed${seed}"
   mkdir -p "$out"
