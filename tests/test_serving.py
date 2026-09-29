@@ -87,7 +87,7 @@ def test_decision_agreement_counts_paired_replans_and_outcomes():
                  dict(t=59, accel=0.0, agents=[], traj=np.zeros((0, 2, 60, 2)))]
     ref_score = {"collision": False, "unnecessary_hard_brake": False}
     test_score = {"collision": True, "unnecessary_hard_brake": False}
-    result = decision_agreement([(scene, (ref_score, reference), (test_score, candidate))])
+    result = decision_agreement(iter([(scene, (ref_score, reference), (test_score, candidate))]))  # generators too
     assert result["acceleration_changed"] == 1
     assert result["acceleration_changed_share"] == 0.5
     assert result["collision_changed_share"] == 1.0

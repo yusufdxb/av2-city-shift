@@ -1,0 +1,171 @@
+{
+  "data": "TRAIN fixed dev slice",
+  "scenarios": 3998,
+  "replans_per_scenario": 6,
+  "batch_policy": "one inference for selected agents per replan, at most 16",
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "tensorrt": "10.13.3.9.post1",
+    "cuda_runtime": null,
+    "cuda_compiled": "12.8"
+  },
+  "latency": {
+    "pytorch-fp32": {
+      "agent_selection": {
+        "p50_ms": 0.16419350868090987,
+        "p99_ms": 0.2678913599811495
+      },
+      "input_build_cpu": {
+        "p50_ms": 1.0669674957171082,
+        "p99_ms": 1.5747912431834266
+      },
+      "host_to_device": {
+        "p50_ms": 0.2154225076083094,
+        "p99_ms": 0.4773659637430698
+      },
+      "inference": {
+        "p50_ms": 2.080030011711642,
+        "p99_ms": 2.50102480989881
+      },
+      "device_to_host": {
+        "p50_ms": 0.04415898001752794,
+        "p99_ms": 0.0628065125783906
+      },
+      "world_transform": {
+        "p50_ms": 0.054914504289627075,
+        "p99_ms": 0.074109077686444
+      },
+      "planning": {
+        "p50_ms": 5.351965985028073,
+        "p99_ms": 5.982775506563485
+      },
+      "end_to_end": {
+        "p50_ms": 9.103139484068379,
+        "p99_ms": 10.354636510019194
+      }
+    },
+    "trt-fp32": {
+      "agent_selection": {
+        "p50_ms": 0.15727849677205086,
+        "p99_ms": 0.2584081463282928
+      },
+      "input_build_cpu": {
+        "p50_ms": 1.057023007888347,
+        "p99_ms": 1.5621141414158057
+      },
+      "host_to_device": {
+        "p50_ms": 0.21047797054052353,
+        "p99_ms": 0.49879453319590544
+      },
+      "inference": {
+        "p50_ms": 1.2878204870503396,
+        "p99_ms": 1.4619040256366136
+      },
+      "device_to_host": {
+        "p50_ms": 0.040469050873070955,
+        "p99_ms": 0.06404694344382739
+      },
+      "world_transform": {
+        "p50_ms": 0.04731904482468963,
+        "p99_ms": 0.06364248169120403
+      },
+      "planning": {
+        "p50_ms": 5.333678011083975,
+        "p99_ms": 5.900105423061178
+      },
+      "end_to_end": {
+        "p50_ms": 8.264703472377732,
+        "p99_ms": 9.345436505973339
+      }
+    },
+    "trt-fp16": {
+      "agent_selection": {
+        "p50_ms": 0.1564880076330155,
+        "p99_ms": 0.2573208813555539
+      },
+      "input_build_cpu": {
+        "p50_ms": 1.0542475210968405,
+        "p99_ms": 1.5572151000378662
+      },
+      "host_to_device": {
+        "p50_ms": 0.20974749349988997,
+        "p99_ms": 0.4887265805155039
+      },
+      "inference": {
+        "p50_ms": 0.7896809838712215,
+        "p99_ms": 1.0044660541461785
+      },
+      "device_to_host": {
+        "p50_ms": 0.043039501179009676,
+        "p99_ms": 0.0643989845411852
+      },
+      "world_transform": {
+        "p50_ms": 0.04825997166335583,
+        "p99_ms": 0.06205031881108881
+      },
+      "planning": {
+        "p50_ms": 5.334555986337364,
+        "p99_ms": 5.885162691120058
+      },
+      "end_to_end": {
+        "p50_ms": 7.778764003887773,
+        "p99_ms": 8.8594097038731
+      }
+    }
+  },
+  "decision_agreement": {
+    "scenarios": 3998,
+    "replans": 23988,
+    "acceleration_changed": 428,
+    "acceleration_changed_share": 0.017842254460563617,
+    "collision_changed": 5,
+    "collision_changed_share": 0.0012506253126563281,
+    "unnecessary_hard_brake_changed": 15,
+    "unnecessary_hard_brake_changed_share": 0.0037518759379689846,
+    "either_outcome_changed": 19,
+    "either_outcome_changed_share": 0.004752376188094047,
+    "largest_trajectory_deviations": [
+      {
+        "scenario_id": "fdf9436d-6bbd-4bc9-96ab-18d665b5019c",
+        "t": 89,
+        "agent_id": "108769",
+        "agent_type": "vehicle",
+        "speed_mps": 9.035562430059892,
+        "max_trajectory_deviation_m": 26.557022986115953
+      },
+      {
+        "scenario_id": "fdf9436d-6bbd-4bc9-96ab-18d665b5019c",
+        "t": 99,
+        "agent_id": "108769",
+        "agent_type": "vehicle",
+        "speed_mps": 9.158717995943435,
+        "max_trajectory_deviation_m": 25.904166732787598
+      },
+      {
+        "scenario_id": "fdf9436d-6bbd-4bc9-96ab-18d665b5019c",
+        "t": 79,
+        "agent_id": "108769",
+        "agent_type": "vehicle",
+        "speed_mps": 10.13304673223887,
+        "max_trajectory_deviation_m": 20.411134902448904
+      },
+      {
+        "scenario_id": "e693a63f-81b6-4eb0-aa52-16137348a843",
+        "t": 89,
+        "agent_id": "22589",
+        "agent_type": "vehicle",
+        "speed_mps": 3.478482956682165e-07,
+        "max_trajectory_deviation_m": 19.269527731912476
+      },
+      {
+        "scenario_id": "30225efd-6543-4fec-b1c7-e63fae888e93",
+        "t": 79,
+        "agent_id": "61418",
+        "agent_type": "vehicle",
+        "speed_mps": 5.960710271590052e-07,
+        "max_trajectory_deviation_m": 19.184231410776597
+      }
+    ]
+  },
+  "elapsed_s": 546.49
+}

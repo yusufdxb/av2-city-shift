@@ -89,6 +89,17 @@ The model exports to ONNX and TensorRT. The gate compares engines against a true
 
 Gate: pass (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate). The FP16 aggregate barely moves, but the largest single-coordinate difference across the 2,000 scenes is 1.45 m, on one mode of one scene. The latency figures time the predictor alone, not the closed-loop serving path (scene building and planning run on the CPU). FP16 is 3.4x faster than PyTorch at batch 1 and 3.5x at batch 32.
 
+**The whole serving path, not just the model** ([report](reports/serving/serving_report.json)): one closed-loop replan (select agents, build inputs, batch up to 16 agents into one inference, plan), measured over 23,988 replans of 3,998 development-slice drives on an otherwise idle GPU. Median milliseconds per replan:
+
+| | PyTorch FP32 | TensorRT FP32 | TensorRT FP16 |
+|---|---|---|---|
+| Inference | 2.08 | 1.29 | 0.79 |
+| Input building (CPU) | 1.07 | 1.06 | 1.05 |
+| Planning (CPU, numpy) | 5.35 | 5.33 | 5.33 |
+| End to end | 9.10 | 8.26 | 7.78 |
+
+TensorRT FP16 makes inference 2.6x faster but the replan only 1.17x faster: the numpy planner is about 69% of the time, so it, not the model, is the next thing to optimise. FP16 changes the chosen acceleration in 1.8% of replans and the final outcome (collision or unnecessary hard brake) in 0.48% of drives (19 of 3,998). Once a decision diverges, later inputs differ too, so the largest per-agent trajectory differences in the report (up to 26.6 m on one mode) include that closed-loop drift and are not pure FP16 rounding.
+
 ## Results
 
 All numbers are on the 24,988 validation scenarios; per-arm outcomes average the three seeds. Source files: [`reports/confirmatory/`](reports/confirmatory/).

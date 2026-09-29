@@ -133,7 +133,7 @@ class Backend:
                 raise ValueError("TensorRT requires a checkpoint")
             model = Predictor().to(self.device).eval()
         if name == "pytorch-fp32":
-            self.runner = Deployable(model).eval()
+            self.runner = Deployable(model).to(self.device).eval()  # the dummy-lane buffer must follow the model
         else:
             from .export_trt import Engine, build_engine, export_onnx
 
@@ -221,9 +221,10 @@ def run_scenario(scene: Scene, backend: Backend, timer: StageTimer) -> tuple[dic
 
 def decision_agreement(pairs: Iterable[tuple[Scene, tuple[dict, list[dict]], tuple[dict, list[dict]]]]) -> dict:
     """Count paired control and outcome changes, and rank common-agent deviations."""
-    replans = changed = collision = braking = either = 0
+    replans = changed = collision = braking = either = n = 0
     deviations = []
-    for scene, (ref_score, ref_trace), (test_score, test_trace) in pairs:
+    for scene, (ref_score, ref_trace), (test_score, test_trace) in pairs:  # may be a generator: count as we go
+        n += 1
         collision_changed = bool(ref_score["collision"] != test_score["collision"])
         braking_changed = bool(ref_score["unnecessary_hard_brake"] != test_score["unnecessary_hard_brake"])
         collision += collision_changed
@@ -242,7 +243,6 @@ def decision_agreement(pairs: Iterable[tuple[Scene, tuple[dict, list[dict]], tup
                         "speed_mps": float(np.linalg.norm(scene.vel[agent, ref["t"]])),
                         "max_trajectory_deviation_m": float(delta.max()),
                     })
-    n = len(pairs)
     return {
         "scenarios": n, "replans": replans, "acceleration_changed": changed,
         "acceleration_changed_share": changed / replans if replans else None,
