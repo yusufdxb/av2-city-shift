@@ -106,7 +106,7 @@ realised coverage per arm and cell is printed by the analysis script.
   fold, reported as mean and 95% interval.
 - **H3.** Per fold: `CF_heldout - CF_indist` (in-dist = the other 5 cities' val
   scenarios, same LOCO-c ensemble). Same bootstrap and sign-flip test, two-sided.
-- **Multiplicity.** Holm-Bonferroni across H1, H2, H3 at family-wise alpha 0.05.
+- **Multiplicity.** Holm-Bonferroni across H1, H2, H3 at family-wise alpha 0.05. (Superseded: see deviation 3.)
 - **Exploratory, labelled as such permanently:** U2 entropy, U3 spread, U4
   Mahalanobis; minADE, minFDE, brier-minFDE; per-type strata; AURC curves; city
   detection AUROC of each signal.
@@ -154,3 +154,18 @@ batch 1 and 32 (p50/p99), with GPU class only described generically.
    std 1.0 (512-scene overfit test, single seed: probability CE 1.79 -> 1.46,
    minFDE 1.79 -> 1.47 m). Dropout unchanged at 0.1.
    Both judged on the train split and the dev slice only.
+3. 2026-09-28, decision rule (before any confirmatory model was scored on val).
+   An external code review pointed out an arithmetic error in the registration:
+   with 6 folds the exact sign-flip p-value has a floor of 2/64 = 0.031
+   (two-sided), so no hypothesis could ever pass Holm over 3 tests (smallest
+   threshold 0.0167), let alone 4 once Stage 2's H4 joined the family (0.0125).
+   The registered analysis could not confirm H1 whatever the data. New rule:
+   each hypothesis is decided by its scenario-level paired bootstrap CI at the
+   Bonferroni level for the four-hypothesis family, 98.75% (10,000 draws); the
+   magnitude bars (+5%, 0.25, +10%) are unchanged. The fold sign-flip p-value is
+   still reported, as a fold-consistency statistic with its floor stated. The
+   bootstrap for H2/H3 was also raised from 2,000 to the registered 10,000 draws
+   (code did not match the registration), and positive-control outcomes now gate
+   the verdict in code (`decisions` in results.json) instead of only being
+   recorded. Every confirmatory checkpoint is validated (finite weights, losses
+   and dev metrics) before any evaluation (`validate_runs.py`).

@@ -20,6 +20,12 @@ from .data import CITIES
 
 COVERAGE = 0.8
 N_BOOT = 10000
+# Decision rule (prereg deviation 3): a hypothesis is decided by its scenario-bootstrap CI at
+# the Bonferroni level for the four-hypothesis family (H1-H4). The fold sign-flip p-value is
+# reported only as fold consistency: with 6 folds its floor (2/64 two-sided) cannot pass any
+# multiplicity correction over 4 tests.
+N_TESTS = 4
+CI_BONF = (100 * 0.05 / N_TESTS / 2, 100 * (1 - 0.05 / N_TESTS / 2))  # 98.75% interval
 
 
 def seed_cols(df: pd.DataFrame, name: str) -> list[str]:
@@ -65,12 +71,21 @@ def sign_flip_p(x: np.ndarray, two_sided: bool = True) -> float:
     return float(np.mean(stats >= obs - 1e-12))
 
 
-def holm(ps: dict[str, float]) -> dict[str, float]:
-    items = sorted(ps.items(), key=lambda kv: kv[1])
-    m, out, running = len(items), {}, 0.0
-    for i, (k, p) in enumerate(items):
-        running = max(running, min(1.0, (m - i) * p))
-        out[k] = running
+def decide(res: dict) -> dict[str, str]:
+    """Apply the registered decision rules, including the positive-control gates."""
+    out = {}
+    h1_lo, _ = res["H1"]["ci_bonferroni"]
+    if h1_lo > 0 and res["H1"]["pooled_rel_change"] >= 0.05:
+        out["H1"] = "supported"
+    else:
+        out["H1"] = "dead" if res.get("PC1", {}).get("pass", False) else "null, uninterpretable (PC1 failed or missing)"
+    h2_lo, _ = res["H2"]["ci_bonferroni"]
+    if h2_lo > 0:
+        out["H2"] = "supported" if res["H2"]["pooled_CF_U1_heldout"] >= 0.25 else "detectable, below the 0.25 useful magnitude"
+    else:
+        out["H2"] = "dead" if res.get("PC2", {}).get("pass", False) else "null, uninterpretable (PC2 failed or missing)"
+    lo3, hi3 = res["H3"]["ci_bonferroni"]
+    out["H3"] = "differs" if (lo3 > 0 or hi3 < 0) else "no detectable difference"
     return out
 
 
@@ -115,7 +130,8 @@ def main() -> None:
     res["H1"] = {
         "pooled_rel_change": float(np.mean(rel)),
         "ci95": [float(np.percentile(pooled, 2.5)), float(np.percentile(pooled, 97.5))],
-        "p_signflip_two_sided": sign_flip_p(np.array(rel)),
+        "ci_bonferroni": [float(np.percentile(pooled, CI_BONF[0])), float(np.percentile(pooled, CI_BONF[1]))],
+        "fold_consistency_p_two_sided": sign_flip_p(np.array(rel)),
         "per_fold": dict(zip(CITIES, map(float, rel))),
     }
 
@@ -126,7 +142,7 @@ def main() -> None:
         score = d["disagree"].to_numpy()[m] if signal == "disagree" else seed_mean(d, signal)[m]
         return capture_fraction(miss, score, oracle)
 
-    def boot_cf(d: pd.DataFrame, m: np.ndarray, signal: str, n: int = 2000) -> np.ndarray:
+    def boot_cf(d: pd.DataFrame, m: np.ndarray, signal: str, n: int = N_BOOT) -> np.ndarray:
         miss = seed_mean(d, "miss")[m]
         oracle = seed_mean(d, "min_fde")[m]
         score = d["disagree"].to_numpy()[m] if signal == "disagree" else seed_mean(d, signal)[m]
@@ -165,19 +181,19 @@ def main() -> None:
     h3 = h2 - np.array(cf["disagree"]["indist"])
     pb2, pb3 = np.nanmean(boots_h2, 0), np.nanmean(boots_h3, 0)
     res["H2"] = {
-        "pooled_CF_U1_heldout": float(h2.mean()),
+        "pooled_CF_U1_heldout": float(np.nanmean(h2)),
         "ci95": [float(np.nanpercentile(pb2, 2.5)), float(np.nanpercentile(pb2, 97.5))],
-        "p_signflip_one_sided": sign_flip_p(h2, two_sided=False),
-        "sham_pooled_mean": float(np.mean([np.mean(v) for v in sham.values()])),
+        "ci_bonferroni": [float(np.nanpercentile(pb2, CI_BONF[0])), float(np.nanpercentile(pb2, CI_BONF[1]))],
+        "fold_consistency_p_one_sided": sign_flip_p(h2[np.isfinite(h2)], two_sided=False),
+        "sham_pooled_mean": float(np.mean([np.nanmean(v) for v in sham.values()])),
+        "folds_undefined": [c for c, x in zip(CITIES, h2) if not np.isfinite(x)],
     }
     res["H3"] = {
-        "pooled_CF_diff_heldout_minus_indist": float(h3.mean()),
+        "pooled_CF_diff_heldout_minus_indist": float(np.nanmean(h3)),
         "ci95": [float(np.nanpercentile(pb3, 2.5)), float(np.nanpercentile(pb3, 97.5))],
-        "p_signflip_two_sided": sign_flip_p(h3),
+        "ci_bonferroni": [float(np.nanpercentile(pb3, CI_BONF[0])), float(np.nanpercentile(pb3, CI_BONF[1]))],
+        "fold_consistency_p_two_sided": sign_flip_p(h3[np.isfinite(h3)]),
     }
-    res["holm"] = holm(
-        {"H1": res["H1"]["p_signflip_two_sided"], "H2": res["H2"]["p_signflip_one_sided"], "H3": res["H3"]["p_signflip_two_sided"]}
-    )
     res["exploratory_CF"] = {s: {k: [float(x) for x in v] for k, v in cf[s].items()} for s in signals}
     # city-detection AUROC of each signal (proxy, exploratory): held-out vs in-dist, per fold
     res["exploratory_city_auroc"] = {
@@ -211,6 +227,7 @@ def main() -> None:
             "pass": bool((mr_s - mr_o) / mr_o >= 0.10 and au > 0.6),
         }
 
+    res["decisions"] = decide(res)
     with open(os.path.join(args.evals, "results.json"), "w") as f:
         json.dump(res, f, indent=2)
     print(json.dumps({k: v for k, v in res.items() if k not in ("per_city", "exploratory_CF", "exploratory_city_auroc")}, indent=2))

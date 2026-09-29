@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from cityshift.analysis import auroc, capture_fraction, holm, keep_mask, sign_flip_p
+from cityshift.analysis import auroc, capture_fraction, keep_mask, sign_flip_p
 from cityshift.metrics import per_sample_metrics, wta_loss
 from cityshift.model import Predictor
 from cityshift.preprocess import FUT, HIST, LANE_PTS, MAX_AGENTS, MAX_LANES, resample_polyline
@@ -99,11 +99,9 @@ def test_capture_fraction_bounds():
     assert abs(rand) < 0.05
 
 
-def test_sign_flip_floor_and_holm():
+def test_sign_flip_floor():
     assert sign_flip_p(np.ones(6)) == pytest.approx(2 / 64)
     assert sign_flip_p(np.ones(6), two_sided=False) == pytest.approx(1 / 64)
-    h = holm({"a": 0.01, "b": 0.04, "c": 0.03})
-    assert h == {"a": 0.03, "c": 0.06, "b": 0.06}
 
 
 def test_auroc():

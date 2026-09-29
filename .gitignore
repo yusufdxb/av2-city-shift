@@ -5,3 +5,7 @@ evals/
 *.engine
 *.onnx
 *.pt
+data/
+*.npy
+*.parquet
+reports/**/*.pt

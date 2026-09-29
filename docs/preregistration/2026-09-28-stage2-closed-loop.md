@@ -1,6 +1,6 @@
 # Pre-registration, Stage 2: does the city shift reach driving outcomes?
 
-Registered 2026-09-29, before any Stage 2 run on the validation split. Stage 1
+Registered 2026-09-28 (late evening), before any Stage 2 run on the validation split. Stage 1
 (`2026-09-28-city-shift.md`) asks whether prediction error rises in an unseen
 city. Stage 2 asks whether a planner that consumes those predictions drives
 worse there. Harness development and debugging use only scenarios from the
@@ -110,7 +110,7 @@ arm (values in {0, 1/3, 2/3, 1}), as in Stage 1.
   F = mean seed-averaged failure on city-c val scenarios. Pooled = mean over
   folds; 95% CI by scenario bootstrap within city (10,000 draws, pairing kept);
   exact sign-flip p over folds, two-sided.
-- Holm correction applied jointly with Stage 1's H1 to H3 (four tests).
+- Multiplicity: superseded by Stage 1 deviation 3 (Bonferroni-level bootstrap CIs across H1 to H4; the fold sign-flip p is fold consistency only).
 - Reported for context: P-ORACLE, P-CV, P-LOG, P-STATIC rates per city.
 - Exploratory, labelled permanently: collision and hard-brake components alone,
   progress, the per-scenario association between Stage 1 prediction miss on the
@@ -148,3 +148,11 @@ Stage 2 run on val, under the A9 clause.
 Dev-slice check after these changes (1,000 scenarios, analytic arms only):
 at-fault collision LOG 0.5%, ORACLE 0.2%, CV 2.5%, STATIC 3.1%; the ego still
 drives 1.55 to 1.73x the logged distance, recorded as a harness limitation.
+
+5. 2026-09-28, analysis plan (before any val run): decision by the 98.75%
+   (Bonferroni, four hypotheses) scenario-bootstrap CI, per Stage 1 deviation 3.
+   A fold whose ALL failure rate is exactly zero has no defined relative change;
+   it is excluded from the pooled effect and the fold-consistency test and listed
+   in the output as `folds_undefined` (previously a NaN could reach the sign-flip
+   test and yield a spurious p = 0). The file was also renamed from a 09-29 date
+   to 09-28, the date it was actually written and committed.

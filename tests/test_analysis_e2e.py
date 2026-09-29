@@ -38,7 +38,10 @@ def test_analysis_detects_planted_effects(tmp_path, monkeypatch):
     analysis.main()
     res = json.load(open(tmp_path / "results.json"))
     assert res["H1"]["pooled_rel_change"] > 0.2 and res["H1"]["ci95"][0] > 0
-    assert res["H1"]["p_signflip_two_sided"] == 2 / 64
+    assert res["H1"]["fold_consistency_p_two_sided"] == 2 / 64
+    assert res["H1"]["ci_bonferroni"][0] > 0
+    # no positive-control files were written, so a supported H1 stands but nulls could not be read
+    assert res["decisions"]["H1"] == "supported" and res["decisions"]["H2"] == "supported"
     assert res["H2"]["pooled_CF_U1_heldout"] > 0.2 and res["H2"]["ci95"][0] > 0
     assert abs(res["H2"]["sham_pooled_mean"]) < 0.05
     for c in CITIES:

@@ -1,0 +1,25 @@
+{
+  "root": "<preprocessed data root>",
+  "out": "runs/pilot/seed99",
+  "exclude_city": null,
+  "n_train": 128000,
+  "steps": 60000,
+  "batch": 128,
+  "lr": 0.001,
+  "wd": 0.01,
+  "seed": 99,
+  "no_map": false,
+  "dev_frac": 0.02,
+  "eval_every": 10000,
+  "workers": 8,
+  "train_indices_sha1": "7af5b85f075964aba50a98b397ebeb2665b28f35",
+  "train_city_counts": {
+    "miami": 34494,
+    "pittsburgh": 27138,
+    "austin": 27129,
+    "washington-dc": 16244,
+    "dearborn": 15326,
+    "palo-alto": 7669
+  },
+  "n_dev": 3998
+}

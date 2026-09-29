@@ -2,9 +2,9 @@
 
 **Does a learned trajectory predictor get worse in a city it has never seen, does it know when it is wrong there, and does any of that reach the car's driving?**
 
-A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (about 225,000 real driving scenarios from six US cities), with a closed-loop planning test and a TensorRT deployment path.
+A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.
 
-> **Status: confirmatory runs in progress.** The hypotheses, arms, and kill criteria were committed before any model was scored on the validation split. The results tables below stay empty until every run finishes and the post-run audit recomputes each number from the saved artifacts. Negative results will be reported with the same prominence as positive ones.
+> **Status: confirmatory runs in progress.** The hypotheses, arms, and kill criteria were committed before any confirmatory model was scored on the validation split. (Throwaway smoke runs used validation data for pipeline debugging before registration; that is disclosed as deviation 1 and no design choice came from it.) The results table stays empty until every run finishes and a manual post-run audit recomputes each number from the saved artifacts. Negative results will be reported with the same prominence as positive ones.
 
 ## The questions
 
@@ -17,7 +17,7 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 
 Pre-registrations, including every deviation and the reason for it:
 [Stage 1](docs/preregistration/2026-09-28-city-shift.md) (H1 to H3) and
-[Stage 2](docs/preregistration/2026-09-29-stage2-closed-loop.md) (H4).
+[Stage 2](docs/preregistration/2026-09-28-stage2-closed-loop.md) (H4).
 
 ## Design
 
@@ -31,7 +31,7 @@ Pre-registrations, including every deviation and the reason for it:
 | Random rejection | sham for H2, rejects the same 20% dose | analysis only |
 | Oracle rejection | ceiling for H2, rejects the truly worst 20% | analysis only |
 
-**Statistics.** The city fold is the unit of inference (n = 6). Pooled effects are means over folds with 95% CIs from a scenario-level paired bootstrap within each city; p-values come from an exact sign-flip test over folds (two-sided floor 2/64 = 0.031). Holm correction across H1 to H4.
+**Statistics.** Pooled effects are means over the six city folds. Each hypothesis is decided by a scenario-level paired bootstrap CI (10,000 draws, resampling within each city) at the Bonferroni level for the four-hypothesis family, 98.75%, together with its magnitude bar. An exact sign-flip test over folds is reported as fold consistency only: with six folds its two-sided floor is 2/64 = 0.031, which no multiplicity correction over four tests can pass. The registration originally used that test with Holm correction; the error was caught by an external code review before any confirmatory scoring and is recorded as deviation 3.
 
 ## Model
 
@@ -43,7 +43,7 @@ A 1.44M-parameter query-based transformer, small enough to train in about 35 min
 - **Decoder:** 6 learned mode queries cross-attend to the scene, and each emits a 6 s trajectory and a probability.
 - **Training:** winner-takes-all regression plus mode classification, AdamW with a cosine schedule, bf16 autocast.
 
-Pilot model on a held-out development slice of the training split (not the validation split, not a study result):
+Pilot model on a held-out development slice of the training split (not the validation split, not a study result; source: [`reports/pilot/dev_metrics.json`](reports/pilot/dev_metrics.json)):
 
 | minADE (m) | minFDE (m) | Miss rate | brier-minFDE |
 |---|---|---|---|
@@ -59,11 +59,11 @@ Open-loop accuracy cannot say whether an error matters: a 3 m miss on a car 80 m
 2. Every second, the planner forecasts up to 16 nearby agents, ranked by how close they come to the car's route. It picks one of 11 constant-acceleration speed profiles along the car's logged path and executes it for 1 s.
 3. The drive is scored against where every agent actually went. The outcomes are an at-fault collision (exact oriented-box overlap, agent ahead of the car) or an unnecessary hard brake (at or below -4 m/s² when the human driver never braked that hard).
 
-Controls: an oracle planner given the true futures (ceiling), constant-velocity and "everyone stands still" forecasts (floors, and a positive control), and a replay of the human's own drive (collision-checker calibration, must be below 1%).
+Development-slice numbers for every control are in [`reports/pilot/stage2_dev_summary.json`](reports/pilot/stage2_dev_summary.json). Controls: an oracle planner given the true futures (ceiling), constant-velocity and "everyone stands still" forecasts (floors, and a positive control), and a replay of the human's own drive (collision-checker calibration, must be below 1%).
 
 ## Deployment
 
-The model exports to ONNX and TensorRT. The check compares engines against a true FP32 reference on 2,000 scenarios. Pilot model, development data, desktop GPU shared with training:
+The model exports to ONNX and TensorRT. The check compares engines against a true FP32 reference on 2,000 scenarios. Pilot model, development data, desktop GPU shared with a training run (source: [`reports/pilot/deploy_report.json`](reports/pilot/deploy_report.json)):
 
 | | minFDE change | Miss rate change | Batch-32 latency (p50) |
 |---|---|---|---|
@@ -77,7 +77,7 @@ The pre-registered gate (FP32 within 1 cm; FP16 within 1% on minFDE and miss rat
 
 *Pending. Filled in only after the post-run audit.*
 
-| | Result | 95% CI | p (Holm) | Verdict |
+| | Result | 98.75% CI | Fold consistency | Verdict |
 |---|---|---|---|---|
 | H1 accuracy gap | | | | |
 | H2 capture fraction | | | | |
@@ -123,7 +123,7 @@ ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs
 ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
-pytest -q                                           # 57 tests
+pytest -q                                           # 58 tests; 40 need the raw data locally and skip without it
 ```
 
 | Path | What it is |
@@ -138,7 +138,7 @@ pytest -q                                           # 57 tests
 
 ## Data and license
 
-Argoverse 2 data is provided under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). This repository contains no dataset files, only code that downloads and processes them. Code in this repository is MIT licensed (see `LICENSE`).
+Argoverse 2 data is © 2022 Argo AI, LLC, provided under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/): non-commercial use only, with attribution and share-alike. This repository contains no dataset files, only code that downloads and processes them. The code in this repository is MIT licensed (see `LICENSE`); that license does not extend to the data or to anything derived from it. This project is not affiliated with or endorsed by Argo AI.
 
 ```bibtex
 @inproceedings{wilson2021argoverse2,

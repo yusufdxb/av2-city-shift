@@ -1,4 +1,4 @@
-"""Stage 2 pre-registered analysis (docs/preregistration/2026-09-29-stage2-closed-loop.md).
+"""Stage 2 pre-registered analysis (docs/preregistration/2026-09-28-stage2-closed-loop.md).
 
 Input: the closed-loop parquet from ``closedloop.py`` run with arms
 log,oracle,cv,static,ALL,LOCO on the val split. Output: <out>.json.
@@ -12,7 +12,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from .analysis import sign_flip_p
+from .analysis import CI_BONF, sign_flip_p
 from .data import CITIES
 
 N_BOOT = 10000
@@ -51,12 +51,16 @@ def main() -> None:
             row[f"failure_{arm}"] = float(df[f"{arm}_failure"].to_numpy(float)[m].mean())
             row[f"collision_{arm}"] = float(df[f"{arm}_collision"].to_numpy(float)[m].mean())
         res["per_city"][c] = row
-    pooled = np.nanmean(boots, 0)
+    rel = np.array(rel, float)
+    ok = np.isfinite(rel)  # a fold with zero ALL failures has no defined relative change
+    pooled = np.nanmean(np.array(boots)[ok], 0) if ok.any() else np.full(N_BOOT, np.nan)
     events_all = float(f_all.sum())
     res["H4"] = {
-        "pooled_rel_change": float(np.nanmean(rel)),
+        "pooled_rel_change": float(rel[ok].mean()) if ok.any() else float("nan"),
         "ci95": [float(np.nanpercentile(pooled, 2.5)), float(np.nanpercentile(pooled, 97.5))],
-        "p_signflip_two_sided": sign_flip_p(np.array(rel)),
+        "ci_bonferroni": [float(np.nanpercentile(pooled, CI_BONF[0])), float(np.nanpercentile(pooled, CI_BONF[1]))],
+        "fold_consistency_p_two_sided": sign_flip_p(rel[ok]) if ok.sum() >= 2 else float("nan"),
+        "folds_undefined": [c for c, g in zip(CITIES, ok) if not g],
         "events_ALL_seed_avg": events_all,
         "underpowered": events_all < MIN_EVENTS,
     }
@@ -65,6 +69,15 @@ def main() -> None:
     res["PC3"] = {"collision_ALL": col_all, "collision_STATIC": col_static, "pass": col_static >= 2 * col_all}
     col_log = float(df["log_collision"].to_numpy(float).mean())
     res["checker_calibration"] = {"collision_LOG": col_log, "pass": col_log < 0.01}
+    lo = res["H4"]["ci_bonferroni"][0]
+    if res["H4"]["underpowered"]:
+        res["H4"]["decision"] = "underpowered"
+    elif not (res["PC3"]["pass"] and res["checker_calibration"]["pass"]):
+        res["H4"]["decision"] = "uninterpretable (PC3 or checker calibration failed)"
+    elif lo > 0 and res["H4"]["pooled_rel_change"] >= 0.10:
+        res["H4"]["decision"] = "supported"
+    else:
+        res["H4"]["decision"] = "dead"
     with open(args.out, "w") as f:
         json.dump(res, f, indent=2)
     print(json.dumps({k: v for k, v in res.items() if k != "per_city"}, indent=2))

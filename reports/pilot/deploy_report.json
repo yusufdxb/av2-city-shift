@@ -1,0 +1,58 @@
+{
+  "n": 2000,
+  "pytorch_fp32": {
+    "minFDE": 1.4274020195007324,
+    "MR": 0.2005000114440918,
+    "latency_bs1_ms": {
+      "p50": 3.0250475101638585,
+      "p99": 3.300642943941056
+    },
+    "latency_bs32_ms": {
+      "p50": 7.775496487738565,
+      "p99": 8.126181990955956
+    }
+  },
+  "trt_fp32": {
+    "max_abs_traj_diff_m": 0.0001773834228515625,
+    "max_abs_prob_diff": 1.0579824447631836e-06,
+    "minFDE": 1.4274019002914429,
+    "MR": 0.2005000114440918,
+    "minFDE_rel_change": -8.351486679991638e-08,
+    "MR_rel_change": 0.0,
+    "latency_bs1_ms": {
+      "p50": 2.8686940495390445,
+      "p99": 3.046959795174189
+    },
+    "latency_bs32_ms": {
+      "p50": 4.134059970965609,
+      "p99": 4.329775446676649
+    }
+  },
+  "trt_fp16": {
+    "max_abs_traj_diff_m": 0.9215564727783203,
+    "max_abs_prob_diff": 0.0191342830657959,
+    "minFDE": 1.4299641847610474,
+    "MR": 0.19850000739097595,
+    "minFDE_rel_change": 0.001794985032465668,
+    "MR_rel_change": -0.009975081989825885,
+    "latency_bs1_ms": {
+      "p50": 2.6024520047940314,
+      "p99": 2.7982568263541907
+    },
+    "latency_bs32_ms": {
+      "p50": 3.1451710092369467,
+      "p99": 3.3289100736146793
+    }
+  },
+  "gate": {
+    "fp32_parity_lt_1cm": true,
+    "fp16_minFDE_lt_1pct": true,
+    "fp16_MR_lt_1pct": true,
+    "pass": true
+  },
+  "versions": {
+    "tensorrt": "10.13.3.9.post1",
+    "torch": "2.11.0+cu128"
+  },
+  "note": "Pilot model; 2,000 scenarios drawn from the TRAIN split (development data, not val). GPU shared with a training run during measurement."
+}

@@ -1,0 +1,33 @@
+{
+  "log": {
+    "collision": 0.005,
+    "unnecessary_hard_brake": 0.0,
+    "failure": 0.005,
+    "progress": 1.0
+  },
+  "oracle": {
+    "collision": 0.002,
+    "unnecessary_hard_brake": 0.008,
+    "failure": 0.01,
+    "progress": 1.7325072826089172
+  },
+  "cv": {
+    "collision": 0.025,
+    "unnecessary_hard_brake": 0.025,
+    "failure": 0.047,
+    "progress": 1.682912380508496
+  },
+  "static": {
+    "collision": 0.031,
+    "unnecessary_hard_brake": 0.024,
+    "failure": 0.054,
+    "progress": 1.5504343461130476
+  },
+  "learned_pilot": {
+    "collision": 0.01,
+    "unnecessary_hard_brake": 0.053,
+    "failure": 0.059,
+    "progress": 1.4817313577640059
+  },
+  "_note": "1,000 scenarios from the dev slice of the TRAIN split, after the Stage 2 harness deviations 1-4; learned_pilot = pilot checkpoint (not a confirmatory model)."
+}
