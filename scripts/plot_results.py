@@ -94,7 +94,7 @@ def fig_h2(evals: str, out: str) -> None:
         curves["random"].append([miss.mean()] * len(cov))
     fig, ax = plt.subplots(figsize=(7.2, 3.9))
     style = {"random": (MUTED, "Random rejection (sham)", (0, (4, 3))), "disagree": (BLUE, "Reject where 3 seeds disagree", "-"),
-             "oracle": (AQUA, "Oracle (knows the true error)", "-")}  # fmt: skip
+             "oracle": (AQUA, "Error-ranked oracle (true minFDE)", "-")}  # fmt: skip
     for key in ("random", "disagree", "oracle"):
         col, lab, ls = style[key]
         yv = np.mean(curves[key], 0) * 100
@@ -108,7 +108,7 @@ def fig_h2(evals: str, out: str) -> None:
     ax.invert_xaxis()
     ax.set_xlabel("Share of scenarios the predictor keeps (%)")
     ax.set_ylabel("Miss rate of kept scenarios (%)")
-    ax.set_title("H2: disagreement catches a third of the misses an oracle could remove", loc="left")
+    ax.set_title("H2: disagreement catches a third of what an error-ranked oracle removes", loc="left")
     ax.grid(axis="y")
     ax.set_axisbelow(True)
     fig.text(0.01, 0.01, "Held-out-city validation scenarios, mean of the six leave-one-city-out folds.", color=INK2, fontsize=8)
@@ -129,7 +129,10 @@ def fig_closed_loop(evals: str, out: str) -> None:
             ("cv", "Constant velocity"), ("static", "Everyone stands still")]  # fmt: skip
     fig, ax = plt.subplots(figsize=(7.2, 3.4))
     for yi, (arm, name) in enumerate(arms[::-1]):
-        c, h = rate(arm, "collision"), rate(arm, "unnecessary_hard_brake")
+        # Segments are disjoint so the bar length equals the failure rate (their union):
+        # any at-fault collision, then hard brakes in drives without a collision.
+        c = rate(arm, "collision")
+        h = rate(arm, "failure") - c
         ax.barh(yi, c, height=0.56, color=ORANGE, edgecolor=SURFACE, linewidth=2)
         ax.barh(yi, h, left=c, height=0.56, color=BLUE, edgecolor=SURFACE, linewidth=2)
         ax.text(c + h + 0.12, yi, f"{rate(arm, 'failure'):.1f}%", va="center", fontsize=9, fontweight="bold")
@@ -137,7 +140,7 @@ def fig_closed_loop(evals: str, out: str) -> None:
     ax.set_xlabel("Share of drives with a planning failure (%)")
     ax.set_title("Closed loop: learned forecasts crash less, phantom-brake more", loc="left")
     ax.bar(0, 0, color=ORANGE, label="At-fault collision")
-    ax.bar(0, 0, color=BLUE, label="Unnecessary hard brake")
+    ax.bar(0, 0, color=BLUE, label="Unnecessary hard brake, no collision")
     ax.legend(loc="upper right", fontsize=8.5)
     ax.grid(axis="x")
     ax.set_axisbelow(True)

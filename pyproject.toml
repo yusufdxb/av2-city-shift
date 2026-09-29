@@ -7,6 +7,7 @@ dependencies = ["torch>=2.3", "numpy", "pandas", "pyarrow"]
 
 [project.optional-dependencies]
 deploy = ["onnx", "tensorrt>=10"]
+figures = ["matplotlib"]
 dev = ["pytest", "ruff"]
 
 [build-system]

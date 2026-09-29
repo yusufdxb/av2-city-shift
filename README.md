@@ -6,7 +6,7 @@ A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://w
 
 > **Status: complete.** 22 training runs, both stages, and the deployment gate ran as pre-registered; the post-run audit recomputed every headline number independently ([`scripts/audit_recompute.py`](scripts/audit_recompute.py)). The hypotheses, arms, and kill criteria were committed before any confirmatory model was scored on the validation split. (Throwaway smoke runs used validation data for pipeline debugging before registration; that is disclosed as deviation 1 and no design choice came from it.)
 
-**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there, as well as it does at home, yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
+**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet it cannot tell that it is in a new city. In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
 ![Two Palo Alto validation scenarios: the model trained with Palo Alto vs the model that never saw it](docs/figures/example_scenarios.png)
 
@@ -25,7 +25,7 @@ Pre-registrations, including every deviation and the reason for it:
 
 ## Design
 
-**Leave one city out.** For each of the six cities (Austin, Dearborn, Miami, Palo Alto, Pittsburgh, Washington DC), a model is trained on the other five. Its comparator is a model trained on all six. Both see the same number of training scenarios (128,000) for the same number of steps, and both are scored on the *same* validation scenarios from the held-out city, so the only difference between them is whether that city was in training. Three seeds per arm; the seeds vary both initialisation and the training-sample draw.
+**Leave one city out.** For each of the six cities (Austin, Dearborn, Miami, Palo Alto, Pittsburgh, Washington DC), a model is trained on the other five. Its comparator is a model trained on all six. Both see the same number of training scenarios (128,000) for the same number of steps, and both are scored on the *same* validation scenarios from the held-out city, so they differ only in whether that city was in training and in the random draw of training scenarios (which the three seeds vary). Three seeds per arm; the seeds vary both initialisation and the training-sample draw.
 
 | Arm | Role | Runs |
 |---|---|---|
@@ -33,7 +33,7 @@ Pre-registrations, including every deviation and the reason for it:
 | ALL | control: trained on all six cities, same size | 3 seeds |
 | NOMAP | positive control: map input removed, must be clearly worse | 1 |
 | Random rejection | sham for H2, rejects the same 20% dose | analysis only |
-| Oracle rejection | ceiling for H2, rejects the truly worst 20% | analysis only |
+| Oracle rejection | reference for H2: rejects the 20% with the largest true error (seed-averaged minFDE) | analysis only |
 
 **Statistics.** Pooled effects are means over the six city folds. Each hypothesis is decided by a scenario-level paired bootstrap CI (10,000 draws, resampling within each city) at the Bonferroni level for the four-hypothesis family, 98.75%, together with its magnitude bar. An exact sign-flip test over folds is reported as fold consistency only: with six folds its two-sided floor is 2/64 = 0.031, which no multiplicity correction over four tests can pass. The registration originally used that test with Holm correction; the error was caught by an external code review before any confirmatory scoring and is recorded as deviation 3.
 
@@ -60,6 +60,7 @@ For context only: the Argoverse 2 paper's strongest baseline, WIMP, reports minF
 Open-loop accuracy cannot say whether an error matters: a 3 m miss on a car 80 m away changes nothing, a 1 m miss on a car cutting in changes everything. Stage 2 puts the predictor in a loop:
 
 1. At 5 s the self-driving car's own logged track is handed to a planner. The other agents replay their logs and do not react.
+   **The planner is privileged by design:** it follows the human driver's *future* path and its speed is capped at the human's future maximum speed plus 1 m/s. It only chooses how fast to go along that path. This makes Stage 2 a paired sensitivity test of one planner to its forecasts, not a general driving benchmark.
 2. Every second, the planner forecasts up to 16 nearby agents, ranked by how close they come to the car's route. It picks one of 11 constant-acceleration speed profiles along the car's logged path and executes it for 1 s.
 3. The drive is scored against where every agent actually went. The outcomes are an at-fault collision (exact oriented-box overlap, agent ahead of the car) or an unnecessary hard brake (at or below -4 m/s² when the human driver never braked that hard).
 
@@ -75,7 +76,7 @@ The model exports to ONNX and TensorRT. The gate compares engines against a true
 | TensorRT FP32 | 0.0% (paths within 0.14 mm) | 0.0% | 0.59 ms | 1.97 ms |
 | TensorRT FP16 | +0.13% | -0.64% | 0.39 ms | 0.97 ms |
 
-Gate: pass (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate). FP16 is 3.4x faster than PyTorch at batch 1 and 3.5x at batch 32.
+Gate: pass (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate). The FP16 aggregate barely moves, but the largest single-coordinate difference across the 2,000 scenes is 1.45 m, on one mode of one scene. The latency figures time the predictor alone, not the closed-loop serving path (scene building and planning run on the CPU). FP16 is 3.4x faster than PyTorch at batch 1 and 3.5x at batch 32.
 
 ## Results
 
@@ -84,7 +85,7 @@ All numbers are on the 24,988 validation scenarios; per-arm outcomes average the
 | | Result | 98.75% CI | Fold consistency | Registered verdict |
 |---|---|---|---|---|
 | **H1** accuracy gap (miss rate, unseen vs seen city) | **+5.3%** relative | [+3.3%, +7.2%] | 6/6 folds positive (p = 0.031, floor) | supported: CI excludes 0 and point estimate clears the +5% bar, but the CI's lower end does not |
-| **H2** capture fraction of ensemble disagreement, unseen city | **0.333** (random rejection: 0.000) | [0.311, 0.356] | 6/6 folds (p = 0.016, floor) | supported, above the 0.25 useful bar |
+| **H2** capture fraction of ensemble disagreement, unseen city (vs error-ranked oracle) | **0.333** (random rejection: 0.000) | [0.311, 0.356] | 6/6 folds (p = 0.016, floor) | supported, above the 0.25 useful bar |
 | **H3** capture fraction, unseen minus seen cities | +0.005 | [-0.018, +0.030] | p = 0.56 | no detectable difference |
 | **H4** planning-failure rate, unseen-city vs all-city predictor | **+4.3%** relative | [+0.1%, +9.1%] | 4/6 folds positive (p = 0.22) | **dead**: CI excludes 0, but the point estimate is below the +10% bar |
 | PC1 no-map model | miss rate 0.355 vs 0.228 (+56%) | | | pass (needs +10%) |
@@ -124,7 +125,7 @@ The fold-consistency p-values sit at the 6-fold floor and are descriptive only; 
 
 ### Exploratory findings (not registered, labelled permanently)
 
-- **Knowing it is wrong is not knowing it is somewhere new.** No uncertainty signal separates unseen-city scenarios from seen-city ones (mean AUROC 0.505 to 0.518 across the four signals, chance is 0.5), even though the same signals rank that city's errors as well as at home (H3).
+- **Knowing it is wrong is not knowing it is somewhere new.** No uncertainty signal separates unseen-city scenarios from seen-city ones (mean AUROC 0.505 to 0.518 across the four signals, chance is 0.5), even though ensemble disagreement ranks that city's errors with no detectable difference from the seen cities (H3; not a proof of equivalence).
 - **A single model's mode spread beats the three-seed ensemble** at catching misses in the unseen city (capture fraction 0.40 vs 0.33), at a third of the inference cost. Mode entropy (0.24) and Mahalanobis distance of the scene embedding (0.17) are weaker.
 - **The learned predictor phantom-brakes.** It collides less than constant velocity (1.3% vs 2.1%) but fails more overall (6.7% vs 4.3%), because the registered planner brakes for any predicted mode that crosses its path, even at a few percent probability. The unseen-city predictor's extra failures are extra hard brakes (6.2% vs 6.0%), not collisions (1.2% vs 1.3%). The planner was deliberately not retuned after this was first seen on development data.
 
@@ -146,6 +147,8 @@ Every one of these was found by a diagnostic before any change was made, and eac
 
 ## Limitations
 
+- **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times, whose accuracy is not separately reported.
+- **At-fault attribution is centre-based:** a collision counts when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles.
 - **Stage 2 agents do not react to the simulated car.** The planner is longitudinal only and has no traffic-light or stop-sign awareness, so it drives about 1.5 to 1.7x the human's distance. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the comparison needs, but they bound what the absolute failure rates mean.
 - **One dataset, six US cities.** No left-hand traffic and no weather split.
 - **The model is small.** City effects could differ at leaderboard scale.
@@ -154,7 +157,7 @@ Every one of these was found by a diagnostic before any change was made, and eac
 ## Reproduce
 
 ```bash
-pip install -e ".[dev,deploy]"
+pip install -e ".[dev,deploy,figures]"   # plus s5cmd (https://github.com/peak/s5cmd) for the download
 # data: ~53 GB (train + val), public bucket
 s5cmd --no-sign-request cp "s3://argoverse/datasets/av2/motion-forecasting/train/*" data/raw/train/
 s5cmd --no-sign-request cp "s3://argoverse/datasets/av2/motion-forecasting/val/*"   data/raw/val/
@@ -165,6 +168,8 @@ ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs
 ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
+# check the published numbers without retraining: per-scenario tables from release v1.0
+gh release download v1.0 -R yusufdxb/av2-city-shift -p per-scenario-results.tar.gz && tar xzf per-scenario-results.tar.gz
 python scripts/audit_recompute.py evals             # independent recomputation of the headline numbers
 python scripts/plot_results.py --root data/pp        # the figures in docs/figures
 pytest -q                                           # 19 tests; 40 more are generated when raw data is present
