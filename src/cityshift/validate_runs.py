@@ -31,7 +31,11 @@ def check(run: str) -> list[str]:
     bad = [k for k, v in state.items() if v.is_floating_point() and not torch.isfinite(v).all()]
     if bad:
         problems.append(f"non-finite weights in {bad[:3]}")
+    cfg = json.load(open(os.path.join(run, "config.json")))
     log = os.path.join(run, "train_log.jsonl")
+    last = max(json.loads(line)["step"] for line in open(log))
+    if last != cfg["steps"]:
+        problems.append(f"log ends at step {last}, configured {cfg['steps']}")
     for line in open(log):
         r = json.loads(line)
         vals = [r.get("loss")] + list(r.get("dev", {}).values())

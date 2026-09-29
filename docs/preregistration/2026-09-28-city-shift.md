@@ -1,7 +1,13 @@
 # Pre-registration: city shift in a learned trajectory predictor
 
 Registered 2026-09-28, before any confirmatory run and before any model has been
-scored on the Argoverse 2 validation split. Everything below is fixed. Changes
+scored on the Argoverse 2 validation split.
+
+[Clarification added 2026-09-28, same day: "any model" means any model whose
+score informs this study. Throwaway smoke models were scored on val before this
+was written, to debug the pipeline; see deviation 1.]
+
+Everything below is fixed. Changes
 after this commit are logged in "Deviations" at the bottom with a reason and date.
 
 ## Step 1. Claims

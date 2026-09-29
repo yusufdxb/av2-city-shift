@@ -153,6 +153,8 @@ drives 1.55 to 1.73x the logged distance, recorded as a harness limitation.
    (Bonferroni, four hypotheses) scenario-bootstrap CI, per Stage 1 deviation 3.
    A fold whose ALL failure rate is exactly zero has no defined relative change;
    it is excluded from the pooled effect and the fold-consistency test and listed
-   in the output as `folds_undefined` (previously a NaN could reach the sign-flip
+   in the output as `folds_undefined`. A fold is also excluded if its ratio is
+   undefined in more than 1% of its bootstrap resamples, so the pooled interval is
+   not conditioned on non-zero-event draws (share reported per city) (previously a NaN could reach the sign-flip
    test and yield a spurious p = 0). The file was also renamed from a 09-29 date
    to 09-28, the date it was actually written and committed.

@@ -5,6 +5,7 @@ ROOT=${ROOT:-$HOME/datasets/av2/cityshift_pp}
 RUNS=${RUNS:-runs}
 EVALS=${EVALS:-evals}
 mkdir -p "$EVALS"
+PYTHONPATH=src python3 -m cityshift.validate_runs "$RUNS" || { echo "run validation failed; not scoring"; exit 1; }
 ev() { PYTHONPATH=src python3 -m cityshift.evaluate --root "$ROOT" "$@"; }
 ev --ckpts $RUNS/ALL/seed{0,1,2}/model.pt --out $EVALS/ALL.parquet
 ev --ckpts $RUNS/ALL/seed{0,1,2}/model.pt --out $EVALS/ALL_mapswap.parquet --map-swap

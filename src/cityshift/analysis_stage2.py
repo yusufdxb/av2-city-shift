@@ -52,7 +52,13 @@ def main() -> None:
             row[f"collision_{arm}"] = float(df[f"{arm}_collision"].to_numpy(float)[m].mean())
         res["per_city"][c] = row
     rel = np.array(rel, float)
-    ok = np.isfinite(rel)  # a fold with zero ALL failures has no defined relative change
+    # A fold's relative change is undefined when its ALL failure rate is zero. Exclude a fold
+    # if that happens at the point estimate or in more than 1% of its bootstrap resamples, so
+    # the pooled interval is not silently conditioned on non-zero-event draws.
+    undefined_share = np.array([float(np.isnan(b).mean()) for b in boots])
+    ok = np.isfinite(rel) & (undefined_share <= 0.01)
+    for c, u in zip(CITIES, undefined_share):
+        res["per_city"][c]["bootstrap_undefined_share"] = float(u)
     pooled = np.nanmean(np.array(boots)[ok], 0) if ok.any() else np.full(N_BOOT, np.nan)
     events_all = float(f_all.sum())
     res["H4"] = {

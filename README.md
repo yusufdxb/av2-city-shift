@@ -123,7 +123,7 @@ ROOT=data/pp scripts/run_confirmatory.sh 128000     # 22 training runs
 ROOT=data/pp scripts/evaluate_all.sh                # Stage 1 scoring + analysis
 RAW=data/raw/val scripts/run_stage2.sh              # Stage 2 closed loop + analysis
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
-pytest -q                                           # 58 tests; 40 need the raw data locally and skip without it
+pytest -q                                           # 18 tests; 40 more are generated when raw data is present
 ```
 
 | Path | What it is |
