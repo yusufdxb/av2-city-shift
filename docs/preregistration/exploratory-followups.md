@@ -148,3 +148,8 @@ uninterpretable. A8 as in C. Estimated compute: about 49,000 drives (two arms, t
 ## Deviations
 
 None at registration.
+
+1. 2026-09-30, before any B or C outcome was computed: the bootstrap generator seed, not fixed above, is set to
+   20260930 for both studies (the uncensored reference check uses its own draws and only its point estimate). The
+   replay also records each arm censored at its own crossing, which the registration lists as a descriptive output.
+   Replay parity passed on all 8,140 scenarios and 18 drives each (reports/followups/replay_parity.json).
