@@ -236,18 +236,21 @@ Controls: the stand-still forecast collides 5.2x as often as the model; the repl
 
 ### Exploratory: where the phantom brakes come from, decision by decision
 
-Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with the focal-only model and the registered planner ([script](src/cityshift/mechanism.py), [numbers](reports/mechanism/mechanism_audit.json)). At each of the 166 replans where the planner *chose* a hard acceleration (-4 m/s^2 or harder; the registered outcome instead uses the realised speed change) instead of the plan it would pick with no risk term, it lists the agents that carry predicted risk on that rejected plan, and checks each against its true logged future with the planner's own look-ahead test (4 s, 0.5 m margin). That test counts near misses, which loosens it, but it scores unobserved future steps as no conflict and checks agent centres rather than contact points, so the true-conflict shares below are approximate, not bounds. The cohort is commanded brakes, not realised ones.
+Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with the focal-only model (seeds 0, 1 and 2) and the registered planner ([script](src/cityshift/mechanism.py), [summary](reports/mechanism/mechanism_audit.json), per-decision and per-agent rows in release v1.4). At each replan where the planner *chose* a hard acceleration (-4 m/s^2 or harder) instead of the plan it would pick with no risk term (166, 170 and 119 replans for the three seeds), it lists the agents that carry predicted risk on that rejected plan and checks each against its true logged future with the planner's own look-ahead test (4 s, 0.5 m margin). A second cohort keeps only the brakes the registered outcome counts (the executed 1 s speed change reaches -4 m/s^2 while the logged human never brakes that hard); every such brake in these scenes (141, 141 and 103) is in the first cohort. The conflict test counts near misses, which loosens it, but it scores unobserved future steps as no conflict and uses agent boxes rather than exact contact, so the true-conflict shares are approximate, not bounds. Intervals are 95%, resampling scenes, seed 0.
 
-| At a phantom-brake decision | Share |
-|---|---|
-| At least one blocking agent was stopped | 76% (all blockers stopped: 46%) |
-| Stopped blockers' risk from the model's moving modes (mean of per-blocker shares) | 96% |
-| Stopped blockers that truly conflict with the rejected plan | 5.8% (moving blockers: 23%) |
-| Stopped blockers that truly conflict, full vs partial future | 7.5% vs 3.9% |
-| Brake decisions with any truly conflicting blocker | 20% |
-| Brakes that PATCH removes at that same replan | 66% (96% when every blocker is stopped) |
+| At a phantom-brake decision (seed 0 [95% CI]; seeds 1 and 2) | Commanded brakes | Realised brakes (seed 0) |
+|---|---|---|
+| At least one blocking agent was stopped | 76% [69, 82]; 74%, 76% | 75% |
+| Share of all blocking risk carried by stopped agents | 56% [48, 64]; 56%, 52% | 58% |
+| Share of stopped agents' risk from the model's moving modes (risk-weighted) | 90% [84, 95]; 88%, 95% | 88% |
+| Stopped blockers that truly conflict with the rejected plan, by count | 5.8% [2.6, 9.8]; 8.1%, 8.8% | 6.0% |
+| Same, weighted by predicted risk | 17% [8, 26]; 27%, 22% | 18% |
+| Moving blockers that truly conflict, by count | 23% [15, 32]; 20%, 25% | 18% |
+| Brake decisions with any truly conflicting blocker | 20% [14, 27]; 20%, 25% | 18% |
+| Brakes that PATCH removes at that same replan | 66% [58, 74]; 65%, 63% | 65% |
+| ...when every blocker is stopped | 96% [91, 100]; 95%, 95% | 96% |
 
-So at these decisions, most of the risk that rules out the faster plan comes from probability the model puts on stopped agents moving, and those agents rarely conflict with that plan in their true futures. This is association at the decision, not proof that each listed agent caused the brake (an agent can carry risk without being decisive); the PATCH counterfactual, which removes 66% of these brakes, is the stronger evidence. Agents with partial futures are not what drives it.
+So at these decisions about half of the risk that rules out the faster plan (48 to 51% across seeds) is probability the model puts on stopped agents moving. By count, those stopped agents rarely conflict with that plan in their true futures (6 to 9%); weighted by risk it is 17 to 27%, so the stopped agents the model is most worried about are more often real conflicts. The pattern is the same for realised brakes and across three model seeds. This is association at the decision, not proof that each listed agent caused the brake (an agent can carry risk without being decisive); the PATCH counterfactual, which removes about two thirds of these brakes, is the stronger evidence. Re-running scene by scene reproduces the registered Stage 4 brake outcome on 1,499, 1,498 and 1,500 of the 1,500 scenes; the few differences are borderline choices one acceleration step apart.
 
 **Skipping inference is exactly equivalent** ([script](scripts/parity_patch_skip.py), [result](reports/serving/parity_patch_skip.json)): on 500 development scenes, PATCH with stopped agents skipping the model chose the same acceleration as PATCH at all 3,000 replans and produced identical outcomes in all 500 drives, while sending 63% fewer agents through the model.
 
@@ -313,6 +316,9 @@ python scripts/audit_stage4.py
 python scripts/audit_decisions.py
 # exploratory planner sweep table (reports/sensitivity/summary.json is its summary), release v1.3
 gh release download v1.3 -R yusufdxb/av2-city-shift -p exploratory-sweep.tar.gz && tar xzf exploratory-sweep.tar.gz
+# exploratory mechanism audit (per-decision and per-agent rows for seeds 0 to 2), release v1.4
+gh release download v1.4 -R yusufdxb/av2-city-shift -p exploratory-mechanism.tar.gz && tar xzf exploratory-mechanism.tar.gz
+(cd reports/mechanism && sha256sum -c SHA256SUMS) && python scripts/summarize_mechanism.py --seeds 0,1,2
 ```
 
 **Full rerun.**
