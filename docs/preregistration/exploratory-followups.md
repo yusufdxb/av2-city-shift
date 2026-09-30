@@ -145,6 +145,42 @@ eligible counts per arm are recorded per replan and the total ratio must be with
 uninterpretable. A8 as in C. Estimated compute: about 49,000 drives (two arms, three seeds, 8,140 scenarios), roughly
 45 minutes on one GPU at the exploratory sweep's measured rate.
 
+## Study D: route-end censored scoring of every registered closed-loop component (CPU), added 2026-09-30
+
+Registered as an amendment before any D outcome was computed, after studies B and C had reported. Study C showed that
+77 to 84% of Stage 4 at-fault collisions first make contact past the end of the logged route. D adds a versioned
+scoring mode, **route-end censoring**, and applies it to every registered closed-loop component of Stage 3 (H7, H8)
+and Stage 4 (H10, H11, H12, H13), reported beside the registered numbers. It replaces nothing: registered verdicts stay
+as registered.
+
+**Claim.** Under route-end censoring, every registered Stage 3 and Stage 4 closed-loop component keeps its registered
+verdict when the registered estimator, CI level, decision rule, controls and power floor are applied to the censored
+outcomes.
+
+**Scoring mode.** For a drive, `cross` is the first step whose distance along the route exceeds the logged route
+length. For a comparison between a set of arms, the cutoff for a scenario and model seed is `min(cross) - 1` over those
+arms, capped at t=109, and every arm in that comparison is scored with the rules of study C inside it. Comparison sets:
+H7 {ALL, MULTI}, H8 {ALL, PATCH}, the Stage 3 sham {ALL, SHAM} (descriptive, as registered), H10 {ALL, PATCH}, H11 {ALL,
+PATCH, SHAM2}, H12 {ALL, TRIM}, H13 {ALL, MIX}. Controls: STATIC and ALL use one window per scenario, the minimum over
+STATIC and ALL seeds 0 to 2; LOG is the human's own drive, which never passes its route, so it is unchanged. Open-loop
+components (H9, H13 focal miss) and the SHAM2 dose are unaffected and carried over.
+
+**Estimator.** The registered analysis code of each stage (`analysis_stage3.closedloop_analysis` with generator seed
+3407, `analysis_stage4.analyze` with its fixed seed), run once per comparison set on a table whose outcome columns are
+the censored ones, keeping only that comparison's components.
+
+**Positive controls.** (1) With every cutoff at t=109, the same pipeline must reproduce the registered Stage 3 and
+Stage 4 closed-loop points and intervals exactly. (2) D's H10 point must equal study C's primary point (0.676265).
+Either failing stops D.
+
+**Decision and kill.** Per component, the registered rule decides. A component whose censored verdict differs from its
+registered verdict is reported as a flip, prominently, and the claim above is dead for it. Underpowered (fewer than 100
+seed-averaged ALL brake events in the window), inconclusive and uninterpretable statuses are reported as such.
+
+**Confounds.** A2: common windows per comparison equalise exposure time within each comparison; windows differ across
+comparisons, so censored effects are not comparable across components. A9: the mode, windows and estimator are fixed
+here before any D outcome. Other items as in B and C.
+
 ## Deviations
 
 None at registration.
