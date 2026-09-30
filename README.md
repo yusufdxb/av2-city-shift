@@ -2,6 +2,10 @@
 
 [![CI](https://github.com/yusufdxb/av2-city-shift/actions/workflows/ci.yml/badge.svg)](https://github.com/yusufdxb/av2-city-shift/actions/workflows/ci.yml)
 
+<a href="https://youtu.be/X_JOo6AltDY"><img src="https://img.youtube.com/vi/X_JOo6AltDY/maxresdefault.jpg" alt="21-second demo: the model predicts parked cars will drive off, the car phantom-brakes, and the stopped-agent fix lets it drive through" width="640"></a>
+
+*21-second demo (YouTube). The scene, forecasts and planner decisions are real outputs of the seed-0 model on an Argoverse 2 scene.*
+
 **Does a learned trajectory predictor get worse in a city it has never seen, does it know when it is wrong there, and does any of that reach the car's driving?**
 
 A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.
