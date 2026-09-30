@@ -10,3 +10,5 @@ data/
 *.parquet
 reports/**/*.pt
 brag-output*/
+reports/mechanism/*.csv
+reports/mechanism/mechanism_audit_seed*.json
