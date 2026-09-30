@@ -80,6 +80,6 @@ checks = {
     "H4": (np.mean(list(r4.values())), s2["H4"]["pooled_rel_change"]),
     "PC1": (N.s0_miss.mean() / A.s0_miss.mean() - 1, res["PC1"]["rel"]),
 }
-bad = [k for k, (mine, theirs) in checks.items() if abs(float(mine) - float(theirs)) > 1e-6]
+bad = [k for k, (mine, theirs) in checks.items() if not abs(float(mine) - float(theirs)) <= 1e-6]  # NaN fails
 print("ALL MATCH (tolerance 1e-6)" if not bad else f"MISMATCH: {bad}")
 sys.exit(1 if bad else 0)

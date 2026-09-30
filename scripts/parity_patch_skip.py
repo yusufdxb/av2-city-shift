@@ -23,12 +23,15 @@ ap.add_argument("--n", type=int, default=500)
 ap.add_argument("--out", default="reports/serving/parity_patch_skip.json")
 args = ap.parse_args()
 ids = sorted(np.load("runs/dev_scenarios.npy", allow_pickle=True).tolist())[: args.n]
+if not ids:
+    raise SystemExit("no scenarios to compare")
 backend = Backend("pytorch-fp32", "runs/ALL/seed0/model.pt", None)
 replans = accel_diff = outcome_diff = inferred_full = inferred_skip = nan_progress = 0
 for sid in ids:
     sc = load_scene(os.path.join(args.raw, sid))
     full_score, full_trace = run_scenario(sc, backend, StageTimer(True), "PATCH")
     skip_score, skip_trace = run_scenario(sc, backend, StageTimer(True), "PATCH-skip-inference")
+    assert len(full_trace) == len(skip_trace), f"{sid}: trace lengths differ"
     for a, b in zip(full_trace, skip_trace):
         replans += 1
         accel_diff += int(a["accel"] != b["accel"])
