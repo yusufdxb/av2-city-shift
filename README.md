@@ -165,7 +165,7 @@ The fold-consistency p-values sit at the 6-fold floor and are descriptive only; 
 ### Exploratory findings (not registered, labelled permanently)
 
 - **Knowing it is wrong is not knowing it is somewhere new.** No uncertainty signal separates unseen-city scenarios from seen-city ones (mean AUROC 0.505 to 0.518 across the four signals, chance is 0.5), even though ensemble disagreement ranks that city's errors with no detectable difference from the seen cities (H3; not a proof of equivalence).
-- **A single model's mode spread beats the three-seed ensemble** at catching misses in the unseen city (capture fraction 0.40 vs 0.33), at a third of the inference cost. Mode entropy (0.24) and Mahalanobis distance of the scene embedding (0.17) are weaker.
+- **Mode spread matches ensemble disagreement, not better.** Scoring each model's own mode spread against its own errors catches the same share of misses in the unseen city as ensemble disagreement (capture fraction 0.333 vs 0.333), at a third of the inference cost. (An earlier version of this line reported 0.40; that figure averaged the spread across the three seeds, which is itself an ensemble, and was corrected after a review.) Mode entropy (0.24) and Mahalanobis distance of the scene embedding (0.17) are weaker.
 - **The learned predictor phantom-brakes.** It collides less than constant velocity (1.3% vs 2.1%) but fails more overall (6.7% vs 4.3%), because the registered planner brakes for any predicted mode that crosses its path, even at a few percent probability. The unseen-city predictor's extra failures are extra hard brakes (6.2% vs 6.0%), not collisions (1.2% vs 1.3%). The planner was deliberately not retuned after this was first seen on development data.
 
 ## Follow-up studies: why the planner phantom-brakes
@@ -236,7 +236,7 @@ Controls: the stand-still forecast collides 5.2x as often as the model; the repl
 
 ### Exploratory: where the phantom brakes come from, decision by decision
 
-Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with the focal-only model and the registered planner ([script](src/cityshift/mechanism.py), [numbers](reports/mechanism/mechanism_audit.json)). At each of the 166 replans where the planner chose a hard brake instead of the plan it would pick with no risk term, it records the agents whose predicted risk ruled that plan out, and checks each against its true logged future.
+Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with the focal-only model and the registered planner ([script](src/cityshift/mechanism.py), [numbers](reports/mechanism/mechanism_audit.json)). At each of the 166 replans where the planner *chose* a hard acceleration (-4 m/s^2 or harder; the registered outcome instead uses the realised speed change) instead of the plan it would pick with no risk term, it lists the agents that carry predicted risk on that rejected plan, and checks each against its true logged future with the planner's own look-ahead test (4 s, 0.5 m margin). That test also counts near misses, so it is looser than the scored collision rule and the true-conflict shares below are upper estimates.
 
 | At a phantom-brake decision | Share |
 |---|---|
@@ -247,7 +247,7 @@ Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with t
 | Brake decisions with any truly conflicting blocker | 20% |
 | Brakes that PATCH removes at that same replan | 66% (96% when every blocker is stopped) |
 
-So the braking the fix removes is caused, at the decision itself, by probability the model puts on stopped agents moving, and those agents almost never actually get in the way. Agents with partial futures are not what drives it.
+So at these decisions, most of the risk that rules out the faster plan comes from probability the model puts on stopped agents moving, and those agents rarely conflict with that plan in their true futures. This is association at the decision, not proof that each listed agent caused the brake (an agent can carry risk without being decisive); the PATCH counterfactual, which removes 66% of these brakes, is the stronger evidence. Agents with partial futures are not what drives it.
 
 **Skipping inference is exactly equivalent** ([script](scripts/parity_patch_skip.py), [result](reports/serving/parity_patch_skip.json)): on 500 development scenes, PATCH with stopped agents skipping the model chose the same acceleration as PATCH at all 3,000 replans and produced identical outcomes in all 500 drives, while sending 63% fewer agents through the model.
 
@@ -257,14 +257,14 @@ Not registered; run after Stage 4 on 3,000 of the replication-pool scenes, model
 
 ![Planner sensitivity sweep](docs/figures/sensitivity_sweep.png)
 
-| Risk weight | PATCH's pooled cut in phantom braking (Stage 3/4 cap, tighter cap) | Collisions, focal-only vs PATCH |
+| Risk weight | PATCH's cut in phantom braking at -4 m/s^2, pooled over scenes (Stage 3/4 cap, tighter cap) | Collisions, focal-only vs PATCH |
 |---|---|---|
 | 0.3 and 1 | -60% to +16% (noise; the planner barely weighs risk and collides in 3 to 30% of drives) | similar |
 | 3 | 35%, 34% | 0.6 to 1.1%, within 0.2 pp |
 | 10 | 44%, 45% | about 0.6%, within 0.1 pp |
 | 30 and 100 | 50 to 51%, 50% | 0.5 to 0.6%, within 0.1 pp |
 
-Wherever the planner actually weighs risk, PATCH cuts phantom braking by a third to a half, under both speed caps and all three brake definitions (the cut is smallest at -5 m/s^2, where events are rare), with collisions essentially unchanged. At weights of 30 and above it brakes about as rarely as constant velocity while colliding 6 to 7x less (0.5 to 0.6% vs 3.2 to 3.9%). The sweep also quantifies how privileged the harness is: at the registered settings 81% of focal-only drives and 94% of PATCH drives end past the end of the human's logged route, on its straight extension.
+Wherever the planner actually weighs risk (weight 3 and up), PATCH cuts phantom braking by about 30 to 50% pooled over scenes (range 29% to 51% across both speed caps and all three brake definitions), with collisions essentially unchanged. City-equal averages, which the registered analyses use, are noisier here because this subset has few events per city: 24% to 50% at -4 m/s^2, and anywhere from 2% to 45% at -5 m/s^2, where events are rarest. At weights of 30 and above PATCH brakes about as rarely as constant velocity while colliding 6 to 7x less (0.5 to 0.6% vs 3.2 to 3.9%). The sweep also quantifies how privileged the harness is: at the registered settings 81% of focal-only drives and 94% of PATCH drives end past the end of the human's logged route, on its straight extension.
 
 ## What broke along the way
 
@@ -287,6 +287,7 @@ Every one of these was found by a diagnostic before any change was made, and eac
 - **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times. Stage 3a scores those agents at one handoff snapshot (t=49) only, not at every replan, so the accuracy of the forecasts at later replans (with the simulated car) is not reported.
 - **At-fault attribution:** Stage 2 counts a collision as at fault when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles. Stages 3 and 4 use the contact point instead (the centroid of the first overlap, in the front half of the ego).
 - **The closed loop is a privileged sensitivity harness, not a driving simulator.** Other agents replay their logs and do not react; the planner controls speed only, along the human's logged route (extended straight past its end), with no traffic-light or stop-sign awareness. The ego therefore drives further than the human: 1.5 to 1.7x in Stage 2, and in Stage 4 1.83x with the focal-only model and 2.14x with PATCH. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the paired comparisons need, but they bound what the absolute collision and braking rates mean; the exploratory planner sensitivity sweep above checks how far the PATCH result depends on the planner's settings (81 to 94% of rollouts at the registered settings end past the end of the logged route).
+- **H3's interval ignores cross-fold covariance.** The in-distribution scenario sets of the six folds overlap, but the registered bootstrap resamples each fold independently, so the H3 interval is likely too narrow. H3's verdict (no detectable difference) would not change with a wider interval.
 - **Confidence intervals are conditional on these six cities and these trained checkpoints.** The bootstrap resamples scenarios, so it does not capture the variance from drawing new cities or from retraining the models.
 - **One dataset, six US cities.** No left-hand traffic and no weather split.
 - **The model is small.** City effects could differ at leaderboard scale.

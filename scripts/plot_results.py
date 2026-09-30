@@ -316,9 +316,9 @@ def fig_sensitivity(sweep: str, out: str) -> None:
             if row == 1:
                 ax.set_xlabel("Planner risk weight (log; 100 = registered)")
     axes[0, 1].set_xlim(0.2, 600)
-    fig.suptitle("Exploratory: PATCH cuts phantom braking by a third to a half wherever the planner weighs risk (weight >= 3)",
+    fig.suptitle("Exploratory: PATCH cuts phantom braking by about 30 to 50% wherever the planner weighs risk (weight >= 3)",
                  x=0.01, ha="left", fontsize=11, fontweight="bold")
-    fig.text(0.01, 0.01, "3,000 replication-pool scenes, model seed 0, no intervals; brake threshold -4 m/s^2. Below weight 3 the "
+    fig.text(0.01, 0.01, "3,000 replication-pool scenes, model seed 0, rates pooled over scenes, no intervals; brake threshold -4 m/s^2. Below weight 3 the "
              "planner barely weighs risk and collides in 3 to 30% of drives.", color=INK2, fontsize=7.6)
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
     fig.savefig(f"{out}/sensitivity_sweep.png", dpi=200)

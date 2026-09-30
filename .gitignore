@@ -9,3 +9,4 @@ data/
 *.npy
 *.parquet
 reports/**/*.pt
+brag-output*/
