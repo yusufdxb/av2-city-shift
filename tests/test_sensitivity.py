@@ -40,6 +40,8 @@ def test_summarize_seed_averaged_effects_and_intervals():
     assert by_t[-4.0]["rates"]["cv"]["model_seeds"] == [0]
     # nobody decelerates to -5, so the reduction is undefined rather than 0
     assert by_t[-5.0]["PATCH_vs_ALL"]["brake_reduction"]["point"] is None
+    assert by_t[-5.0]["PATCH_vs_ALL"]["brake_reduction"]["ci95_over_defined_draws_only"] is True
+    assert e["brake_reduction"]["ci95_over_defined_draws_only"] is (e["brake_reduction"]["undefined_bootstrap_share"] > 0)
     assert r["seed0_legacy"]["configs"][1]["PATCH_pooled_brake_reduction"] == pytest.approx(0.5)
     assert r["seed0_legacy"]["configs"][2]["PATCH_pooled_brake_reduction"] is None
 

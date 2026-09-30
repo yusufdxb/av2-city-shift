@@ -109,7 +109,9 @@ NOTE = ("EXPLORATORY, not registered. 3,000 replication-pool scenes (fixed rando
         "decelerated that hard. ALL and PATCH use model seeds {seeds}; cv and oracle use no model and come from the "
         "seed-0 run. Intervals are unadjusted 95% percentile intervals from a scenario-cluster bootstrap "
         "({boots} draws: resample scenes with replacement, average the seeds within each resampled scene); no "
-        "multiplicity correction across the {n_configs} configurations.")
+        "multiplicity correction across the {n_configs} configurations. A brake reduction is undefined in draws whose "
+        "resampled focal-only arm has no brakes; its interval then covers the defined draws only "
+        "(ci95_over_defined_draws_only, with undefined_bootstrap_share).")
 
 
 def with_brake(d: pd.DataFrame, threshold: float) -> pd.DataFrame:
@@ -183,6 +185,7 @@ def summarize(d: pd.DataFrame, n_boot: int = 10_000, boot_seed: int = 20260930) 
                         "point": float(1 - p_b.mean() / a_b.mean()) if a_b.mean() > 0 else None,
                         "ci95": _interval(boot_red),
                         "undefined_bootstrap_share": float(np.isnan(boot_red).mean()),
+                        "ci95_over_defined_draws_only": bool(np.isnan(boot_red).any()),
                         "per_seed": {str(s): (1 - per_seed["PATCH"]["per_seed"][str(s)]["unnecessary_hard_brake"]
                                               / per_seed["ALL"]["per_seed"][str(s)]["unnecessary_hard_brake"])
                                      if per_seed["ALL"]["per_seed"][str(s)]["unnecessary_hard_brake"] > 0 else None
