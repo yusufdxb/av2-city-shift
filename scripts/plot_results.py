@@ -247,6 +247,44 @@ def fig_stage3(stage3: str, out: str) -> None:
     plt.close(fig)
 
 
+def fig_stage4(closedloop: str, out: str) -> None:
+    """Stage 4 replication on fresh scenes: unnecessary hard brakes and at-fault collisions per forecast source."""
+    D = pd.read_parquet(closedloop)
+
+    def rate(arm: str, metric: str) -> float:
+        cols = [f"{arm}_s{i}_{metric}" for i in range(3)]
+        if cols[0] in D:
+            return float(D[cols].astype(float).mean(axis=1).mean() * 100)
+        return float(D[f"{arm}_{metric}"].astype(float).mean() * 100)
+
+    arms = [("oracle", "Oracle (true futures)"), ("ALL", "Focal-only model"),
+            ("PATCH", "PATCH: CV for stopped agents"), ("TRIM", "TRIM: drop moving modes of stopped agents"),
+            ("SHAM2", "Dose-matched sham (random agents)"), ("MIX", "MIX: retrained, 25% stopped agents"),
+            ("cv", "Constant velocity"), ("static", "Everyone stands still")]  # fmt: skip
+    fig, axes = plt.subplots(1, 2, figsize=(9.8, 4.0), sharey=True)
+    for ax, key, title in ((axes[0], "unnecessary_hard_brake", "Unnecessary hard brakes"),
+                           (axes[1], "collision", "At-fault collisions")):  # fmt: skip
+        values = {a: rate(a, key) for a, _ in arms}
+        for yi, (arm, _) in enumerate(arms[::-1]):
+            v = values[arm]
+            col = ORANGE if arm in ("PATCH", "TRIM") else (BLUE if arm in ("ALL", "MIX") else MUTED)
+            ax.barh(yi, v, height=0.56, color=col, edgecolor=SURFACE, linewidth=2)
+            ax.text(v + 0.1, yi, f"{v:.1f}%", va="center", fontsize=8.5, fontweight="bold" if arm in ("PATCH", "TRIM") else "normal")
+        ax.set_title(title, loc="left", fontsize=10)
+        ax.grid(axis="x")
+        ax.set_axisbelow(True)
+        ax.set_xlim(0, max(values.values()) * 1.25)
+        ax.set_xlabel("Share of drives (%)")
+    axes[0].set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
+    fig.suptitle("Stage 4 (8,140 fresh scenes): the stopped-agent fix replicates; a dose-matched sham does not reduce braking",
+                 x=0.01, ha="left", fontsize=11, fontweight="bold")
+    fig.text(0.01, 0.01, "Scenes no compared model trained on; model arms averaged over 3 seeds. TRIM fell back to CV for about 67% "
+             "of stopped agents (no stationary mode).", color=INK2, fontsize=7.6)
+    fig.tight_layout(rect=(0, 0.05, 1, 0.94))
+    fig.savefig(f"{out}/stage4_replication.png", dpi=200)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--evals", default="evals")
@@ -254,6 +292,7 @@ def main() -> None:
     ap.add_argument("--root", required=True)
     ap.add_argument("--out", default="docs/figures")
     ap.add_argument("--stage3", default="reports/stage3", help="directory with the Stage 3 results.json")
+    ap.add_argument("--stage4", default="runs/stage4/closedloop_pool.parquet", help="Stage 4 closed-loop table (release v1.2)")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     fig_h1(args.evals, args.out)
@@ -261,6 +300,7 @@ def main() -> None:
     fig_closed_loop(args.evals, args.out)
     fig_examples(args.evals, args.runs, args.root, args.out)
     fig_stage3(args.stage3, args.out)
+    fig_stage4(args.stage4, args.out)
     print("wrote", sorted(os.listdir(args.out)))
 
 

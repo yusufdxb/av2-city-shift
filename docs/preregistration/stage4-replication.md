@@ -53,3 +53,10 @@ Complete one scoring pass over the 8,140-scenario pool, one fixed analysis, and 
 ## Deviations
 
 None at registration. Review note: the dose rule above was finalised during code review, before registration and before any pool scoring; the train-dev smoke test (50 scenarios) realised equal totals (2,463 each).
+
+1. 2026-09-29, after scoring, before the analysis produced any output: the descriptive calibration summary rejected
+   predicted hit probabilities above 1 + 1e-8. 376 of 10,786,168 logged values exceeded 1 by at most 1.2e-7, which is
+   float32 rounding in the sum of mode probabilities. The tolerance is now 1e-6 and values are clipped to [0, 1]. This
+   affects only the descriptive calibration output; no confirmatory decision uses it. The analysis then failed to write
+   its JSON because one control was a numpy boolean; a serialisation fallback was added. Scoring was not rerun, and no
+   analysis output existed before both fixes.

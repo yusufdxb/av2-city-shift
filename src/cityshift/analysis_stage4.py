@@ -205,8 +205,10 @@ def summarize_calibration(path: str) -> dict:
                 if not subset.empty:
                     p = subset.predicted_hit_probability.to_numpy(float)
                     y = subset.contact.to_numpy(bool)
-                    if ((p < -1e-8) | (p > 1 + 1e-8)).any():
+                    # probabilities are float32 sums, so allow float32 rounding (observed max excess 1.2e-7)
+                    if ((p < -1e-6) | (p > 1 + 1e-6)).any():
                         raise ValueError("predicted risk outside [0, 1]")
+                    p = np.clip(p, 0.0, 1.0)
                     groups[str(arm), name].append((p, y))
     result = {}
     for (arm, name), parts in groups.items():
@@ -223,6 +225,13 @@ def summarize_calibration(path: str) -> dict:
                                              "contact_rate": float(y.mean()), "auroc": _auc(p, y),
                                              "reliability": reliability}
     return {"by_arm": result, "censored_rows_excluded": dict(censored)}
+
+
+def _plain(value):
+    """JSON fallback for numpy scalars (for example numpy.bool_ from comparisons)."""
+    if hasattr(value, "item"):
+        return value.item()
+    raise TypeError(f"not JSON serialisable: {type(value).__name__}")
 
 
 def main() -> None:
@@ -245,8 +254,8 @@ def main() -> None:
     result["calibration"] = summarize_calibration(args.risk)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w") as stream:
-        json.dump(result, stream, indent=2, allow_nan=False)
-    print(json.dumps({"claims": result["claims"], "controls": result["controls"]}, indent=2))
+        json.dump(result, stream, indent=2, allow_nan=False, default=_plain)
+    print(json.dumps({"claims": result["claims"], "controls": result["controls"]}, indent=2, default=_plain))
 
 
 if __name__ == "__main__":
