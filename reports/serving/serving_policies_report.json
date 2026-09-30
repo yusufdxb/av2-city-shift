@@ -1,0 +1,456 @@
+{
+  "data": "TRAIN fixed dev slice",
+  "scenarios": 3998,
+  "replans_per_scenario": 6,
+  "policy_definitions": {
+    "PATCH": "Stage 3 CV substitution for selected agents with observed speed < 0.5 m/s",
+    "PATCH-skip-inference": "PATCH with stopped selected agents excluded from model inference",
+    "TRIM": "For stopped selected agents, retain modes with endpoint displacement <= 2 m; renormalize; CV fallback"
+  },
+  "batch_policy": "one inference call per replan for selected agents requiring model forecasts, at most 16",
+  "cpu": {
+    "model": "AMD Ryzen 9 9900X 12-Core Processor",
+    "logical_cores": 24
+  },
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "tensorrt": "10.13.3.9.post1",
+    "cuda_runtime": null,
+    "cuda_compiled": "12.8"
+  },
+  "latency": {
+    "pytorch-fp32": {
+      "none": {
+        "agent_selection": {
+          "p50_ms": 0.16379798762500286,
+          "p99_ms": 0.2679615898523481
+        },
+        "inference_filter": {
+          "p50_ms": 0.00545999500900507,
+          "p99_ms": 0.007381326868198822
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.0610954777803272,
+          "p99_ms": 1.5753663034411152
+        },
+        "host_to_device": {
+          "p50_ms": 0.16772799426689744,
+          "p99_ms": 0.2890436828602108
+        },
+        "inference": {
+          "p50_ms": 2.0656909910030663,
+          "p99_ms": 2.3386693338397895
+        },
+        "device_to_host": {
+          "p50_ms": 0.041350023820996284,
+          "p99_ms": 0.05954913445748389
+        },
+        "world_transform": {
+          "p50_ms": 0.06939398008398712,
+          "p99_ms": 0.08585590927395984
+        },
+        "forecast_policy": {
+          "p50_ms": 0.0040800077840685844,
+          "p99_ms": 0.005401198868639776
+        },
+        "planning": {
+          "p50_ms": 5.334312008926645,
+          "p99_ms": 5.959398771519773
+        },
+        "end_to_end": {
+          "p50_ms": 9.009069006424397,
+          "p99_ms": 10.240591245819816
+        }
+      },
+      "PATCH": {
+        "agent_selection": {
+          "p50_ms": 0.1587779843248427,
+          "p99_ms": 0.2562516863690691
+        },
+        "inference_filter": {
+          "p50_ms": 0.005420006345957518,
+          "p99_ms": 0.00736130343284459
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.0533004824537784,
+          "p99_ms": 1.5512330189812928
+        },
+        "host_to_device": {
+          "p50_ms": 0.1656979729887098,
+          "p99_ms": 0.261557487538085
+        },
+        "inference": {
+          "p50_ms": 2.0158804836682975,
+          "p99_ms": 2.2107478114776336
+        },
+        "device_to_host": {
+          "p50_ms": 0.04017900209873915,
+          "p99_ms": 0.05626899655908346
+        },
+        "world_transform": {
+          "p50_ms": 0.06788899190723896,
+          "p99_ms": 0.082974216202274
+        },
+        "forecast_policy": {
+          "p50_ms": 0.05791900912299752,
+          "p99_ms": 0.08723160659428687
+        },
+        "planning": {
+          "p50_ms": 5.323427991243079,
+          "p99_ms": 5.844088309095242
+        },
+        "end_to_end": {
+          "p50_ms": 9.021656995173544,
+          "p99_ms": 10.085531606455334
+        }
+      },
+      "PATCH-skip-inference": {
+        "agent_selection": {
+          "p50_ms": 0.15693798195570707,
+          "p99_ms": 0.2576087095076218
+        },
+        "inference_filter": {
+          "p50_ms": 0.021369487512856722,
+          "p99_ms": 0.026652623782865724
+        },
+        "input_build_cpu": {
+          "p50_ms": 0.36549000651575625,
+          "p99_ms": 1.173288648715243
+        },
+        "host_to_device": {
+          "p50_ms": 0.09093800326809287,
+          "p99_ms": 0.21763920201919973
+        },
+        "inference": {
+          "p50_ms": 1.5458885172847658,
+          "p99_ms": 2.0433319977018987
+        },
+        "device_to_host": {
+          "p50_ms": 0.03694900078698993,
+          "p99_ms": 0.05175172875169667
+        },
+        "world_transform": {
+          "p50_ms": 0.051089038606733084,
+          "p99_ms": 0.06993115064688028
+        },
+        "forecast_policy": {
+          "p50_ms": 0.056869001127779484,
+          "p99_ms": 0.08451409521512691
+        },
+        "planning": {
+          "p50_ms": 5.322835990227759,
+          "p99_ms": 5.85499246604741
+        },
+        "end_to_end": {
+          "p50_ms": 7.727898482698947,
+          "p99_ms": 9.394818117143586
+        }
+      },
+      "TRIM": {
+        "agent_selection": {
+          "p50_ms": 0.15764799900352955,
+          "p99_ms": 0.2567507757339627
+        },
+        "inference_filter": {
+          "p50_ms": 0.00545999500900507,
+          "p99_ms": 0.007321143057197342
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.0530615400057286,
+          "p99_ms": 1.5510855312459177
+        },
+        "host_to_device": {
+          "p50_ms": 0.16566796693950891,
+          "p99_ms": 0.27136837365105804
+        },
+        "inference": {
+          "p50_ms": 2.0161335123702884,
+          "p99_ms": 2.191595783224331
+        },
+        "device_to_host": {
+          "p50_ms": 0.039979990106076,
+          "p99_ms": 0.0559715897543356
+        },
+        "world_transform": {
+          "p50_ms": 0.06680897786282003,
+          "p99_ms": 0.08076029829680921
+        },
+        "forecast_policy": {
+          "p50_ms": 0.09966350626200438,
+          "p99_ms": 0.15894974349066618
+        },
+        "planning": {
+          "p50_ms": 5.317515489878133,
+          "p99_ms": 5.847175886738117
+        },
+        "end_to_end": {
+          "p50_ms": 9.053671499714255,
+          "p99_ms": 10.106341604841873
+        }
+      }
+    },
+    "trt-fp16": {
+      "none": {
+        "agent_selection": {
+          "p50_ms": 0.15616801101714373,
+          "p99_ms": 0.2555594767909497
+        },
+        "inference_filter": {
+          "p50_ms": 0.005259993486106396,
+          "p99_ms": 0.00704119971487672
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.0472209833096713,
+          "p99_ms": 1.5450647415127607
+        },
+        "host_to_device": {
+          "p50_ms": 0.16198298544622958,
+          "p99_ms": 0.26052395638544285
+        },
+        "inference": {
+          "p50_ms": 0.7794589910190552,
+          "p99_ms": 1.0009561281185597
+        },
+        "device_to_host": {
+          "p50_ms": 0.038439000491052866,
+          "p99_ms": 0.056094216997735244
+        },
+        "world_transform": {
+          "p50_ms": 0.05940999835729599,
+          "p99_ms": 0.07483293011318895
+        },
+        "forecast_policy": {
+          "p50_ms": 0.003949971869587898,
+          "p99_ms": 0.005209993105381727
+        },
+        "planning": {
+          "p50_ms": 5.317230505170301,
+          "p99_ms": 5.84292721701786
+        },
+        "end_to_end": {
+          "p50_ms": 7.7232505136635154,
+          "p99_ms": 8.734374887426384
+        }
+      },
+      "PATCH": {
+        "agent_selection": {
+          "p50_ms": 0.15464297030121088,
+          "p99_ms": 0.25216717272996936
+        },
+        "inference_filter": {
+          "p50_ms": 0.005199981387704611,
+          "p99_ms": 0.006849082419648767
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.047546014888212,
+          "p99_ms": 1.5482126374263316
+        },
+        "host_to_device": {
+          "p50_ms": 0.16165798297151923,
+          "p99_ms": 0.25070091651286935
+        },
+        "inference": {
+          "p50_ms": 0.7670845079701394,
+          "p99_ms": 0.8630731818266214
+        },
+        "device_to_host": {
+          "p50_ms": 0.03763899439945817,
+          "p99_ms": 0.05486911453772336
+        },
+        "world_transform": {
+          "p50_ms": 0.058878998970612884,
+          "p99_ms": 0.07183902198448777
+        },
+        "forecast_policy": {
+          "p50_ms": 0.05572897498495877,
+          "p99_ms": 0.08380030980333687
+        },
+        "planning": {
+          "p50_ms": 5.3125775011722,
+          "p99_ms": 5.767638491233812
+        },
+        "end_to_end": {
+          "p50_ms": 7.728118041995913,
+          "p99_ms": 8.691628312226385
+        }
+      },
+      "PATCH-skip-inference": {
+        "agent_selection": {
+          "p50_ms": 0.15368300955742598,
+          "p99_ms": 0.25385608838405466
+        },
+        "inference_filter": {
+          "p50_ms": 0.021224492229521275,
+          "p99_ms": 0.026030000299215317
+        },
+        "input_build_cpu": {
+          "p50_ms": 0.3591499989852309,
+          "p99_ms": 1.164271219749935
+        },
+        "host_to_device": {
+          "p50_ms": 0.08892349433153868,
+          "p99_ms": 0.2134638733696194
+        },
+        "inference": {
+          "p50_ms": 0.5467215087264776,
+          "p99_ms": 0.7939408137463034
+        },
+        "device_to_host": {
+          "p50_ms": 0.036648998502641916,
+          "p99_ms": 0.05296507733874027
+        },
+        "world_transform": {
+          "p50_ms": 0.04547450225800276,
+          "p99_ms": 0.06430114619433881
+        },
+        "forecast_policy": {
+          "p50_ms": 0.055069016525521874,
+          "p99_ms": 0.08186290971934798
+        },
+        "planning": {
+          "p50_ms": 5.308869498549029,
+          "p99_ms": 5.820173061219976
+        },
+        "end_to_end": {
+          "p50_ms": 6.659385981038213,
+          "p99_ms": 8.170322502846831
+        }
+      },
+      "TRIM": {
+        "agent_selection": {
+          "p50_ms": 0.154398032464087,
+          "p99_ms": 0.25434547627810405
+        },
+        "inference_filter": {
+          "p50_ms": 0.005259993486106396,
+          "p99_ms": 0.006971312104724358
+        },
+        "input_build_cpu": {
+          "p50_ms": 1.0474860027898103,
+          "p99_ms": 1.5496535436250272
+        },
+        "host_to_device": {
+          "p50_ms": 0.16171799506992102,
+          "p99_ms": 0.2512185467639939
+        },
+        "inference": {
+          "p50_ms": 0.7666509773116559,
+          "p99_ms": 0.8747216517804194
+        },
+        "device_to_host": {
+          "p50_ms": 0.0380990095436573,
+          "p99_ms": 0.05552900256589055
+        },
+        "world_transform": {
+          "p50_ms": 0.058788980823010206,
+          "p99_ms": 0.07239032769575716
+        },
+        "forecast_policy": {
+          "p50_ms": 0.09484897600486875,
+          "p99_ms": 0.15348930784966797
+        },
+        "planning": {
+          "p50_ms": 5.306620500050485,
+          "p99_ms": 5.790726174018346
+        },
+        "end_to_end": {
+          "p50_ms": 7.764658483210951,
+          "p99_ms": 8.761843746760864
+        }
+      }
+    }
+  },
+  "agent_counts": {
+    "pytorch-fp32": {
+      "none": {
+        "selected_agents": 292970,
+        "inferred_agents": 292970
+      },
+      "PATCH": {
+        "selected_agents": 293134,
+        "inferred_agents": 293134
+      },
+      "PATCH-skip-inference": {
+        "selected_agents": 293134,
+        "inferred_agents": 109357
+      },
+      "TRIM": {
+        "selected_agents": 293140,
+        "inferred_agents": 293140
+      }
+    },
+    "trt-fp16": {
+      "none": {
+        "selected_agents": 292962,
+        "inferred_agents": 292962
+      },
+      "PATCH": {
+        "selected_agents": 293134,
+        "inferred_agents": 293134
+      },
+      "PATCH-skip-inference": {
+        "selected_agents": 293134,
+        "inferred_agents": 109365
+      },
+      "TRIM": {
+        "selected_agents": 293137,
+        "inferred_agents": 293137
+      }
+    }
+  },
+  "trt_fp16_vs_pytorch_fp32_patch_agreement": {
+    "scenarios": 3998,
+    "replans": 23988,
+    "acceleration_changed": 181,
+    "acceleration_changed_share": 0.007545439386359846,
+    "collision_changed": 1,
+    "collision_changed_share": 0.0002501250625312656,
+    "unnecessary_hard_brake_changed": 2,
+    "unnecessary_hard_brake_changed_share": 0.0005002501250625312,
+    "either_outcome_changed": 3,
+    "either_outcome_changed_share": 0.0007503751875937969,
+    "largest_trajectory_deviations": [
+      {
+        "scenario_id": "6b984551-7655-48a0-aa49-7dd988c9f3ad",
+        "t": 99,
+        "agent_id": "124028",
+        "agent_type": "vehicle",
+        "speed_mps": 7.853470773664169,
+        "max_trajectory_deviation_m": 28.40481327436991
+      },
+      {
+        "scenario_id": "6b984551-7655-48a0-aa49-7dd988c9f3ad",
+        "t": 89,
+        "agent_id": "124028",
+        "agent_type": "vehicle",
+        "speed_mps": 6.912187614424836,
+        "max_trajectory_deviation_m": 17.58160125464927
+      },
+      {
+        "scenario_id": "dad4d1a2-9836-4197-a5ca-6cbf3314fef3",
+        "t": 89,
+        "agent_id": "89563",
+        "agent_type": "vehicle",
+        "speed_mps": 6.909855181747719,
+        "max_trajectory_deviation_m": 16.293603154924824
+      },
+      {
+        "scenario_id": "9592afab-2eb8-436b-a6d1-435dd5f33cee",
+        "t": 99,
+        "agent_id": "281532",
+        "agent_type": "vehicle",
+        "speed_mps": 6.25482198402122,
+        "max_trajectory_deviation_m": 12.415614285247274
+      },
+      {
+        "scenario_id": "07f28534-5a62-4b9e-8752-ac57ef45db1c",
+        "t": 99,
+        "agent_id": "28631",
+        "agent_type": "vehicle",
+        "speed_mps": 9.322952929406531,
+        "max_trajectory_deviation_m": 11.554057662654081
+      }
+    ]
+  },
+  "elapsed_s": 1415.81
+}

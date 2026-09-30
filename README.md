@@ -106,6 +106,17 @@ Gate: pass (FP32 within 1 cm; FP16 within 1% on minFDE and miss rate). The FP16 
 
 TensorRT FP16 makes inference 2.6x faster but the replan only 1.17x faster: the numpy planner is about 69% of the time, so it, not the model, is the next thing to optimise. FP16 changes the chosen acceleration in 1.8% of replans and the final outcome (collision or unnecessary hard brake) in 0.48% of drives (19 of 3,998). Once a decision diverges, later inputs differ too, so the largest per-agent trajectory differences in the report (up to 26.6 m on one mode) include that closed-loop drift and are not pure FP16 rounding.
 
+**Serving the fix** ([report](reports/serving/serving_policies_report.json)): the same benchmark with the forecast policies from Stages 3 and 4 inserted before planning (closed loop v2 scoring). Because PATCH replaces stopped agents' forecasts with constant velocity anyway, those agents can skip the model entirely; that cut the agents sent to inference from 293,134 to 109,357 (63% fewer). Median milliseconds per replan:
+
+| Policy | PyTorch FP32 | TensorRT FP16 |
+|---|---|---|
+| None (focal-only model) | 9.01 | 7.72 |
+| PATCH | 9.02 | 7.73 |
+| PATCH, stopped agents skip inference | 7.73 | 6.66 |
+| TRIM | 9.05 | 7.76 |
+
+The fix is free, and served with skipped inference it makes the TensorRT FP16 replan 14% faster. Under PATCH, TensorRT FP16 and PyTorch FP32 disagree on the final outcome of 3 of 3,998 drives (0.075%), against 19 (0.48%) without it. Planning (5.3 ms) remains the bottleneck.
+
 ## Results
 
 All numbers are on the 24,988 validation scenarios; per-arm outcomes average the three seeds. Source files: [`reports/confirmatory/`](reports/confirmatory/).
