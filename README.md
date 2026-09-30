@@ -6,13 +6,13 @@
 
 A pre-registered study on the [Argoverse 2 motion forecasting dataset](https://www.argoverse.org/av2.html) (this study uses its 224,896 train and validation scenarios from six US cities; the unlabelled test split is not used), with a closed-loop planning test and a TensorRT deployment path.
 
-> **Status: Stages 1 to 4 complete and audited.** 22 confirmatory training runs, Stages 1, 2, 3a, 3 and 4, and the deployment gate ran as pre-registered, and every headline number is independently recomputable from the released per-row tables ([`scripts/audit_recompute.py`](scripts/audit_recompute.py), [`scripts/audit_stage3.py`](scripts/audit_stage3.py), [`scripts/audit_stage4.py`](scripts/audit_stage4.py)). Each stage's hypotheses, arms, and kill criteria were committed before that stage's scoring. (Throwaway smoke runs used validation data for pipeline debugging before the Stage 1 registration; that is disclosed as deviation 1 and no design choice came from it.)
+> **Status: Stages 1 to 4 complete and audited.** 22 confirmatory training runs, Stages 1, 2, 3a, 3 and 4, and the deployment gate ran as pre-registered. From the released per-row tables, [`scripts/audit_decisions.py`](scripts/audit_decisions.py) independently re-derives every registered decision (H1 to H13): each point estimate, a fresh bootstrap interval, and the verdict; [`audit_recompute.py`](scripts/audit_recompute.py), [`audit_stage3.py`](scripts/audit_stage3.py) and [`audit_stage4.py`](scripts/audit_stage4.py) check the point estimates and controls against checksummed files. Each stage's hypotheses, arms, and kill criteria were committed before that stage's scoring. (Throwaway smoke runs used validation data for pipeline debugging before the Stage 1 registration; that is disclosed as deviation 1 and no design choice came from it.)
 
-**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet it shows no useful ability to tell that it is in a new city (mean AUROC 0.505 to 0.518; no equivalence test was run). In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
+**Answers, in one line each.** Accuracy drops in an unseen city, but only by about 5%. The model's own uncertainty still flags the predictions that fail there (with no detectable difference from how it does at home), yet its ability to tell that it is in a new city is near chance (mean AUROC 0.505 to 0.518, where 0.5 is chance; no equivalence test was run). In closed loop the extra error shows up as a small rise in planning failures (+4%, mostly extra phantom braking), below the registered +10% bar, so H4 is dead as registered.
 
 **On the agents the planner actually uses, the learned model misses more often than constant velocity.** Across all 304,988 planner-relevant agents (Stage 3a, one snapshot at the t=49 handoff), the all-city model's miss rate is 0.424, against 0.281 for constant velocity and 0.440 for lane following. Its mean errors are lower than constant velocity's (minFDE 2.36 vs 2.62 m, minADE 0.94 vs 1.24 m): it is closer on average but more often more than 2 m off.
 
-**The follow-ups trace the phantom braking to stopped agents, and the fix replicates on fresh scenes.** The model was trained on Argoverse's *focal* agents, which are chosen for being interesting: a stopped focal agent is almost always about to move. On the parked cars around the self-driving car, it predicts motion that never happens (miss rate 0.52 vs 0.09 for constant velocity), and the planner brakes for it. Giving stopped agents a constant-velocity forecast cut unnecessary hard brakes by **38%** in Stage 3 and by **45%** in Stage 4, on 8,140 scenes no compared model trained on, with collisions inside the registered margin both times. A properly dose-matched sham that gives the same number of *random* agents constant-velocity forecasts did not reduce braking (+3.9%, interval spanning zero), so the effect is specific to stopped agents. Two learned fixes failed: retraining on focal plus scored agents (Stage 3) and a 75/25 focal and stopped-agent mixture (Stage 4) both fixed much of the open-loop error without reducing braking, and both cost focal accuracy.
+**Targeting stopped agents removes a large share of the phantom braking, and that replicates on fresh scenes.** On stopped agents around the self-driving car (mostly parked cars; 39.5% leave the scene or lose tracking within 6 s and are scored at their last observed point), the model predicts motion that does not happen (miss rate 0.52 vs 0.09 for constant velocity), and the planner brakes for it. Giving stopped agents a constant-velocity forecast cut unnecessary hard brakes by **38%** in Stage 3 and by **45%** in Stage 4, on 8,140 scenes no compared model trained on, with collisions inside the registered margin both times. A properly dose-matched sham, giving the same number of *random* agents constant-velocity forecasts, showed no detectable reduction (3.9% fewer brakes, interval from 5.4% more to 12.1% fewer), so what matters is targeting the stopped agents. The likely reason the model gets them wrong is how its training agents were chosen: Argoverse's *focal* agents are picked for being interesting, and a stopped focal agent is almost always about to move. That explanation fits the data (below) but is not isolated by any intervention here. Two learned fixes failed to reduce braking: retraining on focal plus scored agents (Stage 3) cut the stopped-agent miss rate sharply (-0.48) but not the braking, and a 75/25 focal and stopped-agent mixture (Stage 4, where only focal accuracy was measured open loop) did not reduce braking either; both cost focal accuracy.
 
 ![Two Palo Alto validation scenarios: the model trained with Palo Alto vs the model that never saw it](docs/figures/example_scenarios.png)
 
@@ -192,7 +192,7 @@ A review asked two things: how the model compares with simple baselines on the s
 
 The learned model has lower mean errors than constant velocity but a higher miss rate on the agents the planner uses. H6 splits the non-focal agents by whether they are stopped or moving.
 
-Why: 13.1% of training focal agents are stopped at the prediction time, but only 3.5% stay within 2 m over the next 6 s. The model learned that stopped means about to move. That is right for focal agents and wrong for parked cars.
+Why this likely happens: 13.1% of training focal agents are stopped at the prediction time, but only 3.5% stay within 2 m over the next 6 s, so a model trained on them can learn that stopped means about to move. That fits the H6 pattern (right on focal agents, wrong on non-focal stopped ones), but no experiment here isolates it as the cause.
 
 **Stage 3** is a sequential follow-up on the same 24,988 validation scenes that Stage 3a had already scored. It was registered after Stage 3a's results were known, so it is not an independent confirmation. It tested two fixes in a less privileged closed loop (no future speed cap, contact-based at-fault attribution), with 99.17% CIs across six comparisons ([results](reports/stage3/results.json)):
 
@@ -222,7 +222,7 @@ Stage 3 reused already-scored validation scenes and its sham reached only 43% of
 |---|---|---|---|
 | **H10** PATCH vs focal-only: unnecessary hard brakes | **44.9% fewer** | [37.7%, 51.4%] | supported |
 | H10 collisions (margin +0.3 pp) | +0.04 pp | [-0.14, +0.22] pp | passes |
-| **H11** PATCH minus dose-matched sham | **41.0 pp** larger reduction (sham alone: +3.9%, [-5.4%, +12.1%]) | [32.8, 50.2] pp | supported |
+| **H11** PATCH minus dose-matched sham | **41.0 pp** larger reduction (sham alone: 3.9% fewer brakes, interval from 5.4% more to 12.1% fewer, no detectable reduction) | [32.8, 50.2] pp | supported |
 | **H12** TRIM (drop stopped agents' moving modes) vs focal-only | **43.1% fewer** | [36.0%, 49.5%] | supported |
 | H12 collisions | +0.05 pp | [-0.13, +0.22] pp | passes |
 | **H13** MIX (75% focal, 25% stopped non-focal samples) vs focal-only | 2.7% *more* brakes | [-12.1%, +5.1%] | killed |
@@ -233,6 +233,23 @@ Controls: the stand-still forecast collides 5.2x as often as the model; the repl
 **Caveat on TRIM.** For about 67% of stopped agents the model had no mode that stays within 2 m, so TRIM fell back to constant velocity. TRIM is therefore mostly PATCH; H12 shows that dropping moving-mode probability is enough where the model has a stationary mode, but it is weak evidence that probability mass, rather than the trajectory, is the mechanism.
 
 **Descriptive only: per-replan risk calibration** (first three replans, which have a full 4 s future; contacts are rare, so Brier scores are small). On stopped agents, PATCH and TRIM halve the planner's risk error (Brier 0.0018 to 0.0009) but rank risky agents worse (AUROC 0.67 to 0.55 and 0.56); the oracle reaches 0.86. The fix works by removing false alarms, not by predicting real conflicts better.
+
+### Exploratory: where the phantom brakes come from, decision by decision
+
+Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with the focal-only model and the registered planner ([script](src/cityshift/mechanism.py), [numbers](reports/mechanism/mechanism_audit.json)). At each of the 166 replans where the planner chose a hard brake instead of the plan it would pick with no risk term, it records the agents whose predicted risk ruled that plan out, and checks each against its true logged future.
+
+| At a phantom-brake decision | Share |
+|---|---|
+| At least one blocking agent was stopped | 76% (all blockers stopped: 46%) |
+| Stopped blockers' risk that came from the model's moving modes | 96% |
+| Stopped blockers that truly conflict with the rejected plan | 5.8% (moving blockers: 23%) |
+| Stopped blockers that truly conflict, full vs partial future | 7.5% vs 3.9% |
+| Brake decisions with any truly conflicting blocker | 20% |
+| Brakes that PATCH removes at that same replan | 66% (96% when every blocker is stopped) |
+
+So the braking the fix removes is caused, at the decision itself, by probability the model puts on stopped agents moving, and those agents almost never actually get in the way. Agents with partial futures are not what drives it.
+
+**Skipping inference is exactly equivalent** ([script](scripts/parity_patch_skip.py), [result](reports/serving/parity_patch_skip.json)): on 500 development scenes, PATCH with stopped agents skipping the model chose the same acceleration as PATCH at all 3,000 replans and produced identical outcomes in all 500 drives, while sending 63% fewer agents through the model.
 
 ## What broke along the way
 
@@ -253,8 +270,8 @@ Every one of these was found by a diagnostic before any change was made, and eac
 ## Limitations
 
 - **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times. Stage 3a scores those agents at one handoff snapshot (t=49) only, not at every replan, so the accuracy of the forecasts at later replans (with the simulated car) is not reported.
-- **At-fault attribution is centre-based:** a collision counts when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles.
-- **Stage 2 agents do not react to the simulated car.** The planner is longitudinal only and has no traffic-light or stop-sign awareness, so it drives about 1.5 to 1.7x the human's distance. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the comparison needs, but they bound what the absolute failure rates mean.
+- **At-fault attribution:** Stage 2 counts a collision as at fault when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles. Stages 3 and 4 use the contact point instead (the centroid of the first overlap, in the front half of the ego).
+- **The closed loop is a privileged sensitivity harness, not a driving simulator.** Other agents replay their logs and do not react; the planner controls speed only, along the human's logged route (extended straight past its end), with no traffic-light or stop-sign awareness. The ego therefore drives further than the human: 1.5 to 1.7x in Stage 2, and in Stage 4 1.83x with the focal-only model and 2.14x with PATCH. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the paired comparisons need, but they bound what the absolute collision and braking rates mean; the exploratory planner sensitivity sweep below checks how far the PATCH result depends on the planner's settings.
 - **Confidence intervals are conditional on these six cities and these trained checkpoints.** The bootstrap resamples scenarios, so it does not capture the variance from drawing new cities or from retraining the models.
 - **One dataset, six US cities.** No left-hand traffic and no weather split.
 - **The model is small.** City effects could differ at leaderboard scale.
@@ -272,6 +289,11 @@ python scripts/audit_recompute.py evals
 # Stage 3a and 3 (H5 to H9, closed-loop controls): per-agent and per-scenario tables, release v1.1
 gh release download v1.1 -R yusufdxb/av2-city-shift -p stage3-per-row-results.tar.gz && tar xzf stage3-per-row-results.tar.gz
 python scripts/audit_stage3.py      # verifies reports/stage3/SHA256SUMS, exits non-zero on any mismatch > 1e-9
+# Stage 4 (H10 to H13): closed-loop, open-loop and risk tables plus the replication pool IDs, release v1.2
+gh release download v1.2 -R yusufdxb/av2-city-shift -p stage4-per-row-results.tar.gz && tar xzf stage4-per-row-results.tar.gz
+python scripts/audit_stage4.py
+# every registered decision (H1 to H13): fresh bootstrap intervals and verdicts; needs all three releases unpacked
+python scripts/audit_decisions.py
 ```
 
 **Full rerun.**

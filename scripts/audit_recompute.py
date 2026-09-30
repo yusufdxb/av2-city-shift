@@ -71,3 +71,15 @@ print(
     "LOG",
     D.log_collision.mean(),
 )
+
+# Pass/fail: Stage 1 tables are float32, so allow 1e-6 (the committed analysis averages in float64).
+checks = {
+    "H1": (np.mean(list(rel.values())), res["H1"]["pooled_rel_change"]),
+    "H2": (np.mean(list(cfs.values())), res["H2"]["pooled_CF_U1_heldout"]),
+    "H3": (np.mean([cfs[c] - cfi[c] for c in CITIES]), res["H3"]["pooled_CF_diff_heldout_minus_indist"]),
+    "H4": (np.mean(list(r4.values())), s2["H4"]["pooled_rel_change"]),
+    "PC1": (N.s0_miss.mean() / A.s0_miss.mean() - 1, res["PC1"]["rel"]),
+}
+bad = [k for k, (mine, theirs) in checks.items() if abs(float(mine) - float(theirs)) > 1e-6]
+print("ALL MATCH (tolerance 1e-6)" if not bad else f"MISMATCH: {bad}")
+sys.exit(1 if bad else 0)

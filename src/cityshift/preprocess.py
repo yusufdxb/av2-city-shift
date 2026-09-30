@@ -219,6 +219,8 @@ def main() -> None:
     with open(os.path.join(out, "failures.txt"), "w") as f:
         f.write("\n".join(failures))
     print(f"{args.split}: wrote {row} samples, {len(failures)} failures")
+    if failures:  # outputs are written, but a partial split must not pass silently
+        raise SystemExit(f"{len(failures)} scenarios failed; see {os.path.join(out, 'failures.txt')}")
 
 
 if __name__ == "__main__":

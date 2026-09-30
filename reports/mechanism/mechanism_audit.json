@@ -1,0 +1,50 @@
+{
+  "_note": "EXPLORATORY, not registered. ALL seed 0, closed loop v2 (registered settings), 1500 replication-pool scenes (fixed random subset, seed 7), 9000 replans.",
+  "hard_brake_decisions": 166,
+  "decisions": {
+    "any_stopped_blocker": {
+      "n": 166,
+      "share": 0.7590361445783133
+    },
+    "all_blockers_stopped": {
+      "n": 166,
+      "share": 0.463855421686747
+    },
+    "any_true_conflict": {
+      "n": 166,
+      "share": 0.20481927710843373
+    },
+    "patch_removes_brake": {
+      "n": 166,
+      "share": 0.6626506024096386
+    }
+  },
+  "patch_removes_brake_when_all_blockers_stopped": {
+    "n": 77,
+    "share": 0.961038961038961
+  },
+  "blockers": {
+    "n": 394,
+    "stopped_share": {
+      "n": 394,
+      "share": 0.6954314720812182
+    },
+    "true_conflict_stopped": {
+      "n": 274,
+      "share": 0.058394160583941604
+    },
+    "true_conflict_moving": {
+      "n": 120,
+      "share": 0.23333333333333334
+    },
+    "moving_mode_share_of_risk_stopped": 0.9576772999120693,
+    "true_conflict_stopped_full_future": {
+      "n": 147,
+      "share": 0.07482993197278912
+    },
+    "true_conflict_stopped_partial_future": {
+      "n": 127,
+      "share": 0.03937007874015748
+    }
+  }
+}

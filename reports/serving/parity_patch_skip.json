@@ -1,0 +1,9 @@
+{
+  "scenarios": 500,
+  "replans": 3000,
+  "acceleration_differs": 0,
+  "outcome_differs": 0,
+  "inferred_agents_patch": 37696,
+  "inferred_agents_skip": 14016,
+  "scenarios_with_undefined_progress": 112
+}

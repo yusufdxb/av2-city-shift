@@ -276,7 +276,7 @@ def fig_stage4(closedloop: str, out: str) -> None:
         ax.set_xlim(0, max(values.values()) * 1.25)
         ax.set_xlabel("Share of drives (%)")
     axes[0].set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
-    fig.suptitle("Stage 4 (8,140 fresh scenes): the stopped-agent fix replicates; a dose-matched sham does not reduce braking",
+    fig.suptitle("Stage 4 (8,140 fresh scenes): the stopped-agent fix replicates; a dose-matched sham shows no detectable effect",
                  x=0.01, ha="left", fontsize=11, fontweight="bold")
     fig.text(0.01, 0.01, "Scenes no compared model trained on; model arms averaged over 3 seeds. TRIM fell back to CV for about 67% "
              "of stopped agents (no stationary mode).", color=INK2, fontsize=7.6)
