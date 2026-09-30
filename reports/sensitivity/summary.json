@@ -1,0 +1,1085 @@
+{
+  "_note": "EXPLORATORY, not registered. 3,000 replication-pool scenes (fixed random subset, seed 2026), model seed 0, closed loop v2 with the risk weight and speed cap varied; no intervals. hard brake = executed decel <= threshold while the human never decelerated that hard.",
+  "configs": [
+    {
+      "cap": "tight",
+      "risk_weight": 0.3,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.004,
+        "collision": 0.24533333333333332,
+        "progress": 2.6535853842155777,
+        "beyond_logged_route": 0.9013333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.005,
+        "collision": 0.246,
+        "progress": 2.6566250909458087,
+        "beyond_logged_route": 0.901
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.004333333333333333,
+        "collision": 0.244,
+        "progress": 2.6425184320283983,
+        "beyond_logged_route": 0.899
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0026666666666666666,
+        "collision": 0.229,
+        "progress": 2.631994589434829,
+        "beyond_logged_route": 0.8993333333333333
+      },
+      "PATCH_pooled_brake_reduction": -0.25
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 0.3,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.0013333333333333333,
+        "collision": 0.24533333333333332,
+        "progress": 2.6535853842155777,
+        "beyond_logged_route": 0.9013333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.0013333333333333333,
+        "collision": 0.246,
+        "progress": 2.6566250909458087,
+        "beyond_logged_route": 0.901
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.0013333333333333333,
+        "collision": 0.244,
+        "progress": 2.6425184320283983,
+        "beyond_logged_route": 0.899
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0006666666666666666,
+        "collision": 0.229,
+        "progress": 2.631994589434829,
+        "beyond_logged_route": 0.8993333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.0
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 0.3,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.0006666666666666666,
+        "collision": 0.24533333333333332,
+        "progress": 2.6535853842155777,
+        "beyond_logged_route": 0.9013333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.0003333333333333333,
+        "collision": 0.246,
+        "progress": 2.6566250909458087,
+        "beyond_logged_route": 0.901
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.0006666666666666666,
+        "collision": 0.244,
+        "progress": 2.6425184320283983,
+        "beyond_logged_route": 0.899
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0,
+        "collision": 0.229,
+        "progress": 2.631994589434829,
+        "beyond_logged_route": 0.8993333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.5
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 1.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.03333333333333333,
+        "collision": 0.043,
+        "progress": 2.020447281014167,
+        "beyond_logged_route": 0.8713333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.025666666666666667,
+        "collision": 0.021666666666666667,
+        "progress": 1.9896610489300335,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.03866666666666667,
+        "collision": 0.041,
+        "progress": 2.0239148920965317,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.017333333333333333,
+        "collision": 0.006666666666666667,
+        "progress": 2.059212585377625,
+        "beyond_logged_route": 0.8886666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.22999999999999998
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 1.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.010666666666666666,
+        "collision": 0.043,
+        "progress": 2.020447281014167,
+        "beyond_logged_route": 0.8713333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.009666666666666667,
+        "collision": 0.021666666666666667,
+        "progress": 1.9896610489300335,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.01,
+        "collision": 0.041,
+        "progress": 2.0239148920965317,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.003,
+        "collision": 0.006666666666666667,
+        "progress": 2.059212585377625,
+        "beyond_logged_route": 0.8886666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.09374999999999989
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 1.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.0023333333333333335,
+        "collision": 0.043,
+        "progress": 2.020447281014167,
+        "beyond_logged_route": 0.8713333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.002,
+        "collision": 0.021666666666666667,
+        "progress": 1.9896610489300335,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.0023333333333333335,
+        "collision": 0.041,
+        "progress": 2.0239148920965317,
+        "beyond_logged_route": 0.8826666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0006666666666666666,
+        "collision": 0.006666666666666667,
+        "progress": 2.059212585377625,
+        "beyond_logged_route": 0.8886666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.1428571428571429
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 3.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.079,
+        "collision": 0.008,
+        "progress": 1.7890917441971255,
+        "beyond_logged_route": 0.801
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.051666666666666666,
+        "collision": 0.006333333333333333,
+        "progress": 1.9035636634137174,
+        "beyond_logged_route": 0.8626666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.062,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.023333333333333334,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.3459915611814346
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 3.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.039,
+        "collision": 0.008,
+        "progress": 1.7890917441971255,
+        "beyond_logged_route": 0.801
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.025666666666666667,
+        "collision": 0.006333333333333333,
+        "progress": 1.9035636634137174,
+        "beyond_logged_route": 0.8626666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.032,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.3418803418803419
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 3.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.018333333333333333,
+        "collision": 0.008,
+        "progress": 1.7890917441971255,
+        "beyond_logged_route": 0.801
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.012666666666666666,
+        "collision": 0.006333333333333333,
+        "progress": 1.9035636634137174,
+        "beyond_logged_route": 0.8626666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.015666666666666666,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0036666666666666666,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.3090909090909091
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 10.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.11666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 1.6710808434396536,
+        "beyond_logged_route": 0.746
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.06433333333333334,
+        "collision": 0.005666666666666667,
+        "progress": 1.8621574914080976,
+        "beyond_logged_route": 0.851
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.062,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.023333333333333334,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4485714285714285
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 10.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.05433333333333333,
+        "collision": 0.006666666666666667,
+        "progress": 1.6710808434396536,
+        "beyond_logged_route": 0.746
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.03,
+        "collision": 0.005666666666666667,
+        "progress": 1.8621574914080976,
+        "beyond_logged_route": 0.851
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.032,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4478527607361963
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 10.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.025666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 1.6710808434396536,
+        "beyond_logged_route": 0.746
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.015666666666666666,
+        "collision": 0.005666666666666667,
+        "progress": 1.8621574914080976,
+        "beyond_logged_route": 0.851
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.015666666666666666,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0036666666666666666,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.38961038961038963
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 30.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.13066666666666665,
+        "collision": 0.005333333333333333,
+        "progress": 1.6201221063112186,
+        "beyond_logged_route": 0.7236666666666667
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.068,
+        "collision": 0.005333333333333333,
+        "progress": 1.8474263021087831,
+        "beyond_logged_route": 0.8456666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.062,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.023333333333333334,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.47959183673469374
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 30.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.06533333333333333,
+        "collision": 0.005333333333333333,
+        "progress": 1.6201221063112186,
+        "beyond_logged_route": 0.7236666666666667
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.033,
+        "collision": 0.005333333333333333,
+        "progress": 1.8474263021087831,
+        "beyond_logged_route": 0.8456666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.032,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4948979591836734
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 30.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.030666666666666665,
+        "collision": 0.005333333333333333,
+        "progress": 1.6201221063112186,
+        "beyond_logged_route": 0.7236666666666667
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.018,
+        "collision": 0.005333333333333333,
+        "progress": 1.8474263021087831,
+        "beyond_logged_route": 0.8456666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.015666666666666666,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0036666666666666666,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4130434782608696
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 100.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.13566666666666666,
+        "collision": 0.005333333333333333,
+        "progress": 1.6080129804945995,
+        "beyond_logged_route": 0.7193333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.071,
+        "collision": 0.005,
+        "progress": 1.8442242106301643,
+        "beyond_logged_route": 0.845
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.062,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.023333333333333334,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4766584766584767
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 100.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.069,
+        "collision": 0.005333333333333333,
+        "progress": 1.6080129804945995,
+        "beyond_logged_route": 0.7193333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.034666666666666665,
+        "collision": 0.005,
+        "progress": 1.8442242106301643,
+        "beyond_logged_route": 0.845
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.032,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.49758454106280203
+    },
+    {
+      "cap": "tight",
+      "risk_weight": 100.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.033,
+        "collision": 0.005333333333333333,
+        "progress": 1.6080129804945995,
+        "beyond_logged_route": 0.7193333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.019,
+        "collision": 0.005,
+        "progress": 1.8442242106301643,
+        "beyond_logged_route": 0.845
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.015666666666666666,
+        "collision": 0.03233333333333333,
+        "progress": 2.0000197928882946,
+        "beyond_logged_route": 0.8796666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0036666666666666666,
+        "collision": 0.005333333333333333,
+        "progress": 2.053207783620446,
+        "beyond_logged_route": 0.8883333333333333
+      },
+      "PATCH_pooled_brake_reduction": 0.4242424242424243
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 0.3,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.006,
+        "collision": 0.304,
+        "progress": 3.3059605405123973,
+        "beyond_logged_route": 0.998
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.008666666666666666,
+        "collision": 0.2996666666666667,
+        "progress": 3.284166551348321,
+        "beyond_logged_route": 0.9986666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.008333333333333333,
+        "collision": 0.29833333333333334,
+        "progress": 3.257529306487196,
+        "beyond_logged_route": 0.9976666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.007333333333333333,
+        "collision": 0.2853333333333333,
+        "progress": 3.262870449594933,
+        "beyond_logged_route": 0.9983333333333333
+      },
+      "PATCH_pooled_brake_reduction": -0.4444444444444444
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 0.3,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.0016666666666666668,
+        "collision": 0.304,
+        "progress": 3.3059605405123973,
+        "beyond_logged_route": 0.998
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.0026666666666666666,
+        "collision": 0.2996666666666667,
+        "progress": 3.284166551348321,
+        "beyond_logged_route": 0.9986666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.003,
+        "collision": 0.29833333333333334,
+        "progress": 3.257529306487196,
+        "beyond_logged_route": 0.9976666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0026666666666666666,
+        "collision": 0.2853333333333333,
+        "progress": 3.262870449594933,
+        "beyond_logged_route": 0.9983333333333333
+      },
+      "PATCH_pooled_brake_reduction": -0.5999999999999999
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 0.3,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.0006666666666666666,
+        "collision": 0.304,
+        "progress": 3.3059605405123973,
+        "beyond_logged_route": 0.998
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.0013333333333333333,
+        "collision": 0.2996666666666667,
+        "progress": 3.284166551348321,
+        "beyond_logged_route": 0.9986666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.0016666666666666668,
+        "collision": 0.29833333333333334,
+        "progress": 3.257529306487196,
+        "beyond_logged_route": 0.9976666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.001,
+        "collision": 0.2853333333333333,
+        "progress": 3.262870449594933,
+        "beyond_logged_route": 0.9983333333333333
+      },
+      "PATCH_pooled_brake_reduction": -1.0
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 1.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.059,
+        "collision": 0.04733333333333333,
+        "progress": 2.3393497719730805,
+        "beyond_logged_route": 0.9653333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.049666666666666665,
+        "collision": 0.03133333333333333,
+        "progress": 2.3274871657163905,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.06933333333333333,
+        "collision": 0.04666666666666667,
+        "progress": 2.358720470001882,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.039,
+        "collision": 0.009666666666666667,
+        "progress": 2.4038354089462173,
+        "beyond_logged_route": 0.989
+      },
+      "PATCH_pooled_brake_reduction": 0.1581920903954802
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 1.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.01633333333333333,
+        "collision": 0.04733333333333333,
+        "progress": 2.3393497719730805,
+        "beyond_logged_route": 0.9653333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.013666666666666667,
+        "collision": 0.03133333333333333,
+        "progress": 2.3274871657163905,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.023333333333333334,
+        "collision": 0.04666666666666667,
+        "progress": 2.358720470001882,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.009666666666666667,
+        "collision": 0.009666666666666667,
+        "progress": 2.4038354089462173,
+        "beyond_logged_route": 0.989
+      },
+      "PATCH_pooled_brake_reduction": 0.16326530612244883
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 1.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.006333333333333333,
+        "collision": 0.04733333333333333,
+        "progress": 2.3393497719730805,
+        "beyond_logged_route": 0.9653333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.004666666666666667,
+        "collision": 0.03133333333333333,
+        "progress": 2.3274871657163905,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.04666666666666667,
+        "progress": 2.358720470001882,
+        "beyond_logged_route": 0.9816666666666667
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.0023333333333333335,
+        "collision": 0.009666666666666667,
+        "progress": 2.4038354089462173,
+        "beyond_logged_route": 0.989
+      },
+      "PATCH_pooled_brake_reduction": 0.26315789473684204
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 3.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.09733333333333333,
+        "collision": 0.01,
+        "progress": 2.0547808843438946,
+        "beyond_logged_route": 0.897
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.06933333333333333,
+        "collision": 0.010666666666666666,
+        "progress": 2.214200811125785,
+        "beyond_logged_route": 0.96
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.08933333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.04666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.28767123287671237
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 3.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.04533333333333334,
+        "collision": 0.01,
+        "progress": 2.0547808843438946,
+        "beyond_logged_route": 0.897
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.029333333333333333,
+        "collision": 0.010666666666666666,
+        "progress": 2.214200811125785,
+        "beyond_logged_route": 0.96
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.042333333333333334,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.016,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.3529411764705883
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 3.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.02266666666666667,
+        "collision": 0.01,
+        "progress": 2.0547808843438946,
+        "beyond_logged_route": 0.897
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.016,
+        "collision": 0.010666666666666666,
+        "progress": 2.214200811125785,
+        "beyond_logged_route": 0.96
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.021333333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.2941176470588236
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 10.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.14033333333333334,
+        "collision": 0.006666666666666667,
+        "progress": 1.8829428213888018,
+        "beyond_logged_route": 0.837
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.081,
+        "collision": 0.006333333333333333,
+        "progress": 2.1506874463699823,
+        "beyond_logged_route": 0.9486666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.08933333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.04666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.4228028503562945
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 10.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.068,
+        "collision": 0.006666666666666667,
+        "progress": 1.8829428213888018,
+        "beyond_logged_route": 0.837
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.03833333333333333,
+        "collision": 0.006333333333333333,
+        "progress": 2.1506874463699823,
+        "beyond_logged_route": 0.9486666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.042333333333333334,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.016,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.4362745098039217
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 10.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.032,
+        "collision": 0.006666666666666667,
+        "progress": 1.8829428213888018,
+        "beyond_logged_route": 0.837
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.022333333333333334,
+        "collision": 0.006333333333333333,
+        "progress": 2.1506874463699823,
+        "beyond_logged_route": 0.9486666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.021333333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.30208333333333337
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 30.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.15233333333333332,
+        "collision": 0.005666666666666667,
+        "progress": 1.812740444249154,
+        "beyond_logged_route": 0.8143333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.08533333333333333,
+        "collision": 0.006,
+        "progress": 2.1295890189313815,
+        "beyond_logged_route": 0.9443333333333334
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.08933333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.04666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.43982494529540483
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 30.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.08133333333333333,
+        "collision": 0.005666666666666667,
+        "progress": 1.812740444249154,
+        "beyond_logged_route": 0.8143333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.041,
+        "collision": 0.006,
+        "progress": 2.1295890189313815,
+        "beyond_logged_route": 0.9443333333333334
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.042333333333333334,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.016,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.49590163934426224
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 30.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.04,
+        "collision": 0.005666666666666667,
+        "progress": 1.812740444249154,
+        "beyond_logged_route": 0.8143333333333334
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.025666666666666667,
+        "collision": 0.006,
+        "progress": 2.1295890189313815,
+        "beyond_logged_route": 0.9443333333333334
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.021333333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.3583333333333333
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 100.0,
+      "brake_threshold": -3.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.15866666666666668,
+        "collision": 0.005666666666666667,
+        "progress": 1.7975209239275631,
+        "beyond_logged_route": 0.8083333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.08766666666666667,
+        "collision": 0.006,
+        "progress": 2.1269350873901045,
+        "beyond_logged_route": 0.9436666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.08933333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.04666666666666667,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.4474789915966386
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 100.0,
+      "brake_threshold": -4.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.085,
+        "collision": 0.005666666666666667,
+        "progress": 1.7975209239275631,
+        "beyond_logged_route": 0.8083333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.042,
+        "collision": 0.006,
+        "progress": 2.1269350873901045,
+        "beyond_logged_route": 0.9436666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.042333333333333334,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.016,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.5058823529411764
+    },
+    {
+      "cap": "v2",
+      "risk_weight": 100.0,
+      "brake_threshold": -5.0,
+      "ALL": {
+        "unnecessary_hard_brake": 0.042666666666666665,
+        "collision": 0.005666666666666667,
+        "progress": 1.7975209239275631,
+        "beyond_logged_route": 0.8083333333333333
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.026,
+        "collision": 0.006,
+        "progress": 2.1269350873901045,
+        "beyond_logged_route": 0.9436666666666667
+      },
+      "cv": {
+        "unnecessary_hard_brake": 0.021333333333333333,
+        "collision": 0.03933333333333333,
+        "progress": 2.3353051849599535,
+        "beyond_logged_route": 0.979
+      },
+      "oracle": {
+        "unnecessary_hard_brake": 0.008,
+        "collision": 0.006666666666666667,
+        "progress": 2.396871334844988,
+        "beyond_logged_route": 0.9876666666666667
+      },
+      "PATCH_pooled_brake_reduction": 0.390625
+    }
+  ]
+}

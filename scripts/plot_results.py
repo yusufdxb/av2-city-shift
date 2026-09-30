@@ -285,6 +285,46 @@ def fig_stage4(closedloop: str, out: str) -> None:
     plt.close(fig)
 
 
+def fig_sensitivity(sweep: str, out: str) -> None:
+    """EXPLORATORY planner sweep: phantom braking and collisions vs risk weight, per speed cap (small multiples)."""
+    d = pd.read_parquet(sweep)
+    d["brake"] = ((d.min_exec_decel <= -4 + 1e-9) & ~(d.min_log_decel <= -4 + 1e-9)).astype(float)
+    d["coll"] = d.collision.astype(float)
+    g = d.groupby(["cap", "risk_weight", "arm"])[["brake", "coll"]].mean().mul(100).reset_index()
+    style = {"ALL": (BLUE, "Focal-only model", "-"), "PATCH": (ORANGE, "PATCH", "-"),
+             "cv": (MUTED, "Constant velocity", (0, (4, 3))), "oracle": (AQUA, "Oracle", (0, (1, 2)))}  # fmt: skip
+    fig, axes = plt.subplots(2, 2, figsize=(9.6, 6.4), sharex=True)
+    for col, (cap, cap_title) in enumerate((("v2", "Stage 3/4 speed cap"), ("tight", "Tighter speed cap"))):
+        for row, (metric, ylabel) in enumerate((("brake", "Unnecessary hard brakes (%)"), ("coll", "At-fault collisions (%)"))):
+            ax = axes[row, col]
+            for arm, (color, label, ls) in style.items():
+                x = g[(g.cap == cap) & (g.arm == arm)].sort_values("risk_weight")
+                ax.plot(x.risk_weight, x[metric], color=color, lw=2, ls=ls, marker="o", ms=4.5, mec=SURFACE, mew=1.2)
+                if row == 0 and col == 1:
+                    nudge = {"PATCH": 0.25, "cv": -0.25}.get(arm, 0.0)  # keep adjacent labels apart
+                    ax.text(x.risk_weight.iloc[-1] * 1.25, x[metric].iloc[-1] + nudge, label, color=INK, fontsize=8.5, va="center")
+            ax.axvline(100, color=MUTED, lw=1, ls=(0, (2, 3)))
+            ax.set_xscale("log")
+            if metric == "coll":
+                ax.set_yscale("log")
+            ax.grid(axis="y", which="major")
+            ax.set_axisbelow(True)
+            if col == 0:
+                ax.set_ylabel(ylabel)
+            if row == 0:
+                ax.set_title(cap_title, loc="left", fontsize=10)
+            if row == 1:
+                ax.set_xlabel("Planner risk weight (log; 100 = registered)")
+    axes[0, 1].set_xlim(0.2, 600)
+    fig.suptitle("Exploratory: PATCH cuts phantom braking by a third to a half wherever the planner weighs risk (weight >= 3)",
+                 x=0.01, ha="left", fontsize=11, fontweight="bold")
+    fig.text(0.01, 0.01, "3,000 replication-pool scenes, model seed 0, no intervals; brake threshold -4 m/s^2. Below weight 3 the "
+             "planner barely weighs risk and collides in 3 to 30% of drives.", color=INK2, fontsize=7.6)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.95))
+    fig.savefig(f"{out}/sensitivity_sweep.png", dpi=200)
+    plt.close(fig)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--evals", default="evals")
@@ -293,6 +333,7 @@ def main() -> None:
     ap.add_argument("--out", default="docs/figures")
     ap.add_argument("--stage3", default="reports/stage3", help="directory with the Stage 3 results.json")
     ap.add_argument("--stage4", default="runs/stage4/closedloop_pool.parquet", help="Stage 4 closed-loop table (release v1.2)")
+    ap.add_argument("--sweep", default="runs/sensitivity/sweep.parquet", help="exploratory planner sweep table")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     fig_h1(args.evals, args.out)
@@ -301,6 +342,7 @@ def main() -> None:
     fig_examples(args.evals, args.runs, args.root, args.out)
     fig_stage3(args.stage3, args.out)
     fig_stage4(args.stage4, args.out)
+    fig_sensitivity(args.sweep, args.out)
     print("wrote", sorted(os.listdir(args.out)))
 
 

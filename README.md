@@ -251,6 +251,21 @@ So the braking the fix removes is caused, at the decision itself, by probability
 
 **Skipping inference is exactly equivalent** ([script](scripts/parity_patch_skip.py), [result](reports/serving/parity_patch_skip.json)): on 500 development scenes, PATCH with stopped agents skipping the model chose the same acceleration as PATCH at all 3,000 replans and produced identical outcomes in all 500 drives, while sending 63% fewer agents through the model.
 
+### Exploratory: does the fix depend on this planner's settings?
+
+Not registered; run after Stage 4 on 3,000 of the replication-pool scenes, model seed 0, no intervals ([script](src/cityshift/sensitivity.py), [summary](reports/sensitivity/summary.json), per-row table in release v1.3). The sweep re-ran the closed loop with the planner's risk weight at 0.3, 1, 3, 10, 30 and 100 (100 is registered), two speed caps (the Stage 3/4 cap and a tighter one), and three hard-brake definitions (-3, -4 and -5 m/s^2). At the registered settings it reproduces the Stage 4 rows exactly (0.0 difference on every arm and metric).
+
+![Planner sensitivity sweep](docs/figures/sensitivity_sweep.png)
+
+| Risk weight | PATCH's pooled cut in phantom braking (Stage 3/4 cap, tighter cap) | Collisions, focal-only vs PATCH |
+|---|---|---|
+| 0.3 and 1 | -60% to +16% (noise; the planner barely weighs risk and collides in 3 to 30% of drives) | similar |
+| 3 | 35%, 34% | 0.6 to 1.1%, within 0.2 pp |
+| 10 | 44%, 45% | about 0.6%, within 0.1 pp |
+| 30 and 100 | 50 to 51%, 50% | 0.5 to 0.6%, within 0.1 pp |
+
+Wherever the planner actually weighs risk, PATCH cuts phantom braking by a third to a half, under both speed caps and all three brake definitions (the cut is smallest at -5 m/s^2, where events are rare), with collisions essentially unchanged. At weights of 30 and above it brakes about as rarely as constant velocity while colliding 6 to 7x less (0.5 to 0.6% vs 3.2 to 3.9%). The sweep also quantifies how privileged the harness is: at the registered settings 81% of focal-only drives and 94% of PATCH drives end past the end of the human's logged route, on its straight extension.
+
 ## What broke along the way
 
 Every one of these was found by a diagnostic before any change was made, and each is recorded in the pre-registration's deviations log. The last one was found after the results were in.
@@ -271,7 +286,7 @@ Every one of these was found by a diagnostic before any change was made, and eac
 
 - **Stage 1 and Stage 2 score different forecasts.** Stage 1 measures the focal agent; the planner consumes forecasts of up to 16 surrounding agents at six replan times. Stage 3a scores those agents at one handoff snapshot (t=49) only, not at every replan, so the accuracy of the forecasts at later replans (with the simulated car) is not reported.
 - **At-fault attribution:** Stage 2 counts a collision as at fault when the other agent's centre is ahead of the ego's centre, which can miss some side-swipes with long vehicles. Stages 3 and 4 use the contact point instead (the centroid of the first overlap, in the front half of the ego).
-- **The closed loop is a privileged sensitivity harness, not a driving simulator.** Other agents replay their logs and do not react; the planner controls speed only, along the human's logged route (extended straight past its end), with no traffic-light or stop-sign awareness. The ego therefore drives further than the human: 1.5 to 1.7x in Stage 2, and in Stage 4 1.83x with the focal-only model and 2.14x with PATCH. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the paired comparisons need, but they bound what the absolute collision and braking rates mean; the exploratory planner sensitivity sweep below checks how far the PATCH result depends on the planner's settings.
+- **The closed loop is a privileged sensitivity harness, not a driving simulator.** Other agents replay their logs and do not react; the planner controls speed only, along the human's logged route (extended straight past its end), with no traffic-light or stop-sign awareness. The ego therefore drives further than the human: 1.5 to 1.7x in Stage 2, and in Stage 4 1.83x with the focal-only model and 2.14x with PATCH. There is no perception noise, and the window is 6 s. These limits apply equally to every arm, which is what the paired comparisons need, but they bound what the absolute collision and braking rates mean; the exploratory planner sensitivity sweep above checks how far the PATCH result depends on the planner's settings (81 to 94% of rollouts at the registered settings end past the end of the logged route).
 - **Confidence intervals are conditional on these six cities and these trained checkpoints.** The bootstrap resamples scenarios, so it does not capture the variance from drawing new cities or from retraining the models.
 - **One dataset, six US cities.** No left-hand traffic and no weather split.
 - **The model is small.** City effects could differ at leaderboard scale.
@@ -294,6 +309,8 @@ gh release download v1.2 -R yusufdxb/av2-city-shift -p stage4-per-row-results.ta
 python scripts/audit_stage4.py
 # every registered decision (H1 to H13): fresh bootstrap intervals and verdicts; needs all three releases unpacked
 python scripts/audit_decisions.py
+# exploratory planner sweep table (reports/sensitivity/summary.json is its summary), release v1.3
+gh release download v1.3 -R yusufdxb/av2-city-shift -p exploratory-sweep.tar.gz && tar xzf exploratory-sweep.tar.gz
 ```
 
 **Full rerun.**
