@@ -48,3 +48,10 @@ def test_summarize_rejects_missing_model_arm_rows():
     d = _rows()
     with pytest.raises(AssertionError):
         summarize(d[~((d.arm == "PATCH") & (d.model_seed == 1) & (d.scenario_id == "c"))], n_boot=10)
+
+
+def test_summarize_rejects_baseline_rows_from_other_seeds():
+    d = _rows()
+    extra = d[d.arm == "cv"].assign(model_seed=1)
+    with pytest.raises(AssertionError):
+        summarize(pd.concat([d, extra], ignore_index=True), n_boot=10)

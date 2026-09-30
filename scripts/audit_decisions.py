@@ -671,8 +671,9 @@ def stage4(args, rng, comps):
     C = pd.read_parquet("runs/stage4/closedloop_pool.parquet")
     ids = sorted(C.scenario_id.astype(str))
     digest = hashlib.sha256("\n".join(ids).encode()).hexdigest()
+    # reported_pass=True: the registered pool must match, so a count or hash mismatch fails the audit
     gate("Stage 4 pool: 8,140 unique IDs, registered SHA-256", len(set(ids)), N_POOL,
-         len(set(ids)) == N_POOL and digest == POOL_SHA256)
+         len(set(ids)) == N_POOL and digest == POOL_SHA256, reported_pass=True)
     arms = ("ALL", "PATCH", "TRIM", "SHAM2", "MIX")
     cols = {f"{a}_b": seed_avg(C, a, "unnecessary_hard_brake") for a in arms}
     cols |= {f"{a}_c": seed_avg(C, a, "collision") for a in arms}

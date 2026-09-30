@@ -166,6 +166,8 @@ def summarize(d: pd.DataFrame, n_boot: int = 10_000, boot_seed: int = 20260930) 
                     per_scene[arm] = {k: wide[k].to_numpy().mean(1) for k in ("unnecessary_hard_brake", "collision")}
                     if arm in ("ALL", "PATCH"):
                         assert arm_seeds == seeds, f"{arm} lacks some model seeds"
+                    else:
+                        assert arm_seeds == [0], f"{arm} uses no model and must come from the seed-0 run only"
                 a_b, p_b = per_scene["ALL"]["unnecessary_hard_brake"], per_scene["PATCH"]["unnecessary_hard_brake"]
                 a_c, p_c = per_scene["ALL"]["collision"], per_scene["PATCH"]["collision"]
                 boot_red, boot_coll = np.empty(n_boot), np.empty(n_boot)

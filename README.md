@@ -245,8 +245,8 @@ Not registered; run after Stage 4 on 1,500 of the replication-pool scenes with t
 | At a phantom-brake decision (seed 0 [95% CI]; seeds 1 and 2) | Commanded brakes | Realised brakes (seed 0) |
 |---|---|---|
 | At least one blocking agent was stopped | 76% [69, 82]; 74%, 76% | 75% |
-| Share of all blocking risk carried by stopped agents | 56% [48, 64]; 56%, 52% | 58% |
-| Share of stopped agents' risk from the model's moving modes (risk-weighted) | 90% [84, 95]; 88%, 95% | 88% |
+| Share of all blocking risk carried by stopped agents | 56% [48, 64]; 55%, 52% | 58% |
+| Share of stopped agents' risk from the model's moving modes (risk-weighted) | 90% [84, 95]; 87%, 95% | 88% |
 | Stopped blockers that truly conflict with the rejected plan, by count | 5.8% [2.6, 9.8]; 8.1%, 8.8% | 6.0% |
 | Same, weighted by predicted risk | 17% [8, 26]; 27%, 22% | 18% |
 | Moving blockers that truly conflict, by count | 23% [15, 32]; 20%, 25% | 18% |
