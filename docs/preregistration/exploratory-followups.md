@@ -153,3 +153,7 @@ None at registration.
    20260930 for both studies (the uncensored reference check uses its own draws and only its point estimate). The
    replay also records each arm censored at its own crossing, which the registration lists as a descriptive output.
    Replay parity passed on all 8,140 scenarios and 18 drives each (reports/followups/replay_parity.json).
+2. 2026-09-30, after the first analysis output: the descriptive "counted only after the cutoff" shares were wrong
+   because the common-window flags loaded as object dtype and `~` on a Python bool is -2 (truthy). The flags are now
+   cast to booleans; the primaries, which average rather than negate the flags, were unchanged (reduction 0.6763,
+   collision difference -0.00022, B difference -0.00019) and match an independent plain-pandas recomputation.

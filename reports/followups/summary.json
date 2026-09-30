@@ -1,0 +1,314 @@
+{
+  "_note": "EXPLORATORY, pre-registered in docs/preregistration/exploratory-followups.md; cannot change any registered Stage 1-4 verdict. 95% within-city scenario-bootstrap intervals (Bonferroni 98.33% for three primaries alongside), 10,000 draws, seeds averaged within scenario, cities equal-weighted.",
+  "replay_parity": {
+    "scenarios": 8140,
+    "drives_per_scenario": 18,
+    "mismatches": {},
+    "passed": true,
+    "runtime_sec": 32
+  },
+  "B_departing_stopped_collisions": {
+    "effects": {
+      "PATCH_minus_ALL": {
+        "point": -0.00019497021407195088,
+        "per_city": {
+          "austin": 0.0001941370607649001,
+          "dearborn": -0.0006620324395895398,
+          "miami": 0.0008920606601248884,
+          "palo-alto": 0.0,
+          "pittsburgh": -0.0005899705014749262,
+          "washington-dc": -0.0010040160642570278
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          -0.0008182155647539994,
+          0.0003831764126131948
+        ],
+        "ci9833": [
+          -0.0009806091373501557,
+          0.0005036412662174783
+        ]
+      },
+      "cv_minus_ALL": {
+        "point": 0.0035097980670318837,
+        "per_city": {
+          "austin": 0.0027179188507086005,
+          "dearborn": 0.0013240648791790798,
+          "miami": 0.0013380909901873328,
+          "palo-alto": 0.008281573498964804,
+          "pittsburgh": 0.00471976401179941,
+          "washington-dc": 0.0026773761713520753
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          0.0018033818473217594,
+          0.005489929662140087
+        ],
+        "ci9833": [
+          0.0014918216498055474,
+          0.005971487599264536
+        ]
+      },
+      "oracle_minus_ALL": {
+        "point": -0.0007326134636928746,
+        "per_city": {
+          "austin": -0.0013589594253543,
+          "dearborn": -0.0006620324395895398,
+          "miami": -0.0004460303300624442,
+          "palo-alto": 0.0,
+          "pittsburgh": -0.0005899705014749262,
+          "washington-dc": -0.0013386880856760372
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          -0.0013352849999117495,
+          -0.00020048407361649998
+        ],
+        "ci9833": [
+          -0.0015017584606197094,
+          -9.053212301550899e-05
+        ]
+      },
+      "static_minus_ALL": {
+        "point": 0.005924488184739475,
+        "per_city": {
+          "austin": 0.006794797126771501,
+          "dearborn": 0.003310162197947699,
+          "miami": 0.005798394290811775,
+          "palo-alto": 0.012422360248447204,
+          "pittsburgh": 0.0035398230088495575,
+          "washington-dc": 0.0036813922356091038
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          0.0038507571192512415,
+          0.008184103985537376
+        ],
+        "ci9833": [
+          0.0034760848291894584,
+          0.00870815241711762
+        ]
+      },
+      "PATCH_minus_ALL_any_replan": {
+        "point": -0.00020521280972771261,
+        "per_city": {
+          "austin": 0.0,
+          "dearborn": -0.0006620324395895398,
+          "miami": 0.0016354445435622952,
+          "palo-alto": 0.0,
+          "pittsburgh": -0.00019665683382497556,
+          "washington-dc": -0.0020080321285140556
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          -0.0009512900223804378,
+          0.0005311030037893094
+        ],
+        "ci9833": [
+          -0.0011638762156978542,
+          0.0006999669980568317
+        ]
+      },
+      "cv_minus_ALL_any_replan": {
+        "point": 0.004661831470248842,
+        "per_city": {
+          "austin": 0.0069889341875364,
+          "dearborn": 0.00132406487917908,
+          "miami": 0.0022301516503122213,
+          "palo-alto": 0.00759144237405107,
+          "pittsburgh": 0.006489675516224189,
+          "washington-dc": 0.0033467202141900937
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          0.002657279631562191,
+          0.0068636874377961425
+        ],
+        "ci9833": [
+          0.002293676727687598,
+          0.007430261462953141
+        ]
+      },
+      "oracle_minus_ALL_any_replan": {
+        "point": -0.0010412048434836681,
+        "per_city": {
+          "austin": -0.0023296447291788003,
+          "dearborn": -0.0006620324395895398,
+          "miami": -0.0008920606601248886,
+          "palo-alto": -0.0006901311249137336,
+          "pittsburgh": 0.0,
+          "washington-dc": -0.001673360107095046
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          -0.002026422201395119,
+          -5.960912583004639e-05
+        ],
+        "ci9833": [
+          -0.002244073323616766,
+          0.00016338490524125658
+        ]
+      },
+      "static_minus_ALL_any_replan": {
+        "point": 0.007067813176123118,
+        "per_city": {
+          "austin": 0.009900990099009901,
+          "dearborn": 0.0033101621979476996,
+          "miami": 0.008920606601248885,
+          "palo-alto": 0.013802622498274672,
+          "pittsburgh": 0.004129793510324484,
+          "washington-dc": 0.002342704149933066
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          0.0047104458924544105,
+          0.009575199580193329
+        ],
+        "ci9833": [
+          0.0042523737274963586,
+          0.010179875475429154
+        ]
+      }
+    },
+    "seed_averaged_events": {
+      "ALL": 11.333333333333332,
+      "PATCH": 11.0,
+      "cv": 35.0,
+      "oracle": 5.0,
+      "static": 55.0
+    },
+    "powered": true,
+    "positive_control_pass": true,
+    "increase_detected": false,
+    "verdict": "non-inferiority holds",
+    "by_arm_pooled": {
+      "ALL": {
+        "at_fault_collision": 0.008230958230958232,
+        "departing_stopped": 0.0013923013923013922,
+        "stopped_not_departing": 0.0009418509418509419,
+        "moving": 0.005896805896805897,
+        "departing_per_km": 0.03438851450644314,
+        "drives": 24420
+      },
+      "PATCH": {
+        "at_fault_collision": 0.0085995085995086,
+        "departing_stopped": 0.0013513513513513514,
+        "stopped_not_departing": 0.0007371007371007371,
+        "moving": 0.006511056511056511,
+        "departing_per_km": 0.02935606826342788,
+        "drives": 24420
+      },
+      "cv": {
+        "at_fault_collision": 0.03931203931203931,
+        "departing_stopped": 0.0042997542997543,
+        "stopped_not_departing": 0.006265356265356265,
+        "moving": 0.028746928746928746,
+        "departing_per_km": 0.08754914512149353,
+        "drives": 8140
+      },
+      "oracle": {
+        "at_fault_collision": 0.008845208845208846,
+        "departing_stopped": 0.0006142506142506142,
+        "stopped_not_departing": 0.0014742014742014742,
+        "moving": 0.006756756756756757,
+        "departing_per_km": 0.012294748486708768,
+        "drives": 8140
+      },
+      "static": {
+        "at_fault_collision": 0.042628992628992626,
+        "departing_stopped": 0.006756756756756757,
+        "stopped_not_departing": 0.0006142506142506142,
+        "moving": 0.03525798525798526,
+        "departing_per_km": 0.15412315320068776,
+        "drives": 8140
+      }
+    },
+    "patch_substitutions_per_drive": {
+      "seed0": 46.22493857493858,
+      "seed1": 46.214742014742015,
+      "seed2": 46.21646191646192
+    }
+  },
+  "C_route_end_censoring": {
+    "uncensored_reference_matches_registered_H10": true,
+    "effects": {
+      "PATCH_reduction": {
+        "point": 0.6762649543372836,
+        "per_city": {
+          "austin": 0.6944444444444444,
+          "dearborn": 0.683168316831683,
+          "miami": 0.5735294117647058,
+          "palo-alto": 0.7101449275362318,
+          "pittsburgh": 0.7133757961783439,
+          "washington-dc": 0.6829268292682927
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          0.6277346531486993,
+          0.7207864648380186
+        ],
+        "ci9833": [
+          0.6158462793791897,
+          0.7296822785802883
+        ]
+      },
+      "PATCH_collision_diff": {
+        "point": -0.0002188102365850552,
+        "per_city": {
+          "austin": -0.0001941370607649001,
+          "dearborn": -0.00066203243958954,
+          "miami": -0.0005947071067499254,
+          "palo-alto": 0.0,
+          "pittsburgh": -0.0001966568338249754,
+          "washington-dc": 0.00033467202141900963
+        },
+        "undefined_share": 0.0,
+        "ci95": [
+          -0.0006802345365595992,
+          0.0002137403417836194
+        ],
+        "ci9833": [
+          -0.0007907874511709663,
+          0.00030634037147629444
+        ]
+      }
+    },
+    "seed_averaged_ALL_brake_events": 401.3333333333333,
+    "cities_with_zero_ALL_brakes": [],
+    "powered": true,
+    "verdict": "supported",
+    "window": {
+      "pairs": 24420,
+      "share_no_scored_segment": 0.21895986895986896,
+      "mean_steps_after_handoff": 33.88857493857494,
+      "median_steps_after_handoff": 42.0,
+      "share_full_window": 0.05221130221130221,
+      "short_routes_le_1m": {
+        "pairs": 5208,
+        "mean_steps_after_handoff": 1.1826036866359446
+      }
+    },
+    "own_crossing_descriptive": {
+      "ALL": {
+        "unnecessary_hard_brake": 0.05331695331695332,
+        "collision": 0.0018837018837018838,
+        "mean_window_steps": 36.41498771498772
+      },
+      "PATCH": {
+        "unnecessary_hard_brake": 0.016666666666666666,
+        "collision": 0.0013513513513513514,
+        "mean_window_steps": 34.02694512694513
+      }
+    },
+    "counted_after_cutoff": {
+      "ALL": {
+        "brakes_counted_only_after_cutoff": 0.02927927927927928,
+        "collisions_counted_only_after_cutoff": 0.006592956592956593
+      },
+      "PATCH": {
+        "brakes_counted_only_after_cutoff": 0.027764127764127764,
+        "collisions_counted_only_after_cutoff": 0.007248157248157248
+      }
+    }
+  }
+}

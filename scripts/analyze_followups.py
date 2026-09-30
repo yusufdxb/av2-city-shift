@@ -166,6 +166,13 @@ def main() -> None:
     if not parity["passed"] or parity["scenarios"] != 8140:
         raise SystemExit("replay parity did not pass: studies B and C must not be analysed")
     rows = pd.read_parquet(args.rows)
+    # common_* / own_* exist only for ALL and PATCH rows, so they load as object dtype; make them real booleans
+    # there (on object dtype, ~True is -2 and truthy)
+    flags = [c for c in rows if c.startswith(("common_", "own_")) and c not in ("common_cutoff",) and "replans" not in c]
+    ap_rows = rows.arm.isin(["ALL", "PATCH"])
+    assert rows.loc[ap_rows, flags].notna().all().all() and rows.loc[~ap_rows, flags].isna().all().all()
+    for c in flags:
+        rows[c] = rows[c].astype("boolean")
     registered = json.load(open(args.stage4))["effects"]
     result = {"_note": "EXPLORATORY, pre-registered in docs/preregistration/exploratory-followups.md; cannot change any "
                        "registered Stage 1-4 verdict. 95% within-city scenario-bootstrap intervals (Bonferroni 98.33% "
