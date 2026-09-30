@@ -303,9 +303,9 @@ def fig_stage4(closedloop: str, out: str) -> None:
                  "of stopped agents (no stationary mode).")  # fmt: skip
 
 
-def fig_sensitivity(sweep: str, out: str) -> None:
+def fig_sensitivity(sweeps: list[str], out: str) -> None:
     """EXPLORATORY planner sweep: phantom braking and collisions vs risk weight, per speed cap (small multiples)."""
-    d = pd.read_parquet(sweep)
+    d = pd.concat([pd.read_parquet(p) for p in sweeps], ignore_index=True)
     d["brake"] = ((d.min_exec_decel <= -4 + 1e-9) & ~(d.min_log_decel <= -4 + 1e-9)).astype(float)
     d["coll"] = d.collision.astype(float)
     g = d.groupby(["cap", "risk_weight", "arm"])[["brake", "coll"]].mean().mul(100).reset_index()
@@ -334,12 +334,14 @@ def fig_sensitivity(sweep: str, out: str) -> None:
             if row == 1:
                 ax.set_xlabel("Planner risk weight (log; 100 = registered)")
     axes[0, 1].set_xlim(0.2, 600)
-    # Tolerates a future multi-seed table: a "seed" column is pooled by the groupby above and named in the note.
-    seeds = f"{d.seed.nunique()} model seeds pooled" if "seed" in d and d.seed.nunique() > 1 else "model seed 0"
+    # ALL and PATCH rows from every model seed are pooled by the groupby above; cv and oracle exist for seed 0 only.
+    n_seeds = d.model_seed.nunique() if "model_seed" in d else 1
+    seeds = f"model seeds 0 to {n_seeds - 1} pooled" if n_seeds > 1 else "model seed 0"
     _finish(fig, f"{out}/sensitivity_sweep.png",
-            title="Exploratory: PATCH cuts phantom braking by about 30 to 50% wherever the planner weighs risk (weight >= 3)",
-            note=f"3,000 replication-pool scenes, {seeds}, rates pooled over scenes, no intervals; brake threshold -4 m/s^2. "
-                 "Below weight 3 the planner barely weighs risk and collides in 3 to 30% of drives.")  # fmt: skip
+            title="Exploratory: PATCH cuts phantom braking by about 40 to 50% at planner risk weights of 10 and above",
+            note=f"3,000 replication-pool scenes, {seeds} (constant velocity and oracle: no model, seed-0 run); rates pooled "
+                 "over scenes, brake threshold -4 m/s^2; intervals in reports/sensitivity/summary.json. At weight 0.3 the "
+                 "planner barely weighs risk and every arm collides in 23 to 30% of drives.")  # fmt: skip
 
 
 def main() -> None:
@@ -350,7 +352,8 @@ def main() -> None:
     ap.add_argument("--out", default="docs/figures")
     ap.add_argument("--stage3", default="reports/stage3", help="directory with the Stage 3 results.json")
     ap.add_argument("--stage4", default="runs/stage4/closedloop_pool.parquet", help="Stage 4 closed-loop table (release v1.2)")
-    ap.add_argument("--sweep", default="runs/sensitivity/sweep.parquet", help="exploratory planner sweep table")
+    ap.add_argument("--sweep", nargs="+", default=[f"runs/sensitivity/sweep_seed{s}.parquet" for s in range(3)],
+                    help="exploratory planner sweep tables, one per model seed")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     fig_h1(args.evals, args.out)
