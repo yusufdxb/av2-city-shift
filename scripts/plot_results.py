@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import textwrap
 
 import matplotlib
 
@@ -36,6 +37,40 @@ plt.rcParams.update({
 
 def seed_mean(df: pd.DataFrame, m: str) -> np.ndarray:
     return df[[f"s{i}_{m}" for i in range(3)]].to_numpy(float).mean(1)
+
+
+def _fit(fig, artist, text: str) -> None:
+    """Set text on artist, wrapped so it fits the figure width (measured, not estimated) with balanced line lengths."""
+    renderer = fig.canvas.get_renderer()
+    limit = fig.bbox.width * 0.98 - artist.get_window_extent(renderer).x0
+
+    def fits(width: int) -> bool:
+        artist.set_text(textwrap.fill(text, width, break_on_hyphens=False))
+        return artist.get_window_extent(renderer).width <= limit
+
+    widest = next((w for w in range(len(text), 19, -1) if fits(w)), 20)
+    lines = len(textwrap.wrap(text, widest, break_on_hyphens=False))
+    best = widest  # narrowest width with the same line count, so the last line is not an orphan
+    while best > 20 and len(textwrap.wrap(text, best - 1, break_on_hyphens=False)) == lines:
+        best -= 1
+    fits(best)
+
+
+def _finish(fig, path: str, title: str | None = None, note: str | None = None, dpi: int = 200, note_size: float = 7.6) -> None:
+    """Left-aligned figure title and footnote, both wrapped to the figure width, with room reserved for them.
+
+    Saving with bbox_inches="tight" is a backstop so no title, label, legend or annotation is ever cut at the edge.
+    """
+    bottom = 0.0
+    if note:
+        t = fig.text(0.01, 0.01, "", color=INK2, fontsize=note_size, va="bottom")
+        _fit(fig, t, note)
+        bottom = (t.get_text().count("\n") + 1) * note_size * 1.3 / 72 / fig.get_figheight() + 0.025
+    if title:  # tight_layout reserves room for the suptitle itself
+        _fit(fig, fig.suptitle("", x=0.01, ha="left", fontsize=11, fontweight="bold"), title)
+    fig.tight_layout(rect=(0, bottom, 1, 1))
+    fig.savefig(path, dpi=dpi, bbox_inches="tight", pad_inches=0.15)
+    plt.close(fig)
 
 
 def fig_h1(evals: str, out: str) -> None:
@@ -72,13 +107,11 @@ def fig_h1(evals: str, out: str) -> None:
     ax.get_yticklabels()[-1].set_fontweight("bold")
     ax.set_ylim(-1.8, len(rows) + 0.7)
     ax.set_xlabel("Change in miss rate when the city was never seen in training (relative, %)")
-    ax.set_title("H1: miss rate rises in all six cities when the city is unseen", loc="left")
     ax.grid(axis="x")
     ax.set_axisbelow(True)
-    fig.text(0.01, 0.01, "Point estimates are positive in every city; Austin's 95% interval crosses zero. Per-city bars: 95% scenario bootstrap; seeds averaged.", color=INK2, fontsize=7.6)
-    fig.tight_layout(rect=(0, 0.04, 1, 1))
-    fig.savefig(f"{out}/h1_per_city.png", dpi=200)
-    plt.close(fig)
+    _finish(fig, f"{out}/h1_per_city.png", title="H1: miss rate rises in all six cities when the city is unseen",
+            note="Point estimates are positive in every city; Austin's 95% interval crosses zero. "
+                 "Per-city bars: 95% scenario bootstrap; seeds averaged.")  # fmt: skip
 
 
 def fig_h2(evals: str, out: str) -> None:
@@ -108,13 +141,10 @@ def fig_h2(evals: str, out: str) -> None:
     ax.invert_xaxis()
     ax.set_xlabel("Share of scenarios the predictor keeps (%)")
     ax.set_ylabel("Miss rate of kept scenarios (%)")
-    ax.set_title("H2: disagreement catches a third of what an error-ranked oracle removes", loc="left")
     ax.grid(axis="y")
     ax.set_axisbelow(True)
-    fig.text(0.01, 0.01, "Held-out-city validation scenarios, mean of the six leave-one-city-out folds.", color=INK2, fontsize=8)
-    fig.tight_layout(rect=(0, 0.04, 1, 1))
-    fig.savefig(f"{out}/h2_risk_coverage.png", dpi=200)
-    plt.close(fig)
+    _finish(fig, f"{out}/h2_risk_coverage.png", title="H2: disagreement catches a third of what an error-ranked oracle removes",
+            note="Held-out-city validation scenarios, mean of the six leave-one-city-out folds.", note_size=8)  # fmt: skip
 
 
 def fig_closed_loop(evals: str, out: str) -> None:
@@ -138,17 +168,14 @@ def fig_closed_loop(evals: str, out: str) -> None:
         ax.text(c + h + 0.12, yi, f"{rate(arm, 'failure'):.1f}%", va="center", fontsize=9, fontweight="bold")
     ax.set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
     ax.set_xlabel("Share of drives with a planning failure (%)")
-    ax.set_title("Closed loop: learned forecasts crash less, phantom-brake more", loc="left")
     ax.bar(0, 0, color=ORANGE, label="At-fault collision")
     ax.bar(0, 0, color=BLUE, label="Unnecessary hard brake, no collision")
     ax.legend(loc="upper right", fontsize=8.5)
     ax.grid(axis="x")
     ax.set_axisbelow(True)
     ax.set_xlim(0, 8.2)
-    fig.text(0.01, 0.01, "24,988 validation drives; human drive replayed: 0.4% (collision-checker calibration).", color=INK2, fontsize=8)
-    fig.tight_layout(rect=(0, 0.04, 1, 1))
-    fig.savefig(f"{out}/closed_loop_failures.png", dpi=200)
-    plt.close(fig)
+    _finish(fig, f"{out}/closed_loop_failures.png", title="Closed loop: learned forecasts crash less, phantom-brake more",
+            note="24,988 validation drives; human drive replayed: 0.4% (collision-checker calibration).", note_size=8)  # fmt: skip
 
 
 def fig_examples(evals: str, runs: str, root: str, out: str, city: str = "palo-alto") -> None:
@@ -166,7 +193,7 @@ def fig_examples(evals: str, runs: str, root: str, out: str, city: str = "palo-a
     for key, path in (("seen", f"{runs}/ALL/seed0/model.pt"), ("unseen", f"{runs}/LOCO-{city}/seed0/model.pt")):
         model, _ = load_model(path, device)
         preds[key] = run_model(model, val, idx, device)
-    fig, axes = plt.subplots(2, 2, figsize=(9.0, 9.2))
+    fig, axes = plt.subplots(2, 2, figsize=(9.0, 8.6))
     for r, vi in enumerate([typical, worst]):
         j = int(np.where(idx == vi)[0][0])
         hist = np.asarray(val.arrays["agent_hist"][vi])
@@ -204,17 +231,14 @@ def fig_examples(evals: str, runs: str, root: str, out: str, city: str = "palo-a
             ax.set_yticks([])
             for sp in ax.spines.values():
                 sp.set_visible(False)
-            ax.set_title(f"{title}: best-of-6 endpoint error {fde:.1f} m", loc="left", fontsize=9.5, color=col)
+            ax.set_title(f"{title}\nbest-of-6 endpoint error {fde:.1f} m", loc="left", fontsize=9.5, color=col)
             if cidx == 0:
                 ax.text(-0.02, 0.5, "Typical scenario" if r == 0 else "Largest gap", transform=ax.transAxes, rotation=90,
                         ha="right", va="center", fontsize=10, fontweight="bold", color=INK)
-    fig.text(0.02, 0.012, "Black: focal vehicle history (solid) and true future (dashed, star). Colour: the 6 predicted futures, thicker = more\n"
-             "probable. Grey: other agents and lanes. Seed-0 models, Palo Alto validation vehicles. Top: the median-error scenario for\n"
-             "the trained-with model. Bottom: selected as the scenario where the unseen-city model does worst relative to the other.",
-             color=INK2, fontsize=7.8)  # fmt: skip
-    fig.tight_layout(rect=(0.02, 0.07, 1, 1))
-    fig.savefig(f"{out}/example_scenarios.png", dpi=170)
-    plt.close(fig)
+    _finish(fig, f"{out}/example_scenarios.png", dpi=170, note_size=7.8,
+            note="Black: focal vehicle history (solid) and true future (dashed, star). Colour: the 6 predicted futures, thicker = more "
+                 "probable. Grey: other agents and lanes. Seed-0 models, Palo Alto validation vehicles. Top: the median-error scenario for "
+                 "the trained-with model. Bottom: selected as the scenario where the unseen-city model does worst relative to the other.")  # fmt: skip
 
 
 def fig_stage3(stage3: str, out: str) -> None:
@@ -238,13 +262,10 @@ def fig_stage3(stage3: str, out: str) -> None:
         ax.set_xlim(0, max(r[key].values()) * 100 * 1.25)
         ax.set_xlabel("Share of validation drives (%)")
     axes[0].set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
-    fig.suptitle("Stage 3: CV for stopped agents cuts phantom brakes 38%, collisions within the registered margin",
-                 x=0.01, ha="left", fontsize=11, fontweight="bold")
-    fig.text(0.01, 0.01, "Closed loop v2 (no future speed cap, contact-based fault), 24,988 validation drives, model arms averaged "
-             "over 3 seeds. Sham substituted 43% of PATCH's dose (see audit).", color=INK2, fontsize=7.6)
-    fig.tight_layout(rect=(0, 0.05, 1, 0.94))
-    fig.savefig(f"{out}/stage3_closed_loop.png", dpi=200)
-    plt.close(fig)
+    _finish(fig, f"{out}/stage3_closed_loop.png",
+            title="Stage 3: CV for stopped agents cuts phantom brakes 38%, collisions within the registered margin",
+            note="Closed loop v2 (no future speed cap, contact-based fault), 24,988 validation drives, model arms averaged "
+                 "over 3 seeds. Sham substituted 43% of PATCH's dose (see audit).")  # fmt: skip
 
 
 def fig_stage4(closedloop: str, out: str) -> None:
@@ -276,13 +297,10 @@ def fig_stage4(closedloop: str, out: str) -> None:
         ax.set_xlim(0, max(values.values()) * 1.25)
         ax.set_xlabel("Share of drives (%)")
     axes[0].set_yticks(range(len(arms)), [a[1] for a in arms[::-1]])
-    fig.suptitle("Stage 4 (8,140 fresh scenes): the stopped-agent fix replicates; a dose-matched sham shows no detectable effect",
-                 x=0.01, ha="left", fontsize=11, fontweight="bold")
-    fig.text(0.01, 0.01, "Scenes no compared model trained on; model arms averaged over 3 seeds. TRIM fell back to CV for about 67% "
-             "of stopped agents (no stationary mode).", color=INK2, fontsize=7.6)
-    fig.tight_layout(rect=(0, 0.05, 1, 0.94))
-    fig.savefig(f"{out}/stage4_replication.png", dpi=200)
-    plt.close(fig)
+    _finish(fig, f"{out}/stage4_replication.png",
+            title="Stage 4 (8,140 fresh scenes): the stopped-agent fix replicates; a dose-matched sham shows no detectable effect",
+            note="Scenes no compared model trained on; model arms averaged over 3 seeds. TRIM fell back to CV for about 67% "
+                 "of stopped agents (no stationary mode).")  # fmt: skip
 
 
 def fig_sensitivity(sweep: str, out: str) -> None:
@@ -316,13 +334,12 @@ def fig_sensitivity(sweep: str, out: str) -> None:
             if row == 1:
                 ax.set_xlabel("Planner risk weight (log; 100 = registered)")
     axes[0, 1].set_xlim(0.2, 600)
-    fig.suptitle("Exploratory: PATCH cuts phantom braking by about 30 to 50% wherever the planner weighs risk (weight >= 3)",
-                 x=0.01, ha="left", fontsize=11, fontweight="bold")
-    fig.text(0.01, 0.01, "3,000 replication-pool scenes, model seed 0, rates pooled over scenes, no intervals; brake threshold -4 m/s^2. Below weight 3 the "
-             "planner barely weighs risk and collides in 3 to 30% of drives.", color=INK2, fontsize=7.6)
-    fig.tight_layout(rect=(0, 0.04, 1, 0.95))
-    fig.savefig(f"{out}/sensitivity_sweep.png", dpi=200)
-    plt.close(fig)
+    # Tolerates a future multi-seed table: a "seed" column is pooled by the groupby above and named in the note.
+    seeds = f"{d.seed.nunique()} model seeds pooled" if "seed" in d and d.seed.nunique() > 1 else "model seed 0"
+    _finish(fig, f"{out}/sensitivity_sweep.png",
+            title="Exploratory: PATCH cuts phantom braking by about 30 to 50% wherever the planner weighs risk (weight >= 3)",
+            note=f"3,000 replication-pool scenes, {seeds}, rates pooled over scenes, no intervals; brake threshold -4 m/s^2. "
+                 "Below weight 3 the planner barely weighs risk and collides in 3 to 30% of drives.")  # fmt: skip
 
 
 def main() -> None:
