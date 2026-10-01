@@ -11,7 +11,6 @@ An ALL rerun is compared with the stored Stage 4 rows (the registration requires
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import multiprocessing as mp
 import os
@@ -98,6 +97,9 @@ def main() -> None:
     if "ALL" in arms:
         report["ALL_parity_vs_stage4"] = parity(out, args.stage4, seeds)
     print(json.dumps(report))
+    with open(args.out + ".report.json", "w") as f:
+        json.dump(report, f, indent=2)
+        f.write("\n")
 
 
 if __name__ == "__main__":
