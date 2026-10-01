@@ -24,3 +24,17 @@ def test_ratio_point_and_decisions():
     assert np.isclose(eff["R"]["point"], 0.1) and decide(eff, 600, [], 1.0) == "killed"
     assert decide(eff, 600, [], 0.9).startswith("uninterpretable")
     assert decide(eff, 50, [], 1.0).startswith("inconclusive")
+
+
+def test_study_e_effects_and_decide():
+    from cityshift.study_e import analyze as analyze_e, decide as decide_e
+    rows = []
+    for c in CITIES:
+        for i in range(400):
+            rows.append({"city": c, "ALL": float(i < 100), "PATCH": float(i < 50), "SHAM2": float(i < 95),
+                         "TRIM": float(i < 55)})
+    e = analyze_e(pd.DataFrame(rows), n_boot=300)
+    assert np.isclose(e["PATCH_reduction"]["point"], 0.5) and np.isclose(e["sham_gap"]["point"], 0.45)
+    assert decide_e(e["PATCH_reduction"], 0.30, True, True) == "supported"
+    assert decide_e(e["PATCH_reduction"], 0.30, True, False) == "uninterpretable"
+    assert decide_e(e["PATCH_reduction"], 0.60, True, True) == "killed"

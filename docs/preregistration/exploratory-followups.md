@@ -245,4 +245,8 @@ None at registration.
    ALL matched every Stage 4 outcome on 300 drives but 2 drives differed by one acceleration step, so production ran on
    the GPU, where the registered 100-scenario ALL rerun matched Stage 4 exactly (300 drives). Result: supported,
    R = 0.82 [0.66, 0.95]; independently recomputed.
+5. 2026-10-01, study E: a 100-scenario GPU smoke run of the runner on the first 100 pool scenarios (to size the VRAM cap
+   while sharing the GPU with another training job) was deleted without its outcomes being examined; the production run
+   rescores those scenarios deterministically. Runner (cityshift.followup_e) and analysis (cityshift.study_e) were
+   committed before any study E output was examined.
 
