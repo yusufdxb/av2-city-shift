@@ -242,7 +242,7 @@ Stage 3 reused already-scored validation scenes and its sham reached only 43% of
 
 Controls: the stand-still forecast collides 5.2x as often as the model; the replayed human drive has 0.38% at-fault collisions; 640 seed-averaged brake events in the control arm (floor 100).
 
-**Caveat on TRIM.** For about 67% of stopped agents the model had no mode that stays within 2 m, so TRIM fell back to constant velocity. TRIM is therefore mostly PATCH: H12's result does not show whether dropping moving-mode probability alone is enough on the agents where the model has a stationary mode (no arm without the fallback was run), and it is weak evidence that probability mass, rather than the trajectory, is the mechanism.
+**Caveat on TRIM.** For about 67% of stopped agents the model had no mode that stays within 2 m, so TRIM fell back to constant velocity. TRIM is therefore mostly PATCH: H12's result does not show whether dropping moving-mode probability alone is enough on the agents where the model has a stationary mode (no arm without the fallback was run), and it is weak evidence that probability mass, rather than the trajectory, is the mechanism. An exploratory follow-up (study A, below) ran that missing arm.
 
 **Descriptive only: per-replan risk calibration** (first three replans, which have a full 4 s future; contacts are rare, so Brier scores are small). On stopped agents, PATCH and TRIM halve the planner's risk error (Brier 0.0018 to 0.0009) but rank risky agents worse (AUROC 0.67 to 0.55 and 0.56); the oracle reaches 0.86. The fix works by removing false alarms, not by predicting real conflicts better.
 
@@ -303,6 +303,8 @@ Pre-registered before any analysis ([registration](docs/preregistration/explorat
 | Stand-still forecast vs model, collisions (control, needs >= 2x) | 5.2x (Stage 4), 5.6x (Stage 3), pass | 1.6x, 1.1x, fail |
 
 Every on-route verdict is uninterpretable because of the last row; the estimates are shown for completeness. The windows are short: 3.3 to 3.5 s after the handoff on average, and 22% of drive pairs have no complete 1 s segment on the route.
+
+- **Without the fallback, dropping moving-mode probability gets most of what constant velocity gets, but only on a small share of the braking.** Study A (pre-registered, run on the GPU after an exact 300-drive rerun of the focal-only arm; [runner](src/cityshift/followup_a.py), [analysis](src/cityshift/study_a.py), [result](reports/followups/study_a.json)) restricts both changes to stopped agents whose own forecast has a mode ending within 2 m: TRIM-NF removes the other modes' probability, PATCH-SUB replaces the forecast with constant velocity, on the same 367,000 agent-replans (eligible-count ratio 0.9999). TRIM-NF cuts unnecessary hard brakes by 6.4% [3.4, 9.2] and PATCH-SUB by 7.8% [4.7, 10.7], a ratio of 0.82 [0.66, 0.95], above the registered 0.5 bar; TRIM-NF's collisions are +0.04 pp [-0.02, +0.09]. So where the model already has a stationary mode, probability mass is most of the mechanism. But PATCH-SUB, which leaves the other two thirds of stopped agents (those with no stationary mode) alone, gets 8% against PATCH's 45%, so most of PATCH's reduction depends on the agents for which the model predicts only motion (effects are not strictly additive).
 
 ## What broke along the way
 

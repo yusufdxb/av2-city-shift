@@ -199,4 +199,10 @@ None at registration.
    than 1% undefined draws) rather than when any arm in the table is. Result: both positive controls passed
    (uncensored reproduction exact; H10 point equals study C's), and the STATIC control failed in the censored window
    (1.62x Stage 4, 1.07x Stage 3, needs 2x), so every censored verdict is uninterpretable. Independently recomputed.
+4. 2026-09-30, study A, before its analysis produced output: the arms, runner (cityshift.followup_a) and analysis
+   (cityshift.study_a, bootstrap seed 20260930 as for B and C) were committed first (536040d, 9bb94c1). A CPU smoke run
+   on 60 pool scenarios checked only the eligible counts (ratio 0.997); its outcomes were not examined. A CPU rerun of
+   ALL matched every Stage 4 outcome on 300 drives but 2 drives differed by one acceleration step, so production ran on
+   the GPU, where the registered 100-scenario ALL rerun matched Stage 4 exactly (300 drives). Result: supported,
+   R = 0.82 [0.66, 0.95]; independently recomputed.
 
