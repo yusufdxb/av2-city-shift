@@ -18,6 +18,7 @@ import pandas as pd
 
 from .analysis_stage3 import CITIES
 from .closedloop_v3 import POOL_SHA256, checked_ids
+from .closedloop import REPLANS
 
 LEVEL, LEVEL_BONF, BOOT_SEED = 0.95, 1 - 0.05 / 3, 20260930
 ARMS = ("ALL", "PATCH", "SHAM2", "TRIM")
@@ -70,6 +71,14 @@ def decide(e: dict, bar: float, powered: bool, interpretable: bool) -> str:
     return "supported" if e["point"] >= bar and e["ci95"][0] > 0 else "killed"
 
 
+def validate_dose(patch: np.ndarray, sham: np.ndarray) -> None:
+    if (patch.ndim != 2 or patch.shape != sham.shape or patch.shape[1] != len(REPLANS)
+            or not np.isfinite(patch).all() or not np.isfinite(sham).all()
+            or (patch < 0).any() or (sham < 0).any() or (sham > patch).any()
+            or (patch != np.floor(patch)).any() or (sham != np.floor(sham)).any()):
+        raise ValueError("invalid SHAM2 dose: require finite nonnegative counts <= PATCH at every replan")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--parts", required=True)
@@ -87,13 +96,12 @@ def main() -> None:
         a: float(d[f"{a}_unnecessary_hard_brake"].astype(float).mean()) for a in ("cv", "oracle", "static")}
     collisions = {a: float(seed_mean(d, a, "collision").mean()) for a in ARMS} | {
         a: float(d[f"{a}_collision"].astype(float).mean()) for a in ("cv", "oracle", "static", "log")}
-    dose = {a: int(sum(np.sum(x) for s in range(3) for x in d[f"{a}_s{s}_dose_by_replan"])) for a in ("PATCH", "SHAM2")}
     for seed in range(3):  # per-replan validation, as Stage 4: SHAM2 never exceeds PATCH's reference, never negative
         p_d = np.stack(d[f"PATCH_s{seed}_dose_by_replan"].to_numpy())
         s_d = np.stack(d[f"SHAM2_s{seed}_dose_by_replan"].to_numpy())
-        if (p_d < 0).any() or (s_d > p_d).any():
-            raise SystemExit(f"invalid SHAM2 dose at seed {seed}")
-    dose_ratio = dose["SHAM2"] / dose["PATCH"]
+        validate_dose(p_d, s_d)
+    dose = {a: int(sum(np.sum(x) for s in range(3) for x in d[f"{a}_s{s}_dose_by_replan"])) for a in ("PATCH", "SHAM2")}
+    dose_ratio = dose["SHAM2"] / dose["PATCH"] if dose["PATCH"] else float("nan")
     control = rates["ALL"] >= 2 * rates["oracle"]
     events = float(data.ALL.sum())
     powered = events >= 100 and all(data.loc[data.city.astype(str) == c, "ALL"].sum() > 0 for c in CITIES)

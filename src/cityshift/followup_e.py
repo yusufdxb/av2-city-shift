@@ -23,6 +23,7 @@ from . import closedloop as base
 from . import closedloop_v2 as v2
 from . import closedloop_v4 as v4
 from .closedloop_v3 import POOL_SHA256, checked_ids, run_forecast
+from .run_manifest import run_settings, validate_manifest, validate_parts
 
 MODEL_ARMS = ("ALL", "PATCH", "SHAM2", "TRIM")  # PATCH before SHAM2: its per-replan dose is SHAM2's reference
 ANALYTIC = ("cv", "oracle", "static")
@@ -64,26 +65,28 @@ def main() -> None:
     ap.add_argument("--device", default="cuda", choices=("cpu", "cuda"))
     args = ap.parse_args()
     seeds = [int(x) for x in args.seeds.split(",")]
+    if not seeds or not set(seeds) <= {0, 1, 2} or len(set(seeds)) != len(seeds):
+        ap.error("seeds must be a unique subset of 0,1,2")
+    if args.chunk <= 0 or args.workers <= 0 or args.limit < 0 or not 0 <= args.mem_fraction <= 1:
+        ap.error("chunk and workers must be positive; limit nonnegative; mem-fraction between 0 and 1")
     ids = sorted(checked_ids(args.pool, POOL_SHA256))
     ids = ids[:args.limit] if args.limit else ids
+    if not ids:
+        ap.error("no scenarios selected")
     device = torch.device(args.device)
+    checkpoints = {f"ALL_s{s}": f"{args.runs}/ALL/seed{s}/model.pt" for s in seeds}
+    settings = run_settings("closedloop_v4", str(device), seeds, args.pool, ids, args.raw, checkpoints,
+                            arms=list(MODEL_ARMS), analytic=list(ANALYTIC), stop_decel=v4.STOP_DECEL,
+                            chunk=args.chunk, workers=args.workers, limit=args.limit, mem_fraction=args.mem_fraction,
+                            calibrate=False)
+    parts = sorted(glob.glob(os.path.join(args.out_dir, "part_*.parquet")))
+    validate_manifest(os.path.join(args.out_dir, "manifest.json"), settings, parts)
+    validate_parts(args.out_dir, ids, args.chunk, seeds)
     if device.type == "cuda" and args.mem_fraction:
         torch.cuda.set_per_process_memory_fraction(args.mem_fraction)
-    models = base.load_models({f"ALL_s{s}": f"{args.runs}/ALL/seed{s}/model.pt" for s in seeds}, device)
+    models = base.load_models(checkpoints, device)
     base.init_ego, base.score = v2.init_ego, v2.score
     v4.install()  # stop-line planner, inherited by every worker forked below
-    os.makedirs(args.out_dir, exist_ok=True)
-    manifest = {"harness": "closedloop_v4", "stop_decel": v4.STOP_DECEL, "device": device.type, "seeds": seeds,
-                "chunk": args.chunk, "limit": args.limit, "runs": args.runs,
-                "git": os.popen("git rev-parse HEAD 2>/dev/null").read().strip()}
-    mpath = os.path.join(args.out_dir, "manifest.json")
-    if os.path.exists(mpath):  # resuming: every setting except the code revision must match the parts already written
-        old = json.load(open(mpath))
-        if {k: v for k, v in old.items() if k != "git"} != {k: v for k, v in manifest.items() if k != "git"}:
-            raise SystemExit(f"refusing to resume: {mpath} was written with different settings")
-    else:
-        with open(mpath, "w") as f:
-            json.dump(manifest, f, indent=2)
     ctx = mp.get_context("fork")
     start, done_drives = time.time(), 0
     for offset in range(0, len(ids), args.chunk):

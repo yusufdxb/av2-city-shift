@@ -1,10 +1,10 @@
-"""Stop-line closed loop (EXPLORATORY candidate harness, CPU pilot first; not registered yet).
+"""Stop-line closed loop (EXPLORATORY study E; docs/preregistration/exploratory-followups.md).
 
 The registered closed loop extends the human's logged route straight past its end, and study D showed that most at-fault
 collisions, and the collision checker's positive control, come from driving on that extension. Here the end of the
-logged route acts as a stop line: the planner may only choose an acceleration after which the ego can still stop at
+logged route acts as a stop line: when feasible, the planner chooses an acceleration after which the ego can still stop at
 or before the route end decelerating at STOP_DECEL (gentler than the -4 m/s^2 hard-brake threshold, so respecting the
-line never needs a hard brake by itself), and its risk and progress terms treat the ego as stopping at the line.
+line can be maintained without a hard brake from a feasible state), and its risk and progress terms treat the ego as stopping there.
 Everything else (agent selection, forecasts, candidate set, weights, execution, scoring) is the closedloop_v2 harness.
 
 From any state that satisfies the rule, braking at exactly STOP_DECEL keeps the stopping point fixed, so once a
@@ -12,7 +12,7 @@ feasible candidate has been executed one always exists at the next replan. The r
 handoff (the remaining route depends on how the human braked; e.g. 10 m/s with 5 m left cannot be met even at
 -8 m/s^2), and if no candidate is feasible the hardest brake is chosen and execution can pass the line. Compliance is
 therefore checked empirically: on all 122,100 study E drives there were 0 infeasible replans and no drive passed the
-route end (reports/followups/study_e_stopline_diagnostics.json).
+route end by more than 1 cm; maximum overshoot was below 1e-6 m (reports/followups/study_e_stopline_diagnostics.json).
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from .closedloop import (ACCELS, CHECK_STEPS, DIMS, EGO_DIMS, EXEC_STEPS, MARGIN
 from .scene import Scene
 
 STOP_DECEL = 3.0
-INFEASIBLE = {"count": 0}  # per-process counter of replans with no feasible candidate (reported by the runner)
+INFEASIBLE = {"count": 0}  # per-process counter of replans with no feasible candidate
 
 
 def feasible(ego: EgoSim, t: int) -> np.ndarray:

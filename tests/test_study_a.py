@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from cityshift.analysis_stage3 import CITIES
 from cityshift.study_a import analyze, decide
@@ -45,5 +46,34 @@ def test_failed_control_is_reported_not_crashed():
              "ALL_c": 0.0, "TRIMNF_c": 0.0, "PATCHSUB_c": 0.0} for c in CITIES for i in range(400)]
     eff = analyze(pd.DataFrame(rows), n_boot=50)
     assert np.isnan(eff["R"]["point"])
-    assert decide(eff, 600, [], 1.0).startswith(("uninterpretable", "inconclusive"))
+    assert decide(eff, 600, [], 1.0) == "uninterpretable (PATCHSUB positive control failed)"
     assert decide(eff, 600, [], float("nan")).startswith("uninterpretable")
+
+
+def test_no_brakes_or_eligibility():
+    data = _data(1.0)
+    data[["ALL_b", "PATCHSUB_b", "TRIMNF_b"]] = 0.0
+    eff = analyze(data, n_boot=50)
+    assert decide(eff, 0, list(CITIES), 1.0).startswith("uninterpretable")
+    assert decide(eff, 0, list(CITIES), float("nan")).startswith("uninterpretable")
+
+
+@pytest.mark.parametrize("bad", [-1, 3, float("nan"), float("inf"), 0.5])
+def test_study_e_rejects_invalid_per_replan_dose(bad):
+    from cityshift.study_e import validate_dose
+    patch, sham = np.full((2, 6), 2.0), np.ones((2, 6))
+    sham[0, 1] = bad
+    with pytest.raises(ValueError, match="invalid SHAM2 dose"):
+        validate_dose(patch, sham)
+
+
+def test_study_e_dose_shape_and_valid_counts():
+    from cityshift.study_e import validate_dose
+    validate_dose(np.full((2, 6), 2), np.ones((2, 6)))
+    validate_dose(np.zeros((2, 6)), np.zeros((2, 6)))
+    with pytest.raises(ValueError):
+        validate_dose(np.ones((2, 5)), np.ones((2, 5)))
+    with pytest.raises(ValueError):
+        validate_dose(np.ones((2, 6)), np.ones((1, 6)))
+    with pytest.raises(ValueError):
+        validate_dose(np.full((2, 6), -1), np.zeros((2, 6)))

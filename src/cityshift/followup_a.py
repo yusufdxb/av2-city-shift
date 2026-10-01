@@ -23,6 +23,7 @@ import torch
 from . import closedloop as base
 from . import closedloop_v2 as v2
 from .closedloop_v3 import POOL_SHA256, checked_ids, run_forecast
+from .run_manifest import file_sha256, run_settings, validate_manifest
 
 ARMS = ("ALL", "TRIMNF", "PATCHSUB")
 PARITY = ("collision", "first_collision_step", "planner_hard_brake", "logged_hard_brake", "unnecessary_hard_brake",
@@ -60,15 +61,25 @@ def main() -> None:
     ap.add_argument("--device", default="auto", choices=("auto", "cpu", "cuda"))
     args = ap.parse_args()
     arms, seeds = args.arms.split(","), [int(x) for x in args.seeds.split(",")]
-    if not set(arms) <= set(ARMS) or not seeds or not set(seeds) <= {0, 1, 2}:
+    if (not arms or not set(arms) <= set(ARMS) or len(set(arms)) != len(arms) or not seeds
+            or not set(seeds) <= {0, 1, 2} or len(set(seeds)) != len(seeds)):
         ap.error("arms must be a subset of ALL,TRIMNF,PATCHSUB and seeds of 0,1,2")
+    if args.chunk <= 0 or args.workers <= 0 or args.limit < 0 or args.offset < 0:
+        ap.error("chunk and workers must be positive; limit and offset must be nonnegative")
     ids = sorted(checked_ids(args.pool, POOL_SHA256))
     ids = ids[args.offset:args.offset + args.limit] if args.limit else ids[args.offset:]
+    if not ids:
+        ap.error("no scenarios selected")
     dirs = [os.path.join(args.raw, i) for i in ids]
     if not all(os.path.isdir(d) for d in dirs):
         ap.error("missing raw scenario directories")
     device = torch.device(("cuda" if torch.cuda.is_available() else "cpu") if args.device == "auto" else args.device)
-    models = base.load_models({f"ALL_s{s}": f"{args.runs}/ALL/seed{s}/model.pt" for s in seeds}, device)
+    checkpoints = {f"ALL_s{s}": f"{args.runs}/ALL/seed{s}/model.pt" for s in seeds}
+    settings = run_settings("closedloop_v3", str(device), seeds, args.pool, ids, args.raw, checkpoints,
+                            arms=arms, chunk=args.chunk, workers=args.workers, limit=args.limit, offset=args.offset,
+                            calibrate=False, stage4_sha256=file_sha256(args.stage4) if "ALL" in arms else None)
+    validate_manifest(args.out + ".manifest.json", settings, [args.out, args.out + ".report.json"])
+    models = base.load_models(checkpoints, device)
     base.init_ego = v2.init_ego
     base.score = v2.score
     ctx = mp.get_context("fork")
@@ -91,7 +102,8 @@ def main() -> None:
               flush=True)
     out = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-    out.to_parquet(args.out, index=False)
+    out.to_parquet(args.out + ".tmp", index=False)
+    os.replace(args.out + ".tmp", args.out)
     report = {"device": str(device), "arms": arms, "seeds": seeds, "scenarios": len(out),
               "runtime_sec": round(time.time() - start)}
     if "ALL" in arms:

@@ -68,10 +68,11 @@ def decide(eff: dict, all_events: float, zero_cities: list[str], dose_ratio: flo
     """The registered decision rules for study A."""
     if not np.isfinite(dose_ratio) or not 0.95 <= dose_ratio <= 1.05:
         return "uninterpretable (eligible-count ratio outside 0.95 to 1.05)"
+    control_lo = eff["PATCHSUB_reduction"]["ci95"][0]
+    if control_lo is None or not control_lo > 0:
+        return "uninterpretable (PATCHSUB positive control failed)"
     if all_events < 100 or zero_cities or max(eff[k]["undefined_share"] for k in eff) > 0.01:
         return "inconclusive (A8)"
-    if not eff["PATCHSUB_reduction"]["ci95"][0] > 0:
-        return "uninterpretable (PATCHSUB positive control failed)"
     lo, hi = eff["R"]["ci95"]
     return "supported" if lo >= 0.5 else "killed" if hi < 0.5 else "inconclusive"
 
