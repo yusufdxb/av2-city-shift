@@ -1,0 +1,352 @@
+{
+  "_note": "EXPLORATORY study D (docs/preregistration/exploratory-followups.md): registered closed-loop components rescored only while every compared drive is on the human's logged route. Registered estimators, CI levels, decision rules and seeds; verdicts stay as registered.",
+  "H10_point_equals_study_C": true,
+  "stage4": {
+    "uncensored_reference_reproduces_registered": true,
+    "controls_censored": {
+      "STATIC_over_ALL": 1.6216216216216217,
+      "STATIC_pass": false,
+      "LOG_collision": 0.0038083538083538084,
+      "LOG_pass": true
+    },
+    "components": {
+      "H10": {
+        "censored": {
+          "PATCH_reduction": {
+            "point": 0.6762649543372836,
+            "ci": [
+              0.6070269332856071,
+              0.7354222361342483
+            ],
+            "ci_98_75": [
+              0.613620137505941,
+              0.7318498678731215
+            ]
+          },
+          "PATCH_collision_diff": {
+            "point": -0.0002188102365850552,
+            "ci": [
+              -0.0008578991697611052,
+              0.0003613089939216386
+            ],
+            "ci_98_75": [
+              -0.0008040580943203143,
+              0.00031374547512667844
+            ]
+          }
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "supported",
+        "flip": true,
+        "seed_averaged_ALL_brake_events": 401.3333333333333,
+        "window": {
+          "mean_steps_after_handoff": 33.88857493857494,
+          "share_no_scored_segment": 0.21895986895986896,
+          "share_full_window": 0.05221130221130221
+        },
+        "registered": {
+          "PATCH_reduction": {
+            "point": 0.4492122595098775,
+            "ci": [
+              0.37677901976240624,
+              0.5144834108431313
+            ],
+            "ci_98_75": [
+              0.38405157358558495,
+              0.5082328758188233
+            ]
+          },
+          "PATCH_collision_diff": {
+            "point": 0.00039382294372131995,
+            "ci": [
+              -0.0014128078249574358,
+              0.0021884907562364393
+            ],
+            "ci_98_75": [
+              -0.0012964393132420923,
+              0.0020351342381198572
+            ]
+          }
+        }
+      },
+      "H11": {
+        "censored": {
+          "sham_gap": {
+            "point": 0.3560126412648385,
+            "ci": [
+              0.27196717172084467,
+              0.4533120865907565
+            ],
+            "ci_98_75": [
+              0.27818585747267327,
+              0.445542425472725
+            ]
+          }
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "supported",
+        "flip": true,
+        "seed_averaged_ALL_brake_events": 391.99999999999994,
+        "window": {
+          "mean_steps_after_handoff": 32.99651924651925,
+          "share_no_scored_segment": 0.22104832104832106,
+          "share_full_window": 0.03341523341523341
+        },
+        "registered": {
+          "sham_gap": {
+            "point": 0.41043604410408435,
+            "ci": [
+              0.32761125769447985,
+              0.5017789727530418
+            ],
+            "ci_98_75": [
+              0.3348643168351618,
+              0.49664561009531055
+            ]
+          }
+        }
+      },
+      "H12": {
+        "censored": {
+          "TRIM_reduction": {
+            "point": 0.6669688564626378,
+            "ci": [
+              0.5979808563345717,
+              0.7258427844052878
+            ],
+            "ci_98_75": [
+              0.6051992709468794,
+              0.7204530325540915
+            ]
+          },
+          "TRIM_collision_diff": {
+            "point": 7.248131162853682e-05,
+            "ci": [
+              -0.0006724441057220499,
+              0.0008675032688012591
+            ],
+            "ci_98_75": [
+              -0.0006235027288667664,
+              0.0007843796829241209
+            ]
+          }
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "supported",
+        "flip": true,
+        "seed_averaged_ALL_brake_events": 401.66666666666663,
+        "window": {
+          "mean_steps_after_handoff": 33.942301392301395,
+          "share_no_scored_segment": 0.21883701883701884,
+          "share_full_window": 0.05389025389025389
+        },
+        "registered": {
+          "TRIM_reduction": {
+            "point": 0.4309927010740831,
+            "ci": [
+              0.36041298918514136,
+              0.4945650149493673
+            ],
+            "ci_98_75": [
+              0.36688057046593303,
+              0.48771847585784306
+            ]
+          },
+          "TRIM_collision_diff": {
+            "point": 0.00048280544856232405,
+            "ci": [
+              -0.0013291983198173761,
+              0.0022279819229806624
+            ],
+            "ci_98_75": [
+              -0.0011608290617479574,
+              0.0020946970998032798
+            ]
+          }
+        }
+      },
+      "H13": {
+        "censored": {
+          "MIX_reduction": {
+            "point": 0.04941272841816715,
+            "ci": [
+              -0.07040352997758743,
+              0.14338476587910573
+            ],
+            "ci_98_75": [
+              -0.06265232641276576,
+              0.13390499490055796
+            ]
+          },
+          "MIX_collision_diff": {
+            "point": -0.00027963181609846265,
+            "ci": [
+              -0.0008635598619015213,
+              0.00021433740653918298
+            ],
+            "ci_98_75": [
+              -0.0008244082340945262,
+              0.00017244881372845833
+            ]
+          },
+          "focal_miss_diff": {
+            "point": 0.013305190776889839,
+            "ci": [
+              0.004652669009889221,
+              0.02181364669539558
+            ],
+            "ci_98_75": [
+              0.005524657810086195,
+              0.02119703514653163
+            ]
+          }
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "killed",
+        "flip": true,
+        "seed_averaged_ALL_brake_events": 420.3333333333333,
+        "window": {
+          "mean_steps_after_handoff": 35.077886977886976,
+          "share_no_scored_segment": 0.2183865683865684,
+          "share_full_window": 0.1104013104013104
+        },
+        "registered": {
+          "MIX_reduction": {
+            "point": -0.027041067797048624,
+            "ci": [
+              -0.12112528974450089,
+              0.050673710475850564
+            ],
+            "ci_98_75": [
+              -0.11223526715735303,
+              0.042935168044478444
+            ]
+          },
+          "MIX_collision_diff": {
+            "point": -0.0014655751134443403,
+            "ci": [
+              -0.003139427204591913,
+              0.00010548027264410185
+            ],
+            "ci_98_75": [
+              -0.002963159176947315,
+              -3.168537659982974e-05
+            ]
+          },
+          "focal_miss_diff": {
+            "point": 0.013305190776889839,
+            "ci": [
+              0.004652669009889221,
+              0.02181364669539558
+            ],
+            "ci_98_75": [
+              0.005524657810086195,
+              0.02119703514653163
+            ]
+          }
+        }
+      }
+    }
+  },
+  "stage3": {
+    "uncensored_reference_reproduces_registered": true,
+    "controls_censored": {
+      "STATIC_over_ALL": 1.06875,
+      "STATIC_pass": false,
+      "LOG_collision": 0.003481671202177045,
+      "LOG_pass": true
+    },
+    "components": {
+      "H7": {
+        "censored": {
+          "brake_reduction": 0.01970064239416355,
+          "brake_ci": [
+            -0.04719012470049743,
+            0.08103959491546854
+          ],
+          "collision_difference": -0.0003156104960478436,
+          "collision_ci": [
+            -0.0007473093744964704,
+            0.00010232520902562407
+          ],
+          "underpowered": false,
+          "undefined_cities": [],
+          "undefined_bootstrap_share": 0.0
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "killed",
+        "flip": true,
+        "registered": {
+          "brake_reduction": -0.01149161344047638,
+          "brake_ci": [
+            -0.0626465258424944,
+            0.036065370257706654
+          ],
+          "collision_difference": -0.0008286625341030248,
+          "collision_ci": [
+            -0.0018481005143253506,
+            0.00015938125377542737
+          ],
+          "underpowered": false,
+          "undefined_cities": [],
+          "undefined_bootstrap_share": 0.0
+        },
+        "window": {
+          "mean_steps_after_handoff": 34.765434075022675,
+          "share_no_scored_segment": 0.22266688010244917,
+          "share_full_window": 0.10477028973907476
+        }
+      },
+      "H8": {
+        "censored": {
+          "brake_reduction": 0.6329920376894634,
+          "brake_ci": [
+            0.5930254304508418,
+            0.6715344058899664
+          ],
+          "collision_difference": -0.00030994301286533794,
+          "collision_ci": [
+            -0.0007325233850456887,
+            0.0001101992509525131
+          ],
+          "underpowered": false,
+          "undefined_cities": [],
+          "undefined_bootstrap_share": 0.0
+        },
+        "censored_status": "uninterpretable",
+        "registered_status": "supported",
+        "flip": true,
+        "registered": {
+          "brake_reduction": 0.3839591908862295,
+          "brake_ci": [
+            0.3406154568401085,
+            0.4244571311834401
+          ],
+          "collision_difference": 0.0008533389364178747,
+          "collision_ci": [
+            -0.0002959236591932099,
+            0.0020150324683945184
+          ],
+          "underpowered": false,
+          "undefined_cities": [],
+          "undefined_bootstrap_share": 0.0
+        },
+        "window": {
+          "mean_steps_after_handoff": 33.619430660050156,
+          "share_no_scored_segment": 0.22321380929512832,
+          "share_full_window": 0.0500907102075663
+        }
+      },
+      "SHAM (descriptive)": {
+        "censored_brake_reduction": -0.045546634582626644,
+        "window": {
+          "mean_steps_after_handoff": 35.052398484605945,
+          "share_no_scored_segment": 0.22284029667573768,
+          "share_full_window": 0.14925831065578143
+        },
+        "registered_brake_reduction": -0.12390506977816584,
+        "censored_SHAM_pass": true
+      }
+    }
+  }
+}

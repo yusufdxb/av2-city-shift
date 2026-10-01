@@ -193,3 +193,10 @@ None at registration.
    because the common-window flags loaded as object dtype and `~` on a Python bool is -2 (truthy). The flags are now
    cast to booleans; the primaries, which average rather than negate the flags, were unchanged (reduction 0.6763,
    collision difference -0.00022, B difference -0.00019) and match an independent plain-pandas recomputation.
+3. 2026-09-30, study D implementation details fixed in code committed before any D output (303f034): the Stage 3
+   H8 sham condition (SHAM's reduction below half of PATCH's) compares SHAM's reduction in the {ALL, SHAM} window with
+   PATCH's in the {ALL, PATCH} window; a component counts as inconclusive when its own interval is undefined (more
+   than 1% undefined draws) rather than when any arm in the table is. Result: both positive controls passed
+   (uncensored reproduction exact; H10 point equals study C's), and the STATIC control failed in the censored window
+   (1.62x Stage 4, 1.07x Stage 3, needs 2x), so every censored verdict is uninterpretable. Independently recomputed.
+
