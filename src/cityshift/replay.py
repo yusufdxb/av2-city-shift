@@ -6,6 +6,7 @@ For each scenario, arm and seed it records the registered outcomes (for the pari
 at-fault collision partner (study B), and outcomes scored inside the ALL/PATCH common on-route window (study C).
 
     PYTHONPATH=src python -m cityshift.replay --raw <train dir> --out runs/followups/replay_rows.parquet
+    PYTHONPATH=src python -m cityshift.replay --stage 3 --raw <val dir> --out runs/followups/replay_rows_stage3.parquet
 """
 
 from __future__ import annotations
@@ -22,13 +23,23 @@ import pandas as pd
 
 from . import closedloop as base
 from . import closedloop_v2 as v2
-from .closedloop import ACCELS, DIMS, DT, EGO_DIMS, END, EXEC_STEPS, HANDOFF, HARD_BRAKE, REPLANS, EgoSim, in_front
+from .closedloop import ACCELS, DIMS, EGO_DIMS, END, HANDOFF, REPLANS, EgoSim, in_front
 from .closedloop_v3 import POOL_SHA256, checked_ids
+from .route_censor import executed_decel, logged_decel, route_end_step, score_on_route
 from .scene import Scene
 
-SEEDED = ("ALL", "PATCH", "TRIM", "SHAM2", "MIX")
+STAGES = {4: {"seeded": ("ALL", "PATCH", "TRIM", "SHAM2", "MIX"), "table": "runs/stage4/closedloop_pool.parquet",
+              "parity": "reports/followups/replay_parity.json", "n": 8140},
+          3: {"seeded": ("ALL", "MULTI", "PATCH", "SHAM"), "table": "runs/stage3/closedloop_val.parquet",
+              "parity": "reports/followups/replay_parity_stage3.json", "n": 24988}}
 SINGLE = ("cv", "oracle", "static")
-DRIVES = [(a, s) for a in SEEDED for s in range(3)] + [(a, None) for a in SINGLE]
+
+
+def drives(stage: int) -> list[tuple[str, int | None]]:
+    return [(a, s) for a in STAGES[stage]["seeded"] for s in range(3)] + [(a, None) for a in SINGLE]
+
+
+DRIVES = drives(4)
 STOPPED_MPS = 0.5  # PATCH's trigger
 DEPART_M = 2.0
 PARITY = ("collision", "first_collision_step", "planner_hard_brake", "logged_hard_brake", "unnecessary_hard_brake")
@@ -98,37 +109,25 @@ def partners(sc: Scene, pos: np.ndarray, head: np.ndarray) -> tuple[int, list[in
 
 
 def crossing(ego: EgoSim) -> int:
-    """First step whose distance along the route exceeds the logged route length (END + 1 if never)."""
-    beyond = np.flatnonzero(ego.s[HANDOFF:END + 1] > ego.path.length_logged)
-    return HANDOFF + int(beyond[0]) if len(beyond) else END + 1
-
-
-def logged_windows(sc: Scene) -> np.ndarray:
-    """Logged 1 s speed changes for windows starting at t=49..94, exactly as closedloop_v2.score computes them."""
-    sp = np.linalg.norm(np.diff(sc.pos[sc.av], axis=0), axis=1) / DT
-    vs = np.convolve(sp, np.ones(5) / 5, mode="same")
-    return vs[HANDOFF + 10:END - 4] - vs[HANDOFF:END - 14]
+    return route_end_step(ego)
 
 
 def censored(sc: Scene, ego: EgoSim, first: int, fault: list[int], cutoff: int) -> dict:
-    """Registered outcomes counted only up to step `cutoff` (study C; cutoff = END reproduces the registered score)."""
-    decel = [(ego.v[t + EXEC_STEPS] - ego.v[t]) / (EXEC_STEPS * DT) for t in REPLANS if t + EXEC_STEPS <= cutoff]
-    log = logged_windows(sc)
-    log = log[HANDOFF + np.arange(len(log)) + EXEC_STEPS <= cutoff]
-    planner_hard = bool(any(dv <= HARD_BRAKE + 1e-9 for dv in decel))
-    logged_hard = bool((log <= HARD_BRAKE + 1e-9).any())
-    return {"collision": bool(fault) and 0 <= first <= cutoff, "planner_hard_brake": planner_hard,
-            "logged_hard_brake": logged_hard, "unnecessary_hard_brake": planner_hard and not logged_hard,
-            "scored_replans": len(decel)}
+    """Registered outcomes counted only up to step `cutoff` (cutoff = END reproduces the registered score)."""
+    r = score_on_route(executed_decel(ego)[None], logged_decel(sc)[None],
+                       np.array([first if fault else -1]), np.array([cutoff]))
+    return {k: (int(v[0]) if k == "scored_replans" else bool(v[0])) for k, v in r.items()}
 
 
-def replay_scene(job: tuple[str, dict]) -> list[dict]:
-    """All drives of one scenario: parity outcomes, partner classes, and the ALL/PATCH common-window scores."""
-    d, stored = job
+def replay_scene(job: tuple[str, dict, int]) -> list[dict]:
+    """All drives of one scenario: parity outcomes, partner classes, route-censoring primitives, and the ALL/PATCH
+    common-window scores."""
+    d, stored, stage = job
     sc = base.load_scene(d)
     primary, stopped49, secondary = departing(sc)
     out, egos, hits = [], {}, {}
-    for arm, seed in DRIVES:
+    log_decel = logged_decel(sc).tolist()
+    for arm, seed in drives(stage):
         col = column(arm, seed)
         ego = replay_ego(sc, stored[f"{col}_accels"])
         r = base.score_sim(sc, ego)
@@ -143,7 +142,9 @@ def replay_scene(job: tuple[str, dict]) -> list[dict]:
                "partner_stopped_not_departing": any(i in stopped49 and i not in primary for i in fault),
                "partner_moving": any(i not in stopped49 for i in fault),
                "partner_departing_any_replan": any(i in secondary for i in fault),
-               "n_departing": len(primary), "n_stopped49": len(stopped49)}
+               "n_departing": len(primary), "n_stopped49": len(stopped49),
+               "exec_decel": executed_decel(ego).tolist(), "fault_step": first if fault else -1,
+               "log_decel": log_decel}
         full = censored(sc, ego, first, fault, END)
         row |= {f"full_{k}": v for k, v in full.items()}
         out.append(row)
@@ -160,11 +161,11 @@ def replay_scene(job: tuple[str, dict]) -> list[dict]:
     return out
 
 
-def parity(rows: pd.DataFrame, stored: pd.DataFrame) -> dict:
+def parity(rows: pd.DataFrame, stored: pd.DataFrame, stage: int = 4) -> dict:
     """Replay vs stored Stage 4 outcomes, every scenario, arm and seed; the gate for studies B and C."""
     s = stored.set_index("scenario_id")
     bad: dict[str, int] = {}
-    for arm, seed in DRIVES:
+    for arm, seed in drives(stage):
         col = column(arm, seed)
         r = rows[(rows.arm == arm) & (rows.model_seed == (-1 if seed is None else seed))].set_index("scenario_id")
         r = r.loc[s.index]
@@ -185,28 +186,32 @@ def parity(rows: pd.DataFrame, stored: pd.DataFrame) -> dict:
         mism = int((~both_nan & ~(np.abs(a - b) <= 1e-9)).sum())
         if mism:
             bad[f"{col}_progress"] = mism
-    return {"scenarios": int(len(s)), "drives_per_scenario": len(DRIVES), "mismatches": bad, "passed": not bad}
+    return {"stage": stage, "scenarios": int(len(s)), "drives_per_scenario": len(drives(stage)), "mismatches": bad,
+            "passed": not bad}
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--raw", required=True, help="Argoverse 2 TRAIN directory")
+    ap.add_argument("--stage", type=int, choices=(3, 4), default=4)
+    ap.add_argument("--raw", required=True, help="Argoverse 2 TRAIN (Stage 4) or VAL (Stage 3) directory")
     ap.add_argument("--pool", default="runs/replication_pool.npy")
-    ap.add_argument("--stage4", default="runs/stage4/closedloop_pool.parquet")
+    ap.add_argument("--table", default=None, help="registered closed-loop table (default per stage)")
     ap.add_argument("--out", required=True)
-    ap.add_argument("--parity-out", default="reports/followups/replay_parity.json")
+    ap.add_argument("--parity-out", default=None)
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--limit", type=int, default=0, help="smoke test on the first N scenarios (no parity file)")
     args = ap.parse_args()
     base.score = v2.score  # the Stage 3/4 contact-based scorer, as closedloop_v3 sets it
-    ids = checked_ids(args.pool, POOL_SHA256)
-    stored = pd.read_parquet(args.stage4)
-    assert set(stored.scenario_id.astype(str)) == set(ids)
+    cfg = STAGES[args.stage]
+    stored = pd.read_parquet(args.table or cfg["table"])
+    assert len(stored) == cfg["n"] and not stored.scenario_id.duplicated().any()
+    if args.stage == 4:
+        assert set(stored.scenario_id.astype(str)) == set(checked_ids(args.pool, POOL_SHA256))
     stored = stored.sort_values("scenario_id").reset_index(drop=True)
     if args.limit:
         stored = stored.iloc[:args.limit]
-    keep = [f"{column(a, s)}_accels" for a, s in DRIVES]
-    jobs = [(os.path.join(args.raw, sid), {k: list(row[k]) for k in keep})
+    keep = [f"{column(a, s)}_accels" for a, s in drives(args.stage)]
+    jobs = [(os.path.join(args.raw, sid), {k: list(row[k]) for k in keep}, args.stage)
             for sid, row in zip(stored.scenario_id, stored[keep].to_dict("records"))]
     assert all(glob.glob(j[0]) for j in jobs), "missing raw scenario directories"
     start = time.time()
@@ -215,11 +220,12 @@ def main() -> None:
     rows = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     rows.to_parquet(args.out, index=False)
-    report = parity(rows, stored) | {"runtime_sec": round(time.time() - start)}
+    report = parity(rows, stored, args.stage) | {"runtime_sec": round(time.time() - start)}
+    parity_out = args.parity_out or cfg["parity"]
     print(json.dumps(report))
     if not args.limit:
-        os.makedirs(os.path.dirname(os.path.abspath(args.parity_out)), exist_ok=True)
-        with open(args.parity_out, "w") as f:
+        os.makedirs(os.path.dirname(os.path.abspath(parity_out)), exist_ok=True)
+        with open(parity_out, "w") as f:
             json.dump(report, f, indent=2)
             f.write("\n")
     if not report["passed"]:

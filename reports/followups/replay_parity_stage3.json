@@ -1,0 +1,8 @@
+{
+  "stage": 3,
+  "scenarios": 24988,
+  "drives_per_scenario": 15,
+  "mismatches": {},
+  "passed": true,
+  "runtime_sec": 88
+}

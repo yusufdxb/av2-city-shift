@@ -1,11 +1,12 @@
 {
   "_note": "EXPLORATORY, pre-registered in docs/preregistration/exploratory-followups.md; cannot change any registered Stage 1-4 verdict. 95% within-city scenario-bootstrap intervals (Bonferroni 98.33% for three primaries alongside), 10,000 draws, seeds averaged within scenario, cities equal-weighted.",
   "replay_parity": {
+    "stage": 4,
     "scenarios": 8140,
     "drives_per_scenario": 18,
     "mismatches": {},
     "passed": true,
-    "runtime_sec": 32
+    "runtime_sec": 33
   },
   "B_departing_stopped_collisions": {
     "effects": {
