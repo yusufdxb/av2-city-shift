@@ -14,6 +14,12 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parents[1]
 
 
+NOTICE = ("These tables are derived evaluation and replay outputs computed from the Argoverse 2 Motion Forecasting "
+          "dataset (https://www.argoverse.org/av2.html), (c) 2021 Argo AI, LLC, and are distributed under CC BY-NC-SA 4.0 "
+          "(https://creativecommons.org/licenses/by-nc-sa/4.0/): non-commercial use only, with attribution and "
+          "share-alike. The MIT license of the av2-city-shift code does not apply to them. Not affiliated with or "
+          "endorsed by Argo AI.")
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -53,7 +59,7 @@ def main() -> None:
     for path in files:
         if not path.is_file():
             raise SystemExit(f"missing release input: {path.relative_to(ROOT)}")
-    inventory = {"release": "v1.5", "publication": "pending", "data_license": "CC BY-NC-SA 4.0 (README.md, Data and license)",
+    inventory = {"release": "v1.5", "data_license": NOTICE,
                  "historical_provenance": {
                      "study_a_manifest_present": (ROOT / "runs/followups/study_a.parquet.manifest.json").exists(),
                      "study_a_parity_manifest_present": (ROOT / "runs/followups/study_a_parity.parquet.manifest.json").exists(),
@@ -70,10 +76,14 @@ def main() -> None:
     inventory_path.write_text(json.dumps(inventory, indent=2) + "\n")
     shutil.copyfile(checksum, out / "SHA256SUMS")
     shutil.copyfile(inventory_path, out / "release_v1.5.json")
+    notice = out / "DATA_NOTICE.txt"
+    notice.write_text(NOTICE + "\n")
+    # Archives carry their checksum list, inventory and notice under runs/release-v1.5/, never over the tracked copies
+    # in reports/followups/, so a clone verifies the released bytes against its own committed list.
     for name, paths in assets.items():
-        archive(out / name, paths + [checksum, inventory_path])
+        archive(out / name, paths + [out / "SHA256SUMS", out / "release_v1.5.json", notice])
     (out / "ASSET_SHA256SUMS").write_text("".join(f"{sha256(out / name)}  {name}\n" for name in sorted(assets)))
-    print(json.dumps({"publication": "pending", "assets": list(assets), "checksummed_files": len(files)}))
+    print(json.dumps({"assets": list(assets), "checksummed_files": len(files)}))
 
 
 if __name__ == "__main__":

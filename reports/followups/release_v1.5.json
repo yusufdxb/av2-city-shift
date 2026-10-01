@@ -1,7 +1,6 @@
 {
   "release": "v1.5",
-  "publication": "pending",
-  "data_license": "CC BY-NC-SA 4.0 (README.md, Data and license)",
+  "data_license": "These tables are derived evaluation and replay outputs computed from the Argoverse 2 Motion Forecasting dataset (https://www.argoverse.org/av2.html), (c) 2021 Argo AI, LLC, and are distributed under CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/): non-commercial use only, with attribution and share-alike. The MIT license of the av2-city-shift code does not apply to them. Not affiliated with or endorsed by Argo AI.",
   "historical_provenance": {
     "study_a_manifest_present": false,
     "study_a_parity_manifest_present": false,

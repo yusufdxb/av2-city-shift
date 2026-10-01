@@ -2,7 +2,7 @@
 
 Attached to GitHub release v1.1 as `stage3-per-row-results.tar.gz`; unpack in the repository root. Checksums are in
 [`SHA256SUMS`](SHA256SUMS); `python scripts/audit_stage3.py` verifies them and recomputes the H5 to H9 point estimates.
-The tables are derived from Argoverse 2 (© 2022 Argo AI, LLC, CC BY-NC-SA 4.0, non-commercial); the MIT license of
+The tables are derived from Argoverse 2 (© 2021 Argo AI, LLC, CC BY-NC-SA 4.0, non-commercial); the MIT license of
 the code does not apply to them.
 
 ## `evals/stage3a/per_agent.parquet` (Stage 3a, H5, H6a, H6b)
