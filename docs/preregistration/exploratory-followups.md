@@ -181,6 +181,46 @@ seed-averaged ALL brake events in the window), inconclusive and uninterpretable 
 comparisons, so censored effects are not comparable across components. A9: the mode, windows and estimator are fixed
 here before any D outcome. Other items as in B and C.
 
+## Study E: braking replication in the stop-line harness (GPU), added 2026-10-01
+
+Registered before any study E pool scoring. A CPU pilot on the 3,998-scenario TRAIN development slice
+(reports/pilot/stopline_pilot.json) showed that in the stop-line harness (src/cityshift/closedloop_v4.py: the ego may
+only choose accelerations after which it can stop at the end of the logged route at <= 3 m/s^2) every arm's at-fault
+collision rate falls to the replayed-human floor and the STATIC collision control fails (1.6x), while phantom braking
+survives (focal-only 6.9% of drives, 13x the oracle). So study E is **braking-only**: collisions are reported
+descriptively and decide nothing. No intervention arm was run in the pilot.
+
+**Claim.** In a harness where the ego never drives past the end of the logged route, PATCH still reduces unnecessary
+hard braking by at least 30% relative to ALL, the reduction exceeds the dose-matched sham's by at least 20 percentage
+points, and TRIM also reduces it by at least 30% (the registered H10, H11 and H12 bars).
+
+| Arm | Role |
+|---|---|
+| ALL seeds 0 to 2 | No-treatment control |
+| PATCH seeds 0 to 2 | Treatment |
+| SHAM2 seeds 0 to 2 | Dose-matched sham, PATCH's realised per-replan dose as in Stage 4 |
+| TRIM seeds 0 to 2 | Probability mechanism (with its CV fallback, as registered in Stage 4) |
+| ORACLE | Ceiling and brake positive control |
+| CV, STATIC, LOG | Descriptive |
+
+All on the 8,140-scenario replication pool, stop-line harness, GPU, with the closedloop_v3 interventions unchanged.
+
+**Brake positive control.** ALL's pooled unnecessary-brake rate must be at least twice ORACLE's; otherwise the harness
+cannot show phantom braking and E is uninterpretable. SHAM2's realised total dose must be at least 99% of PATCH's,
+else the sham component is uninterpretable.
+
+**Estimator and decisions.** The shared estimator above (seeds averaged per scenario, cities equal-weighted, 10,000
+within-city scenario bootstraps, generator seed 20260930), 95% intervals with Bonferroni 98.33% (three components)
+alongside. PATCH and TRIM: supported if the point reduction is >= 0.30 with lower bound > 0. Sham gap: supported if
+the point gap is >= 0.20 with lower bound > 0. Killed otherwise; A8: fewer than 100 seed-averaged ALL brake events, a
+city with none, or more than 1% undefined draws makes a component inconclusive. Each component is published whatever
+it shows.
+
+**Confounds.** A2: the stop line changes the planner's exposure for every arm alike; collisions are not interpretable
+in this harness (pilot) and are excluded from decisions. A9: the harness, the 3 m/s^2 stopping rule and the controls
+were chosen on the development slice before any pool scoring in this harness. A10: the pool is disjoint from all
+training data.
+
 ## Deviations
 
 None at registration.
