@@ -365,10 +365,10 @@ gh release download v1.4 -R yusufdxb/av2-city-shift -p exploratory-mechanism.tar
 (cd reports/mechanism && sha256sum -c SHA256SUMS) && python scripts/summarize_mechanism.py --seeds 0,1,2
 ```
 
-**Follow-ups A to E, release v1.5: pending publication.** These download commands are for the planned release and will fail until it is published. The local assets and their exact row-file locations are listed in the [release inventory](reports/followups/release_v1.5.json); [`prepare_followup_release.py`](scripts/prepare_followup_release.py) builds them under `runs/release-v1.5/`. A includes the production and parity tables with their `.report.json` files; E includes all parts and the stored stop-line diagnostics. The replay asset supplies B/C and D's Stage 3 and Stage 4 rows. Historical A and E runs have no validated manifests; this gap is recorded in the inventory rather than filled retrospectively. Checksums verify the bytes, not historical settings ([checksums](reports/followups/SHA256SUMS), [inventory](reports/followups/release_v1.5.json)).
+**Follow-ups A to E, release v1.5.** The local assets and their exact row-file locations are listed in the [release inventory](reports/followups/release_v1.5.json); [`prepare_followup_release.py`](scripts/prepare_followup_release.py) builds them under `runs/release-v1.5/`. A includes the production and parity tables with their `.report.json` files; E includes all parts and the stored stop-line diagnostics. The replay asset supplies B/C and D's Stage 3 and Stage 4 rows. Historical A and E runs have no validated manifests; this gap is recorded in the inventory rather than filled retrospectively. Checksums verify the bytes, not historical settings ([checksums](reports/followups/SHA256SUMS), [inventory](reports/followups/release_v1.5.json)).
 
 ```bash
-# PENDING PUBLICATION: v1.5 does not exist yet. First unpack v1.1 and v1.2 above.
+# first unpack the v1.1 and v1.2 tables above
 gh release download v1.5 -R yusufdxb/av2-city-shift -p study-a-row-results.tar.gz \
   -p study-e-row-results.tar.gz -p followup-replay-rows.tar.gz
 for asset in study-a-row-results.tar.gz study-e-row-results.tar.gz followup-replay-rows.tar.gz; do tar xzf "$asset"; done
