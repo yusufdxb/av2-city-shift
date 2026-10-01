@@ -1,0 +1,79 @@
+{
+  "_note": "EXPLORATORY study E (docs/preregistration/exploratory-followups.md): braking only, stop-line harness, 8,140 pool scenarios, seeds averaged per scenario, cities equal-weighted, 10,000 within-city bootstraps, 95% (Bonferroni 98.33% alongside). Collisions descriptive only.",
+  "verdicts": {
+    "H10e PATCH": "supported",
+    "H11e sham gap": "supported",
+    "H12e TRIM": "supported"
+  },
+  "effects": {
+    "PATCH_reduction": {
+      "point": 0.697530135552686,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.6617171882687362,
+        0.7324378549127155
+      ],
+      "ci9833": [
+        0.6539953410072433,
+        0.7399580317335934
+      ]
+    },
+    "TRIM_reduction": {
+      "point": 0.682611951417552,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.6462691671782653,
+        0.7177514758314415
+      ],
+      "ci9833": [
+        0.6390715938954598,
+        0.7243749753335081
+      ]
+    },
+    "sham_gap": {
+      "point": 0.36605478713251643,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.31641713426769075,
+        0.42368014522859254
+      ],
+      "ci9833": [
+        0.30477544742688517,
+        0.43558026921359905
+      ]
+    }
+  },
+  "brake_rates": {
+    "ALL": 0.06707616707616708,
+    "PATCH": 0.021539721539721536,
+    "SHAM2": 0.044430794430794424,
+    "TRIM": 0.02252252252252252,
+    "cv": 0.014127764127764128,
+    "oracle": 0.006633906633906634,
+    "static": 0.014987714987714987
+  },
+  "brake_control_ALL_over_oracle": 10.11111111111111,
+  "brake_control_pass": true,
+  "dose": {
+    "PATCH": 1130590,
+    "SHAM2": 1130546
+  },
+  "dose_ratio": 0.999961082266781,
+  "seed_averaged_ALL_brake_events": 546.0,
+  "collisions_descriptive": {
+    "ALL": 0.0028665028665028664,
+    "PATCH": 0.002334152334152334,
+    "SHAM2": 0.0027436527436527436,
+    "TRIM": 0.0024160524160524157,
+    "cv": 0.002334152334152334,
+    "oracle": 0.002457002457002457,
+    "static": 0.003071253071253071,
+    "log": 0.0038083538083538084
+  },
+  "median_progress": {
+    "ALL": 0.8933401197534347,
+    "PATCH": 0.9146973384641144,
+    "SHAM2": 0.9066830990835018,
+    "TRIM": 0.9143317748666775
+  }
+}
