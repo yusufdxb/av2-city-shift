@@ -56,6 +56,19 @@ def trim_predictions(sc: Scene, agents: list[int], t: int, traj: np.ndarray,
     return traj, prob, fallback
 
 
+def stationary_eligible(sc: Scene, agents: list[int], t: int, traj: np.ndarray, prob: np.ndarray) -> list[tuple[int, np.ndarray]]:
+    """Study A eligibility: selected agents moving < 0.5 m/s whose own forecast has a mode ending <= 2 m from the
+    current position with positive probability (TRIM's test without its fallback). Returns (index, keep mask)."""
+    out = []
+    for j, i in enumerate(agents):
+        if np.linalg.norm(sc.vel[i, t]) >= 0.5:
+            continue
+        keep = np.linalg.norm(traj[j, :, -1] - sc.pos[i, t], axis=-1) <= 2.0
+        if keep.any() and prob[j, keep].sum() > 0:
+            out.append((j, keep))
+    return out
+
+
 def sham_indices(sc: Scene, agents: list[int], t: int, model_seed: int, dose: int) -> np.ndarray:
     """Select PATCH's per-replan dose from all selected agents, capped at the number available.
 
@@ -75,6 +88,17 @@ def intervention(sc: Scene, agents: list[int], t: int, arm: str, seed: int,
                  ) -> tuple[np.ndarray, np.ndarray, int, int, int]:
     """Apply a forecast intervention and return trigger, substitution and fallback counts."""
     trigger = sum(np.linalg.norm(sc.vel[i, t]) < 0.5 for i in agents)
+    if arm in ("TRIMNF", "PATCHSUB"):  # exploratory study A (docs/preregistration/exploratory-followups.md)
+        eligible = stationary_eligible(sc, agents, t, traj, prob)
+        for j, keep in eligible:
+            if arm == "TRIMNF":
+                prob[j, ~keep] = 0
+                prob[j] /= prob[j].sum()
+            else:
+                traj[j] = base.cv_forecast(sc, agents[j], t)[None]
+                prob[j] = 0
+                prob[j, 0] = 1
+        return traj, prob, len(eligible), len(eligible), 0
     if arm == "TRIM":
         traj, prob, fallback = trim_predictions(sc, agents, t, traj, prob)
         return traj, prob, trigger, 0, fallback
@@ -135,8 +159,23 @@ def calibration_rows(sc: Scene, ego: base.EgoSim, t: int, agents: list[int], tra
     return rows
 
 
+def _plan_calibrate(job):
+    """Worker: plan once, record calibration rows for that same candidate, then execute it.
+
+    Before 2026-09-30 the parent planned every scenario serially for the calibration rows and the workers planned it
+    again; this does the identical computation once, in parallel (outputs verified identical on CPU).
+    """
+    k, ego, t, agents, traj, prob, arm, seed, calibrate = job
+    sc = base._SCENES[k]
+    candidate = base.plan(sc, ego, t, agents, traj, prob)
+    rows = calibration_rows(sc, ego, t, agents, traj, prob, candidate, arm, seed) if calibrate else []
+    base.execute(ego, t, candidate)
+    return k, ego, rows
+
+
 def run_forecast(pool, n: int, arm: str, key: str | None, models: dict, device: torch.device,
-                 seed: int, reference_dose: np.ndarray | None = None) -> tuple[list[dict], list[dict], np.ndarray]:
+                 seed: int, reference_dose: np.ndarray | None = None,
+                 calibrate: bool = True) -> tuple[list[dict], list[dict], np.ndarray]:
     """Run one v2 planner arm with forecast changes and calibration recording."""
     egos = [v2.init_ego(base._SCENES[k]) for k in range(n)]
     trigger_count, substituted_count, fallback_count = (np.zeros(n, np.int32) for _ in range(3))
@@ -165,14 +204,13 @@ def run_forecast(pool, n: int, arm: str, key: str | None, models: dict, device: 
             trigger_count[k] += trigger
             substituted_count[k] += substituted
             fallback_count[k] += fallback
-            replan_dose[k, replan_index] = substituted if arm == "SHAM2" else trigger
+            replan_dose[k, replan_index] = substituted if arm in ("SHAM2", "TRIMNF", "PATCHSUB") else trigger
             if arm == "SHAM2":
                 assert substituted == min(reference, len(agents)), "SHAM2 dose differs from capped PATCH reference"
-            candidate = base.plan(sc, egos[k], t, agents, traj, prob)
-            risk_rows.extend(calibration_rows(sc, egos[k], t, agents, traj, prob, candidate, arm, seed))
-            jobs.append((k, egos[k], t, agents, traj, prob))
-        for k, ego in pool.map(base._plan, jobs, chunksize=8):
+            jobs.append((k, egos[k], t, agents, traj, prob, arm, seed, calibrate))
+        for k, ego, rows in pool.map(_plan_calibrate, jobs, chunksize=8):
             egos[k] = ego
+            risk_rows.extend(rows)
     scores = [base.score_sim(base._SCENES[k], egos[k]) |
               {"trigger_count": int(trigger_count[k]), "substituted_count": int(substituted_count[k]),
                "trim_fallback_count": int(fallback_count[k])} |
