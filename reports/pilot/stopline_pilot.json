@@ -1,0 +1,111 @@
+{
+  "scenarios": 3998,
+  "runtime_sec": 1525,
+  "stop_decel": 3.0,
+  "registered": {
+    "arms": {
+      "ALL": {
+        "collision": 0.008504252126063032,
+        "unnecessary_hard_brake": 0.08104052026013006,
+        "planner_hard_brake": 0.08129064532266134,
+        "reached_route_end": 0.5947973986993497,
+        "median_progress": 1.178579643119456,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.0063411540900443885
+      },
+      "cv": {
+        "collision": 0.03576788394197099,
+        "unnecessary_hard_brake": 0.05027513756878439,
+        "planner_hard_brake": 0.05027513756878439,
+        "reached_route_end": 0.7673836918459229,
+        "median_progress": 1.3469394964538817,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.028535193405199746
+      },
+      "log": {
+        "collision": 0.003501750875437719,
+        "unnecessary_hard_brake": 0.0,
+        "planner_hard_brake": 0.0,
+        "reached_route_end": 1.0,
+        "median_progress": 1.0,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.004121750158528852
+      },
+      "oracle": {
+        "collision": 0.009504752376188095,
+        "unnecessary_hard_brake": 0.0167583791895948,
+        "planner_hard_brake": 0.017008504252126064,
+        "reached_route_end": 0.775887943971986,
+        "median_progress": 1.3700631084676982,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.007926442612555484
+      },
+      "static": {
+        "collision": 0.04177088544272136,
+        "unnecessary_hard_brake": 0.04277138569284642,
+        "planner_hard_brake": 0.04302151075537769,
+        "reached_route_end": 0.5982991495747874,
+        "median_progress": 1.2464519870614148,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.024413443246670895
+      }
+    },
+    "STATIC_over_ALL": 4.911764705882352,
+    "STATIC_over_ALL_route_gt_1m": 3.85,
+    "LOG_collision": 0.003501750875437719,
+    "ALL_unnecessary_brake_events": 324
+  },
+  "stopline": {
+    "arms": {
+      "ALL": {
+        "collision": 0.002001000500250125,
+        "unnecessary_hard_brake": 0.06953476738369184,
+        "planner_hard_brake": 0.06953476738369184,
+        "reached_route_end": 0.007503751875937969,
+        "median_progress": 0.8940223904856561,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.0019023462270133164
+      },
+      "cv": {
+        "collision": 0.0022511255627813906,
+        "unnecessary_hard_brake": 0.014257128564282141,
+        "planner_hard_brake": 0.014257128564282141,
+        "reached_route_end": 0.009504752376188095,
+        "median_progress": 0.9157130795988611,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.0022194039315155357
+      },
+      "log": {
+        "collision": 0.003501750875437719,
+        "unnecessary_hard_brake": 0.0,
+        "planner_hard_brake": 0.0,
+        "reached_route_end": 1.0,
+        "median_progress": 1.0,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.004121750158528852
+      },
+      "oracle": {
+        "collision": 0.0022511255627813906,
+        "unnecessary_hard_brake": 0.005252626313156579,
+        "planner_hard_brake": 0.005252626313156579,
+        "reached_route_end": 0.009504752376188095,
+        "median_progress": 0.9181761119727334,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.0022194039315155357
+      },
+      "static": {
+        "collision": 0.0032516258129064533,
+        "unnecessary_hard_brake": 0.01150575287643822,
+        "planner_hard_brake": 0.01150575287643822,
+        "reached_route_end": 0.010005002501250625,
+        "median_progress": 0.9000086659045743,
+        "infeasible_replans": 0,
+        "collision_route_gt_1m": 0.0034876347495244133
+      }
+    },
+    "STATIC_over_ALL": 1.6250000000000002,
+    "STATIC_over_ALL_route_gt_1m": 1.8333333333333333,
+    "LOG_collision": 0.003501750875437719,
+    "ALL_unnecessary_brake_events": 278
+  }
+}
