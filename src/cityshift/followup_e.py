@@ -73,6 +73,17 @@ def main() -> None:
     base.init_ego, base.score = v2.init_ego, v2.score
     v4.install()  # stop-line planner, inherited by every worker forked below
     os.makedirs(args.out_dir, exist_ok=True)
+    manifest = {"harness": "closedloop_v4", "stop_decel": v4.STOP_DECEL, "device": device.type, "seeds": seeds,
+                "chunk": args.chunk, "limit": args.limit, "runs": args.runs,
+                "git": os.popen("git rev-parse HEAD 2>/dev/null").read().strip()}
+    mpath = os.path.join(args.out_dir, "manifest.json")
+    if os.path.exists(mpath):  # resuming: every setting except the code revision must match the parts already written
+        old = json.load(open(mpath))
+        if {k: v for k, v in old.items() if k != "git"} != {k: v for k, v in manifest.items() if k != "git"}:
+            raise SystemExit(f"refusing to resume: {mpath} was written with different settings")
+    else:
+        with open(mpath, "w") as f:
+            json.dump(manifest, f, indent=2)
     ctx = mp.get_context("fork")
     start, done_drives = time.time(), 0
     for offset in range(0, len(ids), args.chunk):

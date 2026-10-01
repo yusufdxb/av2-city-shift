@@ -1,0 +1,53 @@
+{
+  "drives": 122100,
+  "drives_with_infeasible_replan": 0,
+  "infeasible_replans": 0,
+  "drives_past_route_end_gt_1cm": 0,
+  "max_overshoot_m": 9.663160134242175e-07,
+  "short_routes_le_1m_drives": 26040,
+  "short_route_drives_past_end_gt_1cm": 0,
+  "by_arm": {
+    "ALL": {
+      "drives": 24420,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "PATCH": {
+      "drives": 24420,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "SHAM2": {
+      "drives": 24420,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "TRIM": {
+      "drives": 24420,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "cv": {
+      "drives": 8140,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "oracle": {
+      "drives": 8140,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "static": {
+      "drives": 8140,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    }
+  }
+}

@@ -51,7 +51,8 @@ def analyze(data: pd.DataFrame, n_boot: int = 10_000, seed: int = BOOT_SEED) -> 
     point = {k: float(np.mean(v)) for k, v in points.items()}
     boot = {k: np.mean(np.stack(v), 0) for k, v in draws.items()}
     with np.errstate(divide="ignore", invalid="ignore"):
-        point["R"] = point["TRIMNF_reduction"] / point["PATCHSUB_reduction"]
+        den = point["PATCHSUB_reduction"]
+        point["R"] = point["TRIMNF_reduction"] / den if den != 0 else float("nan")  # failed control: undefined, not a crash
         boot["R"] = boot["TRIMNF_reduction"] / boot["PATCHSUB_reduction"]
     out = {}
     for k in point:
@@ -65,7 +66,7 @@ def analyze(data: pd.DataFrame, n_boot: int = 10_000, seed: int = BOOT_SEED) -> 
 
 def decide(eff: dict, all_events: float, zero_cities: list[str], dose_ratio: float) -> str:
     """The registered decision rules for study A."""
-    if not 0.95 <= dose_ratio <= 1.05:
+    if not np.isfinite(dose_ratio) or not 0.95 <= dose_ratio <= 1.05:
         return "uninterpretable (eligible-count ratio outside 0.95 to 1.05)"
     if all_events < 100 or zero_cities or max(eff[k]["undefined_share"] for k in eff) > 0.01:
         return "inconclusive (A8)"
@@ -100,7 +101,7 @@ def main() -> None:
     eff = analyze(data, args.bootstraps)
     elig = {arm: float(sum(np.sum(x) for s in range(3) for x in d[f"{arm}_s{s}_eligible_by_replan"]))
             for arm in ("TRIMNF", "PATCHSUB")}
-    dose_ratio = elig["TRIMNF"] / elig["PATCHSUB"]
+    dose_ratio = elig["TRIMNF"] / elig["PATCHSUB"] if elig["PATCHSUB"] > 0 else float("nan")  # nan fails the gate
     zero = [c for c in CITIES if data.loc[data.city.astype(str) == c, "ALL_b"].sum() == 0]
     events = float(data.ALL_b.sum())
     result = {"_note": "EXPLORATORY study A, docs/preregistration/exploratory-followups.md. 95% within-city scenario "

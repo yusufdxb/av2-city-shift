@@ -35,6 +35,7 @@ def effects(m: dict) -> dict:
     with np.errstate(divide="ignore", invalid="ignore"):
         return {"PATCH_reduction": (m["ALL"] - m["PATCH"]) / m["ALL"],
                 "TRIM_reduction": (m["ALL"] - m["TRIM"]) / m["ALL"],
+                "SHAM2_reduction_descriptive": (m["ALL"] - m["SHAM2"]) / m["ALL"],
                 "sham_gap": (m["SHAM2"] - m["PATCH"]) / m["ALL"]}
 
 
@@ -87,6 +88,11 @@ def main() -> None:
     collisions = {a: float(seed_mean(d, a, "collision").mean()) for a in ARMS} | {
         a: float(d[f"{a}_collision"].astype(float).mean()) for a in ("cv", "oracle", "static", "log")}
     dose = {a: int(sum(np.sum(x) for s in range(3) for x in d[f"{a}_s{s}_dose_by_replan"])) for a in ("PATCH", "SHAM2")}
+    for seed in range(3):  # per-replan validation, as Stage 4: SHAM2 never exceeds PATCH's reference, never negative
+        p_d = np.stack(d[f"PATCH_s{seed}_dose_by_replan"].to_numpy())
+        s_d = np.stack(d[f"SHAM2_s{seed}_dose_by_replan"].to_numpy())
+        if (p_d < 0).any() or (s_d > p_d).any():
+            raise SystemExit(f"invalid SHAM2 dose at seed {seed}")
     dose_ratio = dose["SHAM2"] / dose["PATCH"]
     control = rates["ALL"] >= 2 * rates["oracle"]
     events = float(data.ALL.sum())

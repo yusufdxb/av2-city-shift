@@ -7,9 +7,12 @@ or before the route end decelerating at STOP_DECEL (gentler than the -4 m/s^2 ha
 line never needs a hard brake by itself), and its risk and progress terms treat the ego as stopping at the line.
 Everything else (agent selection, forecasts, candidate set, weights, execution, scoring) is the closedloop_v2 harness.
 
-From any state that satisfies the rule, braking at exactly STOP_DECEL keeps the stopping point fixed, so a feasible
-candidate always exists after the first replan. At the handoff the route is the human's own next 6 s, so the rule is
-feasible for any speed up to 36 m/s; if no candidate is feasible the hardest brake is chosen and counted.
+From any state that satisfies the rule, braking at exactly STOP_DECEL keeps the stopping point fixed, so once a
+feasible candidate has been executed one always exists at the next replan. The rule is NOT guaranteed feasible at the
+handoff (the remaining route depends on how the human braked; e.g. 10 m/s with 5 m left cannot be met even at
+-8 m/s^2), and if no candidate is feasible the hardest brake is chosen and execution can pass the line. Compliance is
+therefore checked empirically: on all 122,100 study E drives there were 0 infeasible replans and no drive passed the
+route end (reports/followups/study_e_stopline_diagnostics.json).
 """
 
 from __future__ import annotations

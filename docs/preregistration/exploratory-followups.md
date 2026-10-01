@@ -249,4 +249,10 @@ None at registration.
    while sharing the GPU with another training job) was deleted without its outcomes being examined; the production run
    rescores those scenarios deterministically. Runner (cityshift.followup_e) and analysis (cityshift.study_e) were
    committed before any study E output was examined.
+6. 2026-10-01, after study E, from an external audit: the stop-line harness description claimed the rule is feasible
+   at the handoff for any speed up to 36 m/s. That is false (the remaining route depends on how the human braked).
+   Compliance was then checked empirically on every stored study E drive (scripts/diagnose_stopline.py): 0 of 122,100
+   drives had a replan with no feasible candidate and none passed the route end (maximum overshoot 1e-6 m). No study E
+   number changes. README wording on collisions was narrowed (non-inferiority and failed discrimination controls, not
+   "no added collisions" or a demonstrated checker defect), and study E is described as a same-pool robustness check.
 

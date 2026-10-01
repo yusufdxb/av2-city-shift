@@ -38,3 +38,12 @@ def test_study_e_effects_and_decide():
     assert decide_e(e["PATCH_reduction"], 0.30, True, True) == "supported"
     assert decide_e(e["PATCH_reduction"], 0.30, True, False) == "uninterpretable"
     assert decide_e(e["PATCH_reduction"], 0.60, True, True) == "killed"
+
+
+def test_failed_control_is_reported_not_crashed():
+    rows = [{"city": c, "ALL_b": float(i < 100), "PATCHSUB_b": float(i < 100), "TRIMNF_b": float(i < 100),
+             "ALL_c": 0.0, "TRIMNF_c": 0.0, "PATCHSUB_c": 0.0} for c in CITIES for i in range(400)]
+    eff = analyze(pd.DataFrame(rows), n_boot=50)
+    assert np.isnan(eff["R"]["point"])
+    assert decide(eff, 600, [], 1.0).startswith(("uninterpretable", "inconclusive"))
+    assert decide(eff, 600, [], float("nan")).startswith("uninterpretable")
