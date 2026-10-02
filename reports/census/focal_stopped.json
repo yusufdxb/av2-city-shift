@@ -1,0 +1,11 @@
+{
+  "_note": "Descriptive census of the full training split (all focal agents, including the 2% dev slice). Stopped: logged speed < 0.5 m/s at t=49. Positions are the focal agent's logged future, t=50..109.",
+  "focal_agents": 199908,
+  "stopped_at_handoff": 26233,
+  "stopped_share": 0.13122536366728696,
+  "stopped_ending_within_2m": 4101,
+  "stopped_ending_within_2m_share": 0.15632981359356535,
+  "stopped_staying_within_2m_throughout": 4065,
+  "stopped_staying_within_2m_throughout_share": 0.1549574962833073,
+  "stopped_moving_more_than_2m_by_6s_share": 0.8436701864064347
+}
