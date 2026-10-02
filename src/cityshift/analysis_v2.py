@@ -356,8 +356,12 @@ def main() -> None:
     elif args.cmd == "r":
         result = analyze_r(load_parts(args.parts), args.harness)
     elif args.cmd == "q-open":
-        result = q_open(load_parts(args.rows) if os.path.isdir(args.rows) else pd.read_parquet(args.rows),
-                        pd.read_parquet(args.stage3a))
+        # per-agent rows (several per scenario), so not load_parts, which requires one row per scenario
+        paths = sorted(glob.glob(os.path.join(args.rows, "part_*.parquet"))) if os.path.isdir(args.rows) else [args.rows]
+        rows = pd.concat([pd.read_parquet(p) for p in paths], ignore_index=True)
+        if rows.duplicated(["scenario_id", "agent_id", "predictor"]).any():
+            raise SystemExit("duplicate agent rows")
+        result = q_open(rows, pd.read_parquet(args.stage3a))
     else:
         with open(args.q_open) as f:
             q0 = json.load(f)["Q0_positive_control"]["pass"]
