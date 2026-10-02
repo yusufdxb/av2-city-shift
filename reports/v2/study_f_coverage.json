@@ -1,0 +1,1559 @@
+{
+  "study": "F",
+  "exploratory": true,
+  "n_boot": 10000,
+  "seed": 20261002,
+  "miss_threshold_m": {
+    "2s": 2.0,
+    "4s": 2.0
+  },
+  "decision": "killed",
+  "selected_coverage": [
+    {
+      "replan": 49,
+      "horizon_s": 2,
+      "n_selected": 306750,
+      "n_excluded": 37636,
+      "excluded_share": 0.12269274653626731
+    },
+    {
+      "replan": 49,
+      "horizon_s": 4,
+      "n_selected": 306750,
+      "n_excluded": 71162,
+      "excluded_share": 0.23198696006519967
+    },
+    {
+      "replan": 59,
+      "horizon_s": 2,
+      "n_selected": 307518,
+      "n_excluded": 37773,
+      "excluded_share": 0.12283183423409362
+    },
+    {
+      "replan": 59,
+      "horizon_s": 4,
+      "n_selected": 307518,
+      "n_excluded": 72403,
+      "excluded_share": 0.23544312853231356
+    },
+    {
+      "replan": 69,
+      "horizon_s": 2,
+      "n_selected": 308151,
+      "n_excluded": 38089,
+      "excluded_share": 0.1236049858673183
+    },
+    {
+      "replan": 69,
+      "horizon_s": 4,
+      "n_selected": 308151,
+      "n_excluded": 117426,
+      "excluded_share": 0.38106642522659345
+    },
+    {
+      "replan": 79,
+      "horizon_s": 2,
+      "n_selected": 308828,
+      "n_excluded": 39355,
+      "excluded_share": 0.12743339334516302
+    },
+    {
+      "replan": 89,
+      "horizon_s": 2,
+      "n_selected": 308813,
+      "n_excluded": 108344,
+      "excluded_share": 0.3508401524547218
+    }
+  ],
+  "cells": [
+    {
+      "replan": 49,
+      "horizon_s": 2,
+      "group": "stopped",
+      "primary": true,
+      "miss_ALL": 0.018448804175455958,
+      "miss_CV6": 0.03753397461941655,
+      "difference_ALL_minus_CV6": -0.019085170443960593,
+      "ci95": [
+        -0.020208063636742553,
+        -0.017960071306370468
+      ],
+      "status": "killed",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36693,
+          "n_agents": 31601,
+          "n_scenarios": 4931,
+          "n_excluded": 5092,
+          "excluded_share": 0.13877306298204017,
+          "miss_ALL": 0.023712329778593503,
+          "miss_CV6": 0.044302395493813485,
+          "min_fde_ALL": 0.41841265738228556,
+          "min_fde_CV6": 0.48841145449813467
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15341,
+          "n_agents": 13267,
+          "n_scenarios": 2456,
+          "n_excluded": 2074,
+          "excluded_share": 0.13519327292875302,
+          "miss_ALL": 0.017687997789000275,
+          "miss_CV6": 0.038139745232531844,
+          "min_fde_ALL": 0.3505535899006321,
+          "min_fde_CV6": 0.4093745329690678
+        },
+        {
+          "city": "miami",
+          "n_selected": 55770,
+          "n_agents": 49539,
+          "n_scenarios": 6340,
+          "n_excluded": 6231,
+          "excluded_share": 0.11172673480365788,
+          "miss_ALL": 0.017508091268159092,
+          "miss_CV6": 0.037283756232463314,
+          "min_fde_ALL": 0.33358612065366144,
+          "min_fde_CV6": 0.38628599821159937
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 9025,
+          "n_agents": 7929,
+          "n_scenarios": 1226,
+          "n_excluded": 1096,
+          "excluded_share": 0.1214404432132964,
+          "miss_ALL": 0.01664774877033674,
+          "miss_CV6": 0.03493504855593391,
+          "min_fde_ALL": 0.33012315940799386,
+          "min_fde_CV6": 0.40292923673592673
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43758,
+          "n_agents": 38123,
+          "n_scenarios": 5044,
+          "n_excluded": 5635,
+          "excluded_share": 0.12877645230586407,
+          "miss_ALL": 0.01828292631744616,
+          "miss_CV6": 0.0358313878760853,
+          "min_fde_ALL": 0.3406904431604037,
+          "min_fde_CV6": 0.3566925064573929
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30363,
+          "n_agents": 27887,
+          "n_scenarios": 3058,
+          "n_excluded": 2476,
+          "excluded_share": 0.081546619240523,
+          "miss_ALL": 0.016853731129199984,
+          "miss_CV6": 0.03471151432567146,
+          "min_fde_ALL": 0.29984724469363205,
+          "min_fde_CV6": 0.37421842901976365
+        }
+      ],
+      "n_selected": 190950,
+      "n_agents": 168346,
+      "n_scenarios": 23055,
+      "n_excluded": 22604,
+      "excluded_share": 0.11837653836082744
+    },
+    {
+      "replan": 49,
+      "horizon_s": 2,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.1035586217854143,
+      "miss_CV6": 0.22935620169806684,
+      "difference_ALL_minus_CV6": -0.12579757991265253,
+      "ci95": [
+        -0.13030187279885624,
+        -0.12124297027466753
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15121,
+          "n_agents": 13104,
+          "n_scenarios": 3976,
+          "n_excluded": 2017,
+          "excluded_share": 0.13339064876661597,
+          "miss_ALL": 0.10439560439560437,
+          "miss_CV6": 0.21504884004884006,
+          "min_fde_ALL": 0.8859512561375307,
+          "min_fde_CV6": 1.4872848195545771
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7152,
+          "n_agents": 6176,
+          "n_scenarios": 2208,
+          "n_excluded": 976,
+          "excluded_share": 0.13646532438478748,
+          "miss_ALL": 0.11458333333333333,
+          "miss_CV6": 0.26845854922279794,
+          "min_fde_ALL": 0.9408216476969543,
+          "min_fde_CV6": 1.5946597343263815
+        },
+        {
+          "city": "miami",
+          "n_selected": 19780,
+          "n_agents": 17137,
+          "n_scenarios": 5240,
+          "n_excluded": 2643,
+          "excluded_share": 0.13361981799797776,
+          "miss_ALL": 0.09200365680496392,
+          "miss_CV6": 0.20289432222676082,
+          "min_fde_ALL": 0.8227333359696568,
+          "min_fde_CV6": 1.422501593289683
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3654,
+          "n_agents": 3180,
+          "n_scenarios": 994,
+          "n_excluded": 474,
+          "excluded_share": 0.1297208538587849,
+          "miss_ALL": 0.11174004192872117,
+          "miss_CV6": 0.26132075471698113,
+          "min_fde_ALL": 0.9454698703911583,
+          "min_fde_CV6": 1.5921146761489615
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11394,
+          "n_agents": 9698,
+          "n_scenarios": 3840,
+          "n_excluded": 1696,
+          "excluded_share": 0.1488502720730209,
+          "miss_ALL": 0.09531174812676152,
+          "miss_CV6": 0.21798308929676222,
+          "min_fde_ALL": 0.8490361597899146,
+          "min_fde_CV6": 1.4901305804204619
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11375,
+          "n_agents": 10008,
+          "n_scenarios": 2462,
+          "n_excluded": 1367,
+          "excluded_share": 0.12017582417582418,
+          "miss_ALL": 0.10331734612310152,
+          "miss_CV6": 0.210431654676259,
+          "min_fde_ALL": 0.8698444381159106,
+          "min_fde_CV6": 1.4334220832335935
+        }
+      ],
+      "n_selected": 68476,
+      "n_agents": 59303,
+      "n_scenarios": 18720,
+      "n_excluded": 9173,
+      "excluded_share": 0.13395934341959226
+    },
+    {
+      "replan": 49,
+      "horizon_s": 4,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.08864827041134578,
+      "miss_CV6": 0.06857608630751436,
+      "difference_ALL_minus_CV6": 0.020072184103831422,
+      "ci95": [
+        0.017677949504025004,
+        0.022423039583044917
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36693,
+          "n_agents": 27414,
+          "n_scenarios": 4739,
+          "n_excluded": 9279,
+          "excluded_share": 0.25288202109394164,
+          "miss_ALL": 0.10728095133873203,
+          "miss_CV6": 0.07941197928065952,
+          "min_fde_ALL": 0.9222687704537972,
+          "min_fde_CV6": 0.9347682611858273
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15341,
+          "n_agents": 11407,
+          "n_scenarios": 2347,
+          "n_excluded": 3934,
+          "excluded_share": 0.2564369988918584,
+          "miss_ALL": 0.0894187779433681,
+          "miss_CV6": 0.07547996844043131,
+          "min_fde_ALL": 0.831493955220494,
+          "min_fde_CV6": 0.8493737879351255
+        },
+        {
+          "city": "miami",
+          "n_selected": 55770,
+          "n_agents": 44384,
+          "n_scenarios": 6196,
+          "n_excluded": 11386,
+          "excluded_share": 0.20415994262148107,
+          "miss_ALL": 0.08898852439317471,
+          "miss_CV6": 0.06797494592645999,
+          "min_fde_ALL": 0.7848344329522052,
+          "min_fde_CV6": 0.7150219563883862
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 9025,
+          "n_agents": 6967,
+          "n_scenarios": 1196,
+          "n_excluded": 2058,
+          "excluded_share": 0.2280332409972299,
+          "miss_ALL": 0.07860867901057365,
+          "miss_CV6": 0.061576001148270415,
+          "min_fde_ALL": 0.7897312006349796,
+          "min_fde_CV6": 0.7874381843719559
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43758,
+          "n_agents": 33386,
+          "n_scenarios": 4930,
+          "n_excluded": 10372,
+          "excluded_share": 0.23703094291329585,
+          "miss_ALL": 0.09560893787815251,
+          "miss_CV6": 0.06553645240519979,
+          "min_fde_ALL": 0.8189245094614039,
+          "min_fde_CV6": 0.6668381138623793
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30363,
+          "n_agents": 25603,
+          "n_scenarios": 3001,
+          "n_excluded": 4760,
+          "excluded_share": 0.15676975265948687,
+          "miss_ALL": 0.07198375190407373,
+          "miss_CV6": 0.061477170644065146,
+          "min_fde_ALL": 0.6961805981821483,
+          "min_fde_CV6": 0.699869243342632
+        }
+      ],
+      "n_selected": 190950,
+      "n_agents": 149161,
+      "n_scenarios": 22409,
+      "n_excluded": 41789,
+      "excluded_share": 0.21884786593349045
+    },
+    {
+      "replan": 49,
+      "horizon_s": 4,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.1889926886401648,
+      "miss_CV6": 0.6724523425912344,
+      "difference_ALL_minus_CV6": -0.4834596539510696,
+      "ci95": [
+        -0.48944983616560356,
+        -0.47746164971424027
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15121,
+          "n_agents": 10866,
+          "n_scenarios": 3750,
+          "n_excluded": 4255,
+          "excluded_share": 0.2813967330203029,
+          "miss_ALL": 0.19068654518682127,
+          "miss_CV6": 0.6674029081538745,
+          "min_fde_ALL": 1.5650111044529063,
+          "min_fde_CV6": 3.8158648740365573
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7152,
+          "n_agents": 5059,
+          "n_scenarios": 2051,
+          "n_excluded": 2093,
+          "excluded_share": 0.29264541387024606,
+          "miss_ALL": 0.1934506160637807,
+          "miss_CV6": 0.7232654674836925,
+          "min_fde_ALL": 1.5979082440625487,
+          "min_fde_CV6": 4.218891152869182
+        },
+        {
+          "city": "miami",
+          "n_selected": 19780,
+          "n_agents": 14363,
+          "n_scenarios": 4927,
+          "n_excluded": 5417,
+          "excluded_share": 0.2738624873609707,
+          "miss_ALL": 0.19058228318132237,
+          "miss_CV6": 0.6420664206642066,
+          "min_fde_ALL": 1.5440094266831494,
+          "min_fde_CV6": 3.6633402853855133
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3654,
+          "n_agents": 2566,
+          "n_scenarios": 898,
+          "n_excluded": 1088,
+          "excluded_share": 0.2977558839627805,
+          "miss_ALL": 0.1758898415172772,
+          "miss_CV6": 0.6823850350740452,
+          "min_fde_ALL": 1.5561176102533223,
+          "min_fde_CV6": 4.185363239338031
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11394,
+          "n_agents": 8202,
+          "n_scenarios": 3592,
+          "n_excluded": 3192,
+          "excluded_share": 0.28014744602422326,
+          "miss_ALL": 0.2004795578314232,
+          "miss_CV6": 0.6638624725676664,
+          "min_fde_ALL": 1.632118202811353,
+          "min_fde_CV6": 3.9527944222913898
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11375,
+          "n_agents": 8261,
+          "n_scenarios": 2353,
+          "n_excluded": 3114,
+          "excluded_share": 0.27375824175824176,
+          "miss_ALL": 0.18286728806036395,
+          "miss_CV6": 0.655731751603922,
+          "min_fde_ALL": 1.5399263064482624,
+          "min_fde_CV6": 3.627717313406912
+        }
+      ],
+      "n_selected": 68476,
+      "n_agents": 49317,
+      "n_scenarios": 17571,
+      "n_excluded": 19159,
+      "excluded_share": 0.2797914597815293
+    },
+    {
+      "replan": 59,
+      "horizon_s": 2,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.01819640386152398,
+      "miss_CV6": 0.0362928547215914,
+      "difference_ALL_minus_CV6": -0.018096450860067417,
+      "ci95": [
+        -0.019209888077298835,
+        -0.01700405880077955
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36662,
+          "n_agents": 31496,
+          "n_scenarios": 4927,
+          "n_excluded": 5166,
+          "excluded_share": 0.14090884294364736,
+          "miss_ALL": 0.021621793243586488,
+          "miss_CV6": 0.04451358902717806,
+          "min_fde_ALL": 0.40421164166455753,
+          "min_fde_CV6": 0.46541097134207776
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15361,
+          "n_agents": 13297,
+          "n_scenarios": 2459,
+          "n_excluded": 2064,
+          "excluded_share": 0.1343662521971226,
+          "miss_ALL": 0.019979443984858736,
+          "miss_CV6": 0.03782808152214785,
+          "min_fde_ALL": 0.3481377798144243,
+          "min_fde_CV6": 0.4067229525093386
+        },
+        {
+          "city": "miami",
+          "n_selected": 55627,
+          "n_agents": 49312,
+          "n_scenarios": 6327,
+          "n_excluded": 6315,
+          "excluded_share": 0.11352400812555054,
+          "miss_ALL": 0.016426022063595065,
+          "miss_CV6": 0.035508598312783905,
+          "min_fde_ALL": 0.32365685884150913,
+          "min_fde_CV6": 0.3707365940176945
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 8973,
+          "n_agents": 7876,
+          "n_scenarios": 1221,
+          "n_excluded": 1097,
+          "excluded_share": 0.12225565585645827,
+          "miss_ALL": 0.017817843236837647,
+          "miss_CV6": 0.031361097003555105,
+          "min_fde_ALL": 0.3278358055968684,
+          "min_fde_CV6": 0.37514653159700995
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43714,
+          "n_agents": 38035,
+          "n_scenarios": 5035,
+          "n_excluded": 5679,
+          "excluded_share": 0.1299126138079334,
+          "miss_ALL": 0.01713334209719118,
+          "miss_CV6": 0.03507295911660313,
+          "min_fde_ALL": 0.3311776312747271,
+          "min_fde_CV6": 0.3434202106446054
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30382,
+          "n_agents": 27963,
+          "n_scenarios": 3060,
+          "n_excluded": 2419,
+          "excluded_share": 0.07961951155289317,
+          "miss_ALL": 0.016199978543074773,
+          "miss_CV6": 0.03347280334728033,
+          "min_fde_ALL": 0.29910775653527805,
+          "min_fde_CV6": 0.37063858779921693
+        }
+      ],
+      "n_selected": 190719,
+      "n_agents": 167979,
+      "n_scenarios": 23029,
+      "n_excluded": 22740,
+      "excluded_share": 0.11923300772340459
+    },
+    {
+      "replan": 59,
+      "horizon_s": 2,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.0977065828720906,
+      "miss_CV6": 0.22879307640939606,
+      "difference_ALL_minus_CV6": -0.13108649353730545,
+      "ci95": [
+        -0.13551785586949033,
+        -0.12672892437579258
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15284,
+          "n_agents": 13244,
+          "n_scenarios": 4009,
+          "n_excluded": 2040,
+          "excluded_share": 0.13347291285003926,
+          "miss_ALL": 0.10374509211718513,
+          "miss_CV6": 0.2149652672908487,
+          "min_fde_ALL": 0.8686150286764915,
+          "min_fde_CV6": 1.460315804999697
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7200,
+          "n_agents": 6227,
+          "n_scenarios": 2209,
+          "n_excluded": 973,
+          "excluded_share": 0.1351388888888889,
+          "miss_ALL": 0.10781007440715164,
+          "miss_CV6": 0.27605588565922595,
+          "min_fde_ALL": 0.9191757058560233,
+          "min_fde_CV6": 1.6009845552214157
+        },
+        {
+          "city": "miami",
+          "n_selected": 19931,
+          "n_agents": 17270,
+          "n_scenarios": 5242,
+          "n_excluded": 2661,
+          "excluded_share": 0.1335106116100547,
+          "miss_ALL": 0.08795599305153445,
+          "miss_CV6": 0.19803126809496235,
+          "min_fde_ALL": 0.8106961124246017,
+          "min_fde_CV6": 1.408696539719023
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3742,
+          "n_agents": 3233,
+          "n_scenarios": 999,
+          "n_excluded": 509,
+          "excluded_share": 0.13602351683591662,
+          "miss_ALL": 0.10392824002474482,
+          "miss_CV6": 0.2601299103000309,
+          "min_fde_ALL": 0.9080094519987955,
+          "min_fde_CV6": 1.5991690177220963
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11437,
+          "n_agents": 9851,
+          "n_scenarios": 3850,
+          "n_excluded": 1586,
+          "excluded_share": 0.13867272886246393,
+          "miss_ALL": 0.08875579467397555,
+          "miss_CV6": 0.21287178966602374,
+          "min_fde_ALL": 0.8283835632824031,
+          "min_fde_CV6": 1.4762317190383554
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11453,
+          "n_agents": 10052,
+          "n_scenarios": 2464,
+          "n_excluded": 1401,
+          "excluded_share": 0.1223260281149044,
+          "miss_ALL": 0.09404430295795198,
+          "miss_CV6": 0.21070433744528452,
+          "min_fde_ALL": 0.844786639871686,
+          "min_fde_CV6": 1.427827899142591
+        }
+      ],
+      "n_selected": 69047,
+      "n_agents": 59877,
+      "n_scenarios": 18773,
+      "n_excluded": 9170,
+      "excluded_share": 0.13280808724492013
+    },
+    {
+      "replan": 59,
+      "horizon_s": 4,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.08857488736752657,
+      "miss_CV6": 0.06933538537325505,
+      "difference_ALL_minus_CV6": 0.01923950199427152,
+      "ci95": [
+        0.016925100959285712,
+        0.02156242025952639
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36662,
+          "n_agents": 27301,
+          "n_scenarios": 4730,
+          "n_excluded": 9361,
+          "excluded_share": 0.2553324968632371,
+          "miss_ALL": 0.10627205352673283,
+          "miss_CV6": 0.08120581663675323,
+          "min_fde_ALL": 0.9108582441296162,
+          "min_fde_CV6": 0.9196291569758502
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15361,
+          "n_agents": 11461,
+          "n_scenarios": 2345,
+          "n_excluded": 3900,
+          "excluded_share": 0.2538897207213072,
+          "miss_ALL": 0.0927784079341535,
+          "miss_CV6": 0.0780036646016927,
+          "min_fde_ALL": 0.8328253656218456,
+          "min_fde_CV6": 0.8598726693292621
+        },
+        {
+          "city": "miami",
+          "n_selected": 55627,
+          "n_agents": 44148,
+          "n_scenarios": 6194,
+          "n_excluded": 11479,
+          "excluded_share": 0.20635662537976163,
+          "miss_ALL": 0.08883754643471957,
+          "miss_CV6": 0.06913110446679352,
+          "min_fde_ALL": 0.7808505004683867,
+          "min_fde_CV6": 0.7146990536500734
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 8973,
+          "n_agents": 6901,
+          "n_scenarios": 1178,
+          "n_excluded": 2072,
+          "excluded_share": 0.230914967123593,
+          "miss_ALL": 0.08047142926145968,
+          "miss_CV6": 0.0634690624547167,
+          "min_fde_ALL": 0.8041096317025711,
+          "min_fde_CV6": 0.7702410216404894
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43714,
+          "n_agents": 33113,
+          "n_scenarios": 4930,
+          "n_excluded": 10601,
+          "excluded_share": 0.2425081209681109,
+          "miss_ALL": 0.09254170064123858,
+          "miss_CV6": 0.062301814997131034,
+          "min_fde_ALL": 0.793117729858082,
+          "min_fde_CV6": 0.6363387677661649
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30382,
+          "n_agents": 25557,
+          "n_scenarios": 2995,
+          "n_excluded": 4825,
+          "excluded_share": 0.15881113817391876,
+          "miss_ALL": 0.07054818640685527,
+          "miss_CV6": 0.061900849082443164,
+          "min_fde_ALL": 0.6880127933760388,
+          "min_fde_CV6": 0.6902198592862225
+        }
+      ],
+      "n_selected": 190719,
+      "n_agents": 148481,
+      "n_scenarios": 22372,
+      "n_excluded": 42238,
+      "excluded_share": 0.22146718470629564
+    },
+    {
+      "replan": 59,
+      "horizon_s": 4,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.18615280054625913,
+      "miss_CV6": 0.6731037460099519,
+      "difference_ALL_minus_CV6": -0.4869509454636928,
+      "ci95": [
+        -0.4928603619694734,
+        -0.4810052992886499
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15284,
+          "n_agents": 10888,
+          "n_scenarios": 3745,
+          "n_excluded": 4396,
+          "excluded_share": 0.2876210416121434,
+          "miss_ALL": 0.1892297330394318,
+          "miss_CV6": 0.6690852314474651,
+          "min_fde_ALL": 1.5429828506404906,
+          "min_fde_CV6": 3.8068800951451105
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7200,
+          "n_agents": 5047,
+          "n_scenarios": 2057,
+          "n_excluded": 2153,
+          "excluded_share": 0.2990277777777778,
+          "miss_ALL": 0.19628822402747503,
+          "miss_CV6": 0.7194372894788984,
+          "min_fde_ALL": 1.589310022103774,
+          "min_fde_CV6": 4.197502292445655
+        },
+        {
+          "city": "miami",
+          "n_selected": 19931,
+          "n_agents": 14301,
+          "n_scenarios": 4919,
+          "n_excluded": 5630,
+          "excluded_share": 0.28247453715317844,
+          "miss_ALL": 0.1877724168473067,
+          "miss_CV6": 0.6421928536465982,
+          "min_fde_ALL": 1.517870685961646,
+          "min_fde_CV6": 3.6036052008100072
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3742,
+          "n_agents": 2607,
+          "n_scenarios": 916,
+          "n_excluded": 1135,
+          "excluded_share": 0.3033137359700695,
+          "miss_ALL": 0.1774709116481268,
+          "miss_CV6": 0.6823935558112774,
+          "min_fde_ALL": 1.5494873646857363,
+          "min_fde_CV6": 4.207464526636266
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11437,
+          "n_agents": 8266,
+          "n_scenarios": 3585,
+          "n_excluded": 3171,
+          "excluded_share": 0.27725802220862117,
+          "miss_ALL": 0.1869102346963465,
+          "miss_CV6": 0.6729978224050327,
+          "min_fde_ALL": 1.5710649301104396,
+          "min_fde_CV6": 3.880035560923558
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11453,
+          "n_agents": 8268,
+          "n_scenarios": 2366,
+          "n_excluded": 3185,
+          "excluded_share": 0.27809307604994327,
+          "miss_ALL": 0.1792452830188679,
+          "miss_CV6": 0.6525157232704403,
+          "min_fde_ALL": 1.4995923470442387,
+          "min_fde_CV6": 3.574279276143747
+        }
+      ],
+      "n_selected": 69047,
+      "n_agents": 49377,
+      "n_scenarios": 17588,
+      "n_excluded": 19670,
+      "excluded_share": 0.2848784161513172
+    },
+    {
+      "replan": 69,
+      "horizon_s": 2,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.018618630778665143,
+      "miss_CV6": 0.037817364210368964,
+      "difference_ALL_minus_CV6": -0.01919873343170382,
+      "ci95": [
+        -0.020315855388425914,
+        -0.018075214378769973
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36884,
+          "n_agents": 31654,
+          "n_scenarios": 4924,
+          "n_excluded": 5230,
+          "excluded_share": 0.14179590066153347,
+          "miss_ALL": 0.02195615088140519,
+          "miss_CV6": 0.045270739874897326,
+          "min_fde_ALL": 0.40608102935982243,
+          "min_fde_CV6": 0.4748916447005294
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15343,
+          "n_agents": 13268,
+          "n_scenarios": 2463,
+          "n_excluded": 2075,
+          "excluded_share": 0.13524082643550805,
+          "miss_ALL": 0.020977791176766153,
+          "miss_CV6": 0.0397196261682243,
+          "min_fde_ALL": 0.3595116384574387,
+          "min_fde_CV6": 0.4107171533040004
+        },
+        {
+          "city": "miami",
+          "n_selected": 55830,
+          "n_agents": 49637,
+          "n_scenarios": 6345,
+          "n_excluded": 6193,
+          "excluded_share": 0.11092602543435429,
+          "miss_ALL": 0.017802580064602343,
+          "miss_CV6": 0.03803614239377883,
+          "min_fde_ALL": 0.3284909968354508,
+          "min_fde_CV6": 0.3752944034677933
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 8970,
+          "n_agents": 7874,
+          "n_scenarios": 1219,
+          "n_excluded": 1096,
+          "excluded_share": 0.1221850613154961,
+          "miss_ALL": 0.01693336720006773,
+          "miss_CV6": 0.0332740665481331,
+          "min_fde_ALL": 0.3224706909462971,
+          "min_fde_CV6": 0.385454388491803
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43548,
+          "n_agents": 37915,
+          "n_scenarios": 5052,
+          "n_excluded": 5633,
+          "excluded_share": 0.12935152016166068,
+          "miss_ALL": 0.017433733350916525,
+          "miss_CV6": 0.03499934063035738,
+          "min_fde_ALL": 0.3328430200593477,
+          "min_fde_CV6": 0.3452872594234035
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30376,
+          "n_agents": 27918,
+          "n_scenarios": 3063,
+          "n_excluded": 2458,
+          "excluded_share": 0.08091914669475903,
+          "miss_ALL": 0.016608161998232916,
+          "miss_CV6": 0.03560426964682284,
+          "min_fde_ALL": 0.303782006897373,
+          "min_fde_CV6": 0.3779720422174123
+        }
+      ],
+      "n_selected": 190951,
+      "n_agents": 168266,
+      "n_scenarios": 23066,
+      "n_excluded": 22685,
+      "excluded_share": 0.11880011102324681
+    },
+    {
+      "replan": 69,
+      "horizon_s": 2,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.0968080091914203,
+      "miss_CV6": 0.2227416352666158,
+      "difference_ALL_minus_CV6": -0.1259336260751955,
+      "ci95": [
+        -0.13040637508980152,
+        -0.12140202511625565
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15337,
+          "n_agents": 13281,
+          "n_scenarios": 4016,
+          "n_excluded": 2056,
+          "excluded_share": 0.13405489991523767,
+          "miss_ALL": 0.09861205230529828,
+          "miss_CV6": 0.21474286574806115,
+          "min_fde_ALL": 0.8529575914646826,
+          "min_fde_CV6": 1.4468332417435286
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7245,
+          "n_agents": 6237,
+          "n_scenarios": 2203,
+          "n_excluded": 1008,
+          "excluded_share": 0.1391304347826087,
+          "miss_ALL": 0.10688899577788467,
+          "miss_CV6": 0.2597402597402597,
+          "min_fde_ALL": 0.8941081717191934,
+          "min_fde_CV6": 1.566866767123359
+        },
+        {
+          "city": "miami",
+          "n_selected": 20041,
+          "n_agents": 17437,
+          "n_scenarios": 5278,
+          "n_excluded": 2604,
+          "excluded_share": 0.12993363604610547,
+          "miss_ALL": 0.08741947200397622,
+          "miss_CV6": 0.19108791649939783,
+          "min_fde_ALL": 0.8156619238844288,
+          "min_fde_CV6": 1.3891636740395488
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3793,
+          "n_agents": 3258,
+          "n_scenarios": 1025,
+          "n_excluded": 535,
+          "excluded_share": 0.14104930134458213,
+          "miss_ALL": 0.10609781051770001,
+          "miss_CV6": 0.2685696746470227,
+          "min_fde_ALL": 0.9025052867049607,
+          "min_fde_CV6": 1.5953825030281272
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11506,
+          "n_agents": 9862,
+          "n_scenarios": 3851,
+          "n_excluded": 1644,
+          "excluded_share": 0.1428819746219364,
+          "miss_ALL": 0.08666261069424729,
+          "miss_CV6": 0.20117623200162238,
+          "min_fde_ALL": 0.8157317287779431,
+          "min_fde_CV6": 1.4395847190405122
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11492,
+          "n_agents": 10063,
+          "n_scenarios": 2486,
+          "n_excluded": 1429,
+          "excluded_share": 0.12434737208492865,
+          "miss_ALL": 0.09516711384941534,
+          "miss_CV6": 0.20113286296333102,
+          "min_fde_ALL": 0.8511304232513269,
+          "min_fde_CV6": 1.4110547316932127
+        }
+      ],
+      "n_selected": 69414,
+      "n_agents": 60138,
+      "n_scenarios": 18859,
+      "n_excluded": 9276,
+      "excluded_share": 0.1336329847004927
+    },
+    {
+      "replan": 69,
+      "horizon_s": 4,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.08131814667210722,
+      "miss_CV6": 0.07025213291400767,
+      "difference_ALL_minus_CV6": 0.011066013758099555,
+      "ci95": [
+        0.008385425848145204,
+        0.01368812442815587
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 36884,
+          "n_agents": 22171,
+          "n_scenarios": 4390,
+          "n_excluded": 14713,
+          "excluded_share": 0.3988992517080577,
+          "miss_ALL": 0.09622179122878233,
+          "miss_CV6": 0.08078120066753867,
+          "min_fde_ALL": 0.8416748006413869,
+          "min_fde_CV6": 0.8244686008656802
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15343,
+          "n_agents": 9217,
+          "n_scenarios": 2173,
+          "n_excluded": 6126,
+          "excluded_share": 0.3992700254187577,
+          "miss_ALL": 0.08411992333007846,
+          "miss_CV6": 0.08506021482044049,
+          "min_fde_ALL": 0.7784544254671881,
+          "min_fde_CV6": 0.8075329691761353
+        },
+        {
+          "city": "miami",
+          "n_selected": 55830,
+          "n_agents": 35906,
+          "n_scenarios": 5893,
+          "n_excluded": 19924,
+          "excluded_share": 0.3568690668099588,
+          "miss_ALL": 0.08382071705750198,
+          "miss_CV6": 0.06854007686737593,
+          "min_fde_ALL": 0.735736315529629,
+          "min_fde_CV6": 0.6434663816024615
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 8970,
+          "n_agents": 5675,
+          "n_scenarios": 1114,
+          "n_excluded": 3295,
+          "excluded_share": 0.3673355629877369,
+          "miss_ALL": 0.06760646108663729,
+          "miss_CV6": 0.059383259911894276,
+          "min_fde_ALL": 0.7089510318840946,
+          "min_fde_CV6": 0.6746071564537333
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43548,
+          "n_agents": 26620,
+          "n_scenarios": 4705,
+          "n_excluded": 16928,
+          "excluded_share": 0.3887204923303022,
+          "miss_ALL": 0.0879914850989231,
+          "miss_CV6": 0.06412471825694967,
+          "min_fde_ALL": 0.7616748975159248,
+          "min_fde_CV6": 0.6096670358368289
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30376,
+          "n_agents": 20920,
+          "n_scenarios": 2887,
+          "n_excluded": 9456,
+          "excluded_share": 0.3112983934685278,
+          "miss_ALL": 0.06814850223072019,
+          "miss_CV6": 0.06362332695984704,
+          "min_fde_ALL": 0.6564583998996482,
+          "min_fde_CV6": 0.6374304714289716
+        }
+      ],
+      "n_selected": 190951,
+      "n_agents": 120509,
+      "n_scenarios": 21162,
+      "n_excluded": 70442,
+      "excluded_share": 0.36890092222612086
+    },
+    {
+      "replan": 69,
+      "horizon_s": 4,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.15616236529200866,
+      "miss_CV6": 0.6621820677714196,
+      "difference_ALL_minus_CV6": -0.506019702479411,
+      "ci95": [
+        -0.5125089765650827,
+        -0.49937457132731666
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15337,
+          "n_agents": 8331,
+          "n_scenarios": 3188,
+          "n_excluded": 7006,
+          "excluded_share": 0.4568038077850949,
+          "miss_ALL": 0.1574440843436162,
+          "miss_CV6": 0.6522626335373904,
+          "min_fde_ALL": 1.345901568314091,
+          "min_fde_CV6": 3.5214072107258105
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7245,
+          "n_agents": 3960,
+          "n_scenarios": 1759,
+          "n_excluded": 3285,
+          "excluded_share": 0.453416149068323,
+          "miss_ALL": 0.1590909090909091,
+          "miss_CV6": 0.7151515151515152,
+          "min_fde_ALL": 1.3656198370259276,
+          "min_fde_CV6": 3.8357000566004182
+        },
+        {
+          "city": "miami",
+          "n_selected": 20041,
+          "n_agents": 11109,
+          "n_scenarios": 4299,
+          "n_excluded": 8932,
+          "excluded_share": 0.44568634299685644,
+          "miss_ALL": 0.15891019293665795,
+          "miss_CV6": 0.6273291925465838,
+          "min_fde_ALL": 1.3397943857170322,
+          "min_fde_CV6": 3.322006223622452
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3793,
+          "n_agents": 1957,
+          "n_scenarios": 750,
+          "n_excluded": 1836,
+          "excluded_share": 0.48404956498813606,
+          "miss_ALL": 0.1430761369443025,
+          "miss_CV6": 0.6928972917731221,
+          "min_fde_ALL": 1.300677456085321,
+          "min_fde_CV6": 3.9351756131024076
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11506,
+          "n_agents": 6457,
+          "n_scenarios": 3099,
+          "n_excluded": 5049,
+          "excluded_share": 0.43881453154875716,
+          "miss_ALL": 0.15714211966341438,
+          "miss_CV6": 0.6557224717361003,
+          "min_fde_ALL": 1.3650170952476917,
+          "min_fde_CV6": 3.5353329397743933
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11492,
+          "n_agents": 6317,
+          "n_scenarios": 2086,
+          "n_excluded": 5175,
+          "excluded_share": 0.4503132613992343,
+          "miss_ALL": 0.16131074877315182,
+          "miss_CV6": 0.6297293018838056,
+          "min_fde_ALL": 1.3581662664856995,
+          "min_fde_CV6": 3.301142547200232
+        }
+      ],
+      "n_selected": 69414,
+      "n_agents": 38131,
+      "n_scenarios": 15181,
+      "n_excluded": 31283,
+      "excluded_share": 0.45067277494453567
+    },
+    {
+      "replan": 79,
+      "horizon_s": 2,
+      "group": "stopped",
+      "primary": false,
+      "miss_ALL": 0.018274204441880385,
+      "miss_CV6": 0.03917450120347104,
+      "difference_ALL_minus_CV6": -0.020900296761590654,
+      "ci95": [
+        -0.022043270309701293,
+        -0.019787317592149384
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 37043,
+          "n_agents": 31782,
+          "n_scenarios": 4930,
+          "n_excluded": 5261,
+          "excluded_share": 0.1420241341144076,
+          "miss_ALL": 0.023126297904474232,
+          "miss_CV6": 0.047668491599018314,
+          "min_fde_ALL": 0.40933149126336804,
+          "min_fde_CV6": 0.47943240151779815
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15414,
+          "n_agents": 13256,
+          "n_scenarios": 2466,
+          "n_excluded": 2158,
+          "excluded_share": 0.140002595043467,
+          "miss_ALL": 0.01828102997384832,
+          "miss_CV6": 0.04050995775497888,
+          "min_fde_ALL": 0.34030520321834945,
+          "min_fde_CV6": 0.39734614465147783
+        },
+        {
+          "city": "miami",
+          "n_selected": 55826,
+          "n_agents": 49433,
+          "n_scenarios": 6349,
+          "n_excluded": 6393,
+          "excluded_share": 0.11451653351484971,
+          "miss_ALL": 0.017363569545310487,
+          "miss_CV6": 0.03827402747152712,
+          "min_fde_ALL": 0.3301321897465201,
+          "min_fde_CV6": 0.37449301061488327
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 9087,
+          "n_agents": 7910,
+          "n_scenarios": 1233,
+          "n_excluded": 1177,
+          "excluded_share": 0.1295256960493012,
+          "miss_ALL": 0.01622418879056047,
+          "miss_CV6": 0.035903919089759796,
+          "min_fde_ALL": 0.30375314471247683,
+          "min_fde_CV6": 0.3779224699478865
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43726,
+          "n_agents": 37896,
+          "n_scenarios": 5040,
+          "n_excluded": 5830,
+          "excluded_share": 0.13333028404153136,
+          "miss_ALL": 0.018066990359580606,
+          "miss_CV6": 0.03570297656744775,
+          "min_fde_ALL": 0.3357221407810551,
+          "min_fde_CV6": 0.35359040718972806
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30448,
+          "n_agents": 27739,
+          "n_scenarios": 3043,
+          "n_excluded": 2709,
+          "excluded_share": 0.08897136100893327,
+          "miss_ALL": 0.016583150077508196,
+          "miss_CV6": 0.03698763473809438,
+          "min_fde_ALL": 0.29958118879907647,
+          "min_fde_CV6": 0.3760379656736621
+        }
+      ],
+      "n_selected": 191544,
+      "n_agents": 168016,
+      "n_scenarios": 23061,
+      "n_excluded": 23528,
+      "excluded_share": 0.12283339598212421
+    },
+    {
+      "replan": 79,
+      "horizon_s": 2,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.09675438934122398,
+      "miss_CV6": 0.21814045380406158,
+      "difference_ALL_minus_CV6": -0.1213860644628376,
+      "ci95": [
+        -0.12580237820783716,
+        -0.1169569459004225
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15595,
+          "n_agents": 13446,
+          "n_scenarios": 4038,
+          "n_excluded": 2149,
+          "excluded_share": 0.13780057710804744,
+          "miss_ALL": 0.09866627001834498,
+          "miss_CV6": 0.2085378551242005,
+          "min_fde_ALL": 0.8559078231329772,
+          "min_fde_CV6": 1.44420197320546
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7236,
+          "n_agents": 6244,
+          "n_scenarios": 2207,
+          "n_excluded": 992,
+          "excluded_share": 0.1370923161967938,
+          "miss_ALL": 0.10698270339525945,
+          "miss_CV6": 0.26121076233183854,
+          "min_fde_ALL": 0.914842531989364,
+          "min_fde_CV6": 1.574191997502495
+        },
+        {
+          "city": "miami",
+          "n_selected": 20224,
+          "n_agents": 17520,
+          "n_scenarios": 5311,
+          "n_excluded": 2704,
+          "excluded_share": 0.1337025316455696,
+          "miss_ALL": 0.08607305936073058,
+          "miss_CV6": 0.1865296803652968,
+          "min_fde_ALL": 0.806966085509858,
+          "min_fde_CV6": 1.377217995809616
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3831,
+          "n_agents": 3306,
+          "n_scenarios": 1026,
+          "n_excluded": 525,
+          "excluded_share": 0.1370399373531715,
+          "miss_ALL": 0.11242185924581567,
+          "miss_CV6": 0.2604355716878403,
+          "min_fde_ALL": 0.9585318294731857,
+          "min_fde_CV6": 1.6122939030926466
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11692,
+          "n_agents": 9919,
+          "n_scenarios": 3869,
+          "n_excluded": 1773,
+          "excluded_share": 0.15164214847759153,
+          "miss_ALL": 0.08260241287764222,
+          "miss_CV6": 0.19588668212521423,
+          "min_fde_ALL": 0.8039182877972489,
+          "min_fde_CV6": 1.4229608707829446
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11559,
+          "n_agents": 10059,
+          "n_scenarios": 2505,
+          "n_excluded": 1500,
+          "excluded_share": 0.12976901116013495,
+          "miss_ALL": 0.09378003114955097,
+          "miss_CV6": 0.19624217118997914,
+          "min_fde_ALL": 0.841834680127224,
+          "min_fde_CV6": 1.3917456516037243
+        }
+      ],
+      "n_selected": 70137,
+      "n_agents": 60494,
+      "n_scenarios": 18956,
+      "n_excluded": 9643,
+      "excluded_share": 0.13748805908436346
+    },
+    {
+      "replan": 89,
+      "horizon_s": 2,
+      "group": "stopped",
+      "primary": true,
+      "miss_ALL": 0.014584027338661052,
+      "miss_CV6": 0.0380979045323744,
+      "difference_ALL_minus_CV6": -0.023513877193713353,
+      "ci95": [
+        -0.024819514395138895,
+        -0.022247431038800867
+      ],
+      "status": "killed",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 37199,
+          "n_agents": 23531,
+          "n_scenarios": 4433,
+          "n_excluded": 13668,
+          "excluded_share": 0.36742923196860133,
+          "miss_ALL": 0.01736716104996246,
+          "miss_CV6": 0.04211465726063491,
+          "min_fde_ALL": 0.34520731532904364,
+          "min_fde_CV6": 0.38558362820876335
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 15383,
+          "n_agents": 9681,
+          "n_scenarios": 2168,
+          "n_excluded": 5702,
+          "excluded_share": 0.37066892023662484,
+          "miss_ALL": 0.015184381778741865,
+          "miss_CV6": 0.04524325999380229,
+          "min_fde_ALL": 0.30834272009584734,
+          "min_fde_CV6": 0.38998897306285174
+        },
+        {
+          "city": "miami",
+          "n_selected": 55843,
+          "n_agents": 36939,
+          "n_scenarios": 5839,
+          "n_excluded": 18904,
+          "excluded_share": 0.3385204949590817,
+          "miss_ALL": 0.013996047537832642,
+          "miss_CV6": 0.035409729554129785,
+          "min_fde_ALL": 0.2822493488558303,
+          "min_fde_CV6": 0.3213292920723263
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 9107,
+          "n_agents": 6016,
+          "n_scenarios": 1140,
+          "n_excluded": 3091,
+          "excluded_share": 0.3394092456352257,
+          "miss_ALL": 0.012134308510638297,
+          "miss_CV6": 0.03241356382978723,
+          "min_fde_ALL": 0.2717732215965408,
+          "min_fde_CV6": 0.3335605331147796
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 43786,
+          "n_agents": 27949,
+          "n_scenarios": 4690,
+          "n_excluded": 15837,
+          "excluded_share": 0.36169095144566754,
+          "miss_ALL": 0.015194342075446943,
+          "miss_CV6": 0.03696017746609897,
+          "min_fde_ALL": 0.29588189201564724,
+          "min_fde_CV6": 0.3200464891183883
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 30453,
+          "n_agents": 21182,
+          "n_scenarios": 2875,
+          "n_excluded": 9271,
+          "excluded_share": 0.3044363445309165,
+          "miss_ALL": 0.013627923079344096,
+          "miss_CV6": 0.03644603908979322,
+          "min_fde_ALL": 0.26201517729471935,
+          "min_fde_CV6": 0.32681054929433545
+        }
+      ],
+      "n_selected": 191771,
+      "n_agents": 125298,
+      "n_scenarios": 21145,
+      "n_excluded": 66473,
+      "excluded_share": 0.34662696653821484
+    },
+    {
+      "replan": 89,
+      "horizon_s": 2,
+      "group": "moving",
+      "primary": false,
+      "miss_ALL": 0.05672629159539195,
+      "miss_CV6": 0.21959106785328772,
+      "difference_ALL_minus_CV6": -0.16286477625789578,
+      "ci95": [
+        -0.16821126552036994,
+        -0.15765419086528842
+      ],
+      "status": "descriptive",
+      "per_city": [
+        {
+          "city": "austin",
+          "n_selected": 15760,
+          "n_agents": 9440,
+          "n_scenarios": 3291,
+          "n_excluded": 6320,
+          "excluded_share": 0.4010152284263959,
+          "miss_ALL": 0.055120056497175135,
+          "miss_CV6": 0.2166313559322034,
+          "min_fde_ALL": 0.6867095666069171,
+          "min_fde_CV6": 1.4257790217142996
+        },
+        {
+          "city": "dearborn",
+          "n_selected": 7292,
+          "n_agents": 4451,
+          "n_scenarios": 1810,
+          "n_excluded": 2841,
+          "excluded_share": 0.3896050466264399,
+          "miss_ALL": 0.06290721186250281,
+          "miss_CV6": 0.27162435407773533,
+          "min_fde_ALL": 0.7517884794073044,
+          "min_fde_CV6": 1.552880586246865
+        },
+        {
+          "city": "miami",
+          "n_selected": 20237,
+          "n_agents": 12186,
+          "n_scenarios": 4367,
+          "n_excluded": 8051,
+          "excluded_share": 0.39783564757622175,
+          "miss_ALL": 0.05060451884676404,
+          "miss_CV6": 0.17684227802396194,
+          "min_fde_ALL": 0.6485838864738661,
+          "min_fde_CV6": 1.3188955617889573
+        },
+        {
+          "city": "palo-alto",
+          "n_selected": 3857,
+          "n_agents": 2230,
+          "n_scenarios": 799,
+          "n_excluded": 1627,
+          "excluded_share": 0.42183043816437643,
+          "miss_ALL": 0.06397608370702541,
+          "miss_CV6": 0.268609865470852,
+          "min_fde_ALL": 0.7370854447654307,
+          "min_fde_CV6": 1.5762943626344437
+        },
+        {
+          "city": "pittsburgh",
+          "n_selected": 11757,
+          "n_agents": 7132,
+          "n_scenarios": 3213,
+          "n_excluded": 4625,
+          "excluded_share": 0.3933826656459981,
+          "miss_ALL": 0.05201906898485698,
+          "miss_CV6": 0.18424004486819967,
+          "min_fde_ALL": 0.6621604551274702,
+          "min_fde_CV6": 1.3496875203320202
+        },
+        {
+          "city": "washington-dc",
+          "n_selected": 11520,
+          "n_agents": 6974,
+          "n_scenarios": 2111,
+          "n_excluded": 4546,
+          "excluded_share": 0.39461805555555557,
+          "miss_ALL": 0.05573080967402733,
+          "miss_CV6": 0.19959850874677373,
+          "min_fde_ALL": 0.6855807198974776,
+          "min_fde_CV6": 1.3659944548917617
+        }
+      ],
+      "n_selected": 70423,
+      "n_agents": 42413,
+      "n_scenarios": 15591,
+      "n_excluded": 28010,
+      "excluded_share": 0.3977393749201255
+    }
+  ]
+}

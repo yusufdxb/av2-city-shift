@@ -1,0 +1,96 @@
+{
+  "study": "H",
+  "n_boot": 10000,
+  "seed": 20261002,
+  "H2": {
+    "pooled_CF_U1_heldout": 0.33304223253161186,
+    "ci95": [
+      0.3162796254999714,
+      0.35103173923367315
+    ],
+    "ci_bonferroni": [
+      0.3110983626043845,
+      0.35646477408486205
+    ],
+    "bootstrap_undefined_share": 0.0,
+    "original_registered": {
+      "pooled_CF_U1_heldout": 0.33304223253161186,
+      "ci95": [
+        0.31639015218472755,
+        0.35102794975233176
+      ],
+      "ci_bonferroni": [
+        0.3112729658458018,
+        0.3559500040192173
+      ],
+      "fold_consistency_p_one_sided": 0.015625,
+      "sham_pooled_mean": 0.0004967194166282642,
+      "folds_undefined": []
+    }
+  },
+  "H3": {
+    "pooled_CF_diff_heldout_minus_indist": 0.0051844145099601375,
+    "ci95": [
+      -0.010905779794087802,
+      0.022506689024349876
+    ],
+    "ci_bonferroni": [
+      -0.016007315601645342,
+      0.02705144609988468
+    ],
+    "bootstrap_undefined_share": 0.0,
+    "original_registered": {
+      "pooled_CF_diff_heldout_minus_indist": 0.0051844145099601375,
+      "ci95": [
+        -0.012755335875382995,
+        0.024494989495564563
+      ],
+      "ci_bonferroni": [
+        -0.018041458052201788,
+        0.030039033288446045
+      ],
+      "fold_consistency_p_two_sided": 0.5625
+    },
+    "shared_draw_verdict": "no detectable difference",
+    "registered_verdict": "no detectable difference",
+    "verdict_unchanged": true
+  },
+  "per_fold": {
+    "austin": {
+      "CF_heldout": 0.313130784586563,
+      "CF_difference": -0.02476915857452866,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    },
+    "dearborn": {
+      "CF_heldout": 0.345620736328264,
+      "CF_difference": 0.018847197956502304,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    },
+    "miami": {
+      "CF_heldout": 0.3441522626762182,
+      "CF_difference": 0.011111886940839755,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    },
+    "palo-alto": {
+      "CF_heldout": 0.34568637962946375,
+      "CF_difference": 0.022557750062496773,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    },
+    "pittsburgh": {
+      "CF_heldout": 0.3375372227545714,
+      "CF_difference": 0.021979423193224212,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    },
+    "washington-dc": {
+      "CF_heldout": 0.3121260092145908,
+      "CF_difference": -0.01862061251877356,
+      "H2_undefined_draw_share": 0.0,
+      "H3_undefined_draw_share": 0.0
+    }
+  }
+}
