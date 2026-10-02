@@ -64,6 +64,7 @@ def main() -> None:
     ap.add_argument("--chunk", type=int, default=500)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--limit", type=int, default=0, help="smoke runs only; production scores the full reserve")
+    ap.add_argument("--smoke", action="store_true", help="<= 100 development-slice scenarios (runs/dev_scenarios.npy)")
     ap.add_argument("--mem-fraction", type=float, default=0.0, help="cap this process's share of GPU memory")
     ap.add_argument("--device", default="cuda", choices=("cpu", "cuda"))
     args = ap.parse_args()
@@ -72,8 +73,14 @@ def main() -> None:
         ap.error("seeds must be a unique subset of 0,1,2")
     if args.chunk <= 0 or args.workers <= 0 or args.limit < 0 or not 0 <= args.mem_fraction <= 1:
         ap.error("chunk and workers must be positive; limit nonnegative; mem-fraction between 0 and 1")
-    ids = sorted(checked_ids(args.pool, RESERVE_SHA256))
-    ids = ids[:args.limit] if args.limit else ids
+    if args.smoke:  # the registration allows smoke runs on the development slice only, never on the reserve
+        if not 0 < args.limit <= 100 or os.path.basename(args.pool) != "dev_scenarios.npy":
+            ap.error("--smoke requires --pool .../dev_scenarios.npy and --limit 1..100")
+        ids = sorted(checked_ids(args.pool))[:args.limit]
+    else:
+        if args.limit:
+            ap.error("production scores the full reserve; use --smoke for limited runs")
+        ids = sorted(checked_ids(args.pool, RESERVE_SHA256))
     device = torch.device(args.device)
     checkpoints = {f"ALL_s{s}": f"{args.runs}/seed{s}/model.pt" for s in seeds}
     harness = "closedloop_v4" if args.harness == "v4" else "closedloop_v2"
