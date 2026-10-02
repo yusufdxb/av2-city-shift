@@ -261,6 +261,70 @@ def q_closed(d: pd.DataFrame, q0_pass: bool, n_boot: int = N_BOOT) -> dict:
             | {a: float(d[f"{a}_collision"].astype(float).mean()) for a in ("cv", "oracle", "static", "log")}}
 
 
+# ------------------------------------------------------------------ study S
+S_FAMILIES = ("ALLR", "SEL", "SELSHAM")
+
+
+def s_open(rows: pd.DataFrame, n_boot: int = N_BOOT) -> dict:
+    """Stopped non-focal planner agents and focal agents on the reserve: SEL versus ALLR and SELSHAM (Stage 3a scoring)."""
+    rows = rows.assign(family=rows.predictor.str.replace(r"_s[0-2]$", "", regex=True))
+    keys = ["scenario_id", "agent_id", "city", "focal", "planner_relevant", "speed", "n_valid"]
+    wide = rows.groupby(keys + ["family"]).miss.mean().unstack("family").reset_index()
+    out = {}
+    rng = np.random.default_rng(SEED)
+    cells = {"stopped_nonfocal": wide.planner_relevant & ~wide.focal & (wide.speed < 0.5),
+             "moving_nonfocal": wide.planner_relevant & ~wide.focal & (wide.speed >= 2.0),
+             "focal": wide.focal, "focal_stopped": wide.focal & (wide.speed < 0.5)}
+    for name, mask in cells.items():
+        sel = wide[mask]
+        cell = {"agents": int(len(sel)),
+                "miss_city_equal": {f: float(np.mean([sel.loc[sel.city == c, f].mean() for c in CITIES]))
+                                    for f in S_FAMILIES + ("CV",)}}
+        for a, b in (("SEL", "ALLR"), ("SEL", "SELSHAM"), ("SELSHAM", "ALLR")):
+            pts, dr = [], []
+            for c in CITIES:
+                sc = sel[sel.city == c]
+                g = sc.groupby("scenario_id")[[a, b]].agg(["sum", "count"])
+                xa, na = g[(a, "sum")].to_numpy(), g[(a, "count")].to_numpy()
+                xb, nb = g[(b, "sum")].to_numpy(), g[(b, "count")].to_numpy()
+                pts.append(xa.sum() / na.sum() - xb.sum() / nb.sum())
+                idx = rng.integers(0, len(xa), size=(n_boot, len(xa)))
+                dr.append(xa[idx].sum(1) / na[idx].sum(1) - xb[idx].sum(1) / nb[idx].sum(1))
+            draws = np.mean(np.stack(dr), 0)
+            cell[f"{a}_minus_{b}"] = {"point": float(np.mean(pts)), "ci9833": interval(draws, 1 - 0.05 / 3),
+                                     "ci95": interval(draws, 0.95)}
+        out[name] = cell
+    st = out["stopped_nonfocal"]
+    for claim, key in (("S1 SEL vs ALLR", "SEL_minus_ALLR"), ("S2 SEL vs SELSHAM", "SEL_minus_SELSHAM")):
+        e = st[key]
+        out.setdefault("verdicts", {})[claim] = ("supported" if e["point"] <= -0.15 and e["ci9833"][1] < 0
+                                                 else "killed")
+    return out
+
+
+def s_closed(allr: pd.DataFrame, sel: pd.DataFrame, sham: pd.DataFrame, n_boot: int = N_BOOT) -> dict:
+    """Stop-line braking on the reserve: SEL (and SELSHAM) focal-only models versus ALLR, paired by scenario."""
+    m = allr[["scenario_id", "city"]].copy()
+    m["ALLR"] = arm_column(allr, "ALL", "unnecessary_hard_brake")
+    for name, d in (("SEL", sel), ("SELSHAM", sham)):
+        x = pd.DataFrame({"scenario_id": d.scenario_id, name: arm_column(d, "ALL", "unnecessary_hard_brake")})
+        m = m.merge(x, on="scenario_id", validate="one_to_one")
+    eff = city_bootstrap(m, ["ALLR", "SEL", "SELSHAM"], lambda r: {
+        "SEL_reduction": (r["ALLR"] - r["SEL"]) / r["ALLR"],
+        "SELSHAM_reduction": (r["ALLR"] - r["SELSHAM"]) / r["ALLR"],
+        "SEL_minus_SELSHAM": (r["SELSHAM"] - r["SEL"]) / r["ALLR"]}, n_boot)
+    eff = {k: summarise(v, {"ci9833": 1 - 0.05 / 3, "ci95": 0.95}) for k, v in eff.items()}
+    rates = {f: float(m[f].mean()) for f in ("ALLR", "SEL", "SELSHAM")}
+    oracle = float(allr["oracle_unnecessary_hard_brake"].astype(float).mean())
+    control = rates["ALLR"] >= 2 * oracle
+    is_powered, events = powered(m, "ALLR")
+    for e in eff.values():
+        e.pop("draws", None)
+    return {"scenarios": len(m), "brake_rates": rates | {"oracle": oracle}, "brake_control_pass": bool(control),
+            "powered": is_powered, "ALLR_brake_events": events, "effects": eff,
+            "verdicts": {"S3 SEL braking": decide_bar(eff["SEL_reduction"], "ci9833", 0.30, is_powered, control)}}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -276,8 +340,20 @@ def main() -> None:
     qc.add_argument("--parts", required=True)
     qc.add_argument("--q-open", default="reports/v2/study_q_open.json")
     qc.add_argument("--out", default="reports/v2/study_q_closed.json")
+    so = sub.add_parser("s-open")
+    so.add_argument("--rows", required=True)
+    so.add_argument("--out", default="reports/v2/study_s_open.json")
+    sc = sub.add_parser("s-closed")
+    sc.add_argument("--allr", default="runs/v2/study_r_v4")
+    sc.add_argument("--sel", default="runs/v2/study_s_SEL_v4")
+    sc.add_argument("--sham", default="runs/v2/study_s_SELSHAM_v4")
+    sc.add_argument("--out", default="reports/v2/study_s_closed.json")
     args = ap.parse_args()
-    if args.cmd == "r":
+    if args.cmd == "s-open":
+        result = s_open(pd.read_parquet(args.rows))
+    elif args.cmd == "s-closed":
+        result = s_closed(load_parts(args.allr), load_parts(args.sel), load_parts(args.sham))
+    elif args.cmd == "r":
         result = analyze_r(load_parts(args.parts), args.harness)
     elif args.cmd == "q-open":
         result = q_open(load_parts(args.rows) if os.path.isdir(args.rows) else pd.read_parquet(args.rows),
