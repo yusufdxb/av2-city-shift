@@ -83,11 +83,42 @@ def sham_indices(sc: Scene, agents: list[int], t: int, model_seed: int, dose: in
     return chosen
 
 
+def most_stationary_mode(sc: Scene, i: int, t: int, traj: np.ndarray) -> int:
+    """v2 study G: the agent's own mode with the smallest maximum displacement over the planner look-ahead."""
+    disp = np.linalg.norm(traj[:, :CHECK_STEPS] - sc.pos[i, t], axis=-1).max(-1)
+    return int(np.argmin(disp))
+
+
+def factorial(sc: Scene, agents: list[int], t: int, arm: str, traj: np.ndarray, prob: np.ndarray
+              ) -> tuple[np.ndarray, np.ndarray, int]:
+    """v2 study G (docs/preregistration/v2-fresh-reserve.md), stopped selected agents only (PATCH's trigger).
+
+    GEO replaces the most stationary mode's trajectory with constant velocity and keeps every probability; PROB keeps
+    every trajectory and puts probability one on the most stationary mode. Applying both is PATCH (one CV mode with
+    probability one; zero-probability modes carry no planner risk).
+    """
+    n = 0
+    for j, i in enumerate(agents):
+        if np.linalg.norm(sc.vel[i, t]) >= 0.5:
+            continue
+        k = most_stationary_mode(sc, i, t, traj[j])
+        if arm == "GEO":
+            traj[j, k] = base.cv_forecast(sc, i, t)
+        else:  # PROB
+            prob[j] = 0
+            prob[j, k] = 1
+        n += 1
+    return traj, prob, n
+
+
 def intervention(sc: Scene, agents: list[int], t: int, arm: str, seed: int,
                  traj: np.ndarray, prob: np.ndarray, reference_dose: int | None = None,
                  ) -> tuple[np.ndarray, np.ndarray, int, int, int]:
     """Apply a forecast intervention and return trigger, substitution and fallback counts."""
     trigger = sum(np.linalg.norm(sc.vel[i, t]) < 0.5 for i in agents)
+    if arm in ("GEO", "PROB"):
+        traj, prob, n = factorial(sc, agents, t, arm, traj, prob)
+        return traj, prob, trigger, n, 0
     if arm in ("TRIMNF", "PATCHSUB"):  # exploratory study A (docs/preregistration/exploratory-followups.md)
         eligible = stationary_eligible(sc, agents, t, traj, prob)
         for j, keep in eligible:

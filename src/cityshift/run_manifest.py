@@ -21,10 +21,10 @@ def file_sha256(path: str | Path) -> str:
 
 
 def run_settings(harness: str, device: str, seeds: list[int], pool: str, ids: list[str], raw: str,
-                 checkpoints: dict[str, str], **settings) -> dict:
+                 checkpoints: dict[str, str], runner: str | None = None, **settings) -> dict:
     source = Path(__file__).parent
     names = ["run_manifest", "data", "model", "preprocess", "scene", "closedloop", "closedloop_v2", "closedloop_v3",
-             "followup_a" if harness == "closedloop_v3" else "followup_e"]
+             runner or ("followup_a" if harness == "closedloop_v3" else "followup_e")]
     if harness == "closedloop_v4":
         names.append("closedloop_v4")
     return {"schema": 1, "harness": harness, "device": device, "seeds": seeds,
@@ -56,15 +56,16 @@ def validate_manifest(path: str | Path, settings: dict, outputs: list[str | Path
         tmp.replace(path)
 
 
-def validate_parts(directory: str | Path, ids: list[str], chunk: int, seeds: list[int]) -> None:
+def validate_parts(directory: str | Path, ids: list[str], chunk: int, seeds: list[int],
+                   arms: tuple[str, ...] = ("ALL", "PATCH", "SHAM2", "TRIM")) -> None:
     """Every existing E part must cover exactly its expected scenarios and contain all arm outcomes and doses."""
     directory = Path(directory)
     expected = {f"part_{i:05d}.parquet": ids[i:i + chunk] for i in range(0, len(ids), chunk)}
     metrics = ("collision", "first_collision_step", "planner_hard_brake", "logged_hard_brake",
                "unnecessary_hard_brake", "progress", "accels")
-    prefixes = [f"{a}_s{s}" for a in ("ALL", "PATCH", "SHAM2", "TRIM") for s in seeds] + ["cv", "oracle", "static", "log"]
+    prefixes = [f"{a}_s{s}" for a in arms for s in seeds] + ["cv", "oracle", "static", "log"]
     required = {"scenario_id", "city"} | {f"{a}_{m}" for a in prefixes for m in metrics if a != "log" or m != "accels"}
-    required |= {f"{a}_s{s}_dose_by_replan" for a in ("ALL", "PATCH", "SHAM2", "TRIM") for s in seeds}
+    required |= {f"{a}_s{s}_dose_by_replan" for a in arms for s in seeds}
     for part in sorted(directory.glob("part_*.parquet")):
         if part.name not in expected:
             raise SystemExit(f"unexpected part: {part}")

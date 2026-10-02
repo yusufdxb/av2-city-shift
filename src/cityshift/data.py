@@ -70,15 +70,19 @@ def loader(split: Split, indices: np.ndarray, batch_size: int, shuffle: bool, se
     )
 
 
-def training_indices(meta: pd.DataFrame, exclude_city: str | None, n: int, dev_frac: float, seed: int) -> np.ndarray:
+def training_indices(meta: pd.DataFrame, exclude_city: str | None, n: int, dev_frac: float, seed: int,
+                     exclude_ids: np.ndarray | None = None) -> np.ndarray:
     """Draw ``n`` training scenarios from the eligible cities, proportional to city size.
 
     The dev slice (``dev_frac`` of every city, fixed by a seed independent of the run
-    seed) is removed first so it never trains any arm.
+    seed) is removed first so it never trains any arm. ``exclude_ids`` (scenario IDs) are removed too; without it the
+    draw is identical to the registered Stage 1 to 4 draws.
     """
     rng = np.random.default_rng(seed)
     dev = dev_indices(meta, dev_frac)
     pool = np.setdiff1d(np.arange(len(meta)), dev)
+    if exclude_ids is not None:
+        pool = pool[~np.isin(meta.scenario_id.astype(str).to_numpy()[pool], np.asarray(exclude_ids, dtype=str))]
     if exclude_city is not None:
         pool = pool[meta.city.to_numpy()[pool] != exclude_city]
     if n > len(pool):

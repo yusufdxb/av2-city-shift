@@ -45,6 +45,7 @@ def main() -> None:
     ap.add_argument("--wd", type=float, default=0.01)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--no-map", action="store_true")
+    ap.add_argument("--exclude-ids", default=None, help=".npy of scenario IDs never drawn for training (v2 reserve)")
     ap.add_argument("--dev-frac", type=float, default=0.02)
     ap.add_argument("--eval-every", type=int, default=5000)
     ap.add_argument("--workers", type=int, default=8)
@@ -59,7 +60,14 @@ def main() -> None:
 
     train = Split(args.root, "train")
     # The training *sample* depends on the seed too: seeds vary both init and data draw.
-    tr_idx = training_indices(train.meta, args.exclude_city, args.n_train, args.dev_frac, seed=1000 + args.seed)
+    if args.exclude_ids:  # v2 fresh reserve; otherwise the call (and the draw) is exactly the registered one
+        excluded = np.load(args.exclude_ids, allow_pickle=True).astype(str)
+        tr_idx = training_indices(train.meta, args.exclude_city, args.n_train, args.dev_frac, seed=1000 + args.seed,
+                                  exclude_ids=excluded)
+        if np.isin(train.meta.scenario_id.astype(str).to_numpy()[tr_idx], excluded).any():
+            raise RuntimeError("an excluded scenario was drawn for training")
+    else:
+        tr_idx = training_indices(train.meta, args.exclude_city, args.n_train, args.dev_frac, seed=1000 + args.seed)
     dev_idx = dev_indices(train.meta, args.dev_frac)
     np.save(os.path.join(args.out, "train_indices.npy"), tr_idx)
     cfg = vars(args) | {
