@@ -204,7 +204,7 @@ A review asked two things: how the model compares with simple baselines on the s
 
 The learned model has lower mean errors than constant velocity but a higher miss rate on the agents the planner uses. H6 splits the non-focal agents by whether they are stopped or moving. Stopped agents are mostly parked cars; 39.5% of them leave the scene or lose tracking within 6 s and are scored at their last observed point.
 
-Why this likely happens: 13.1% of training focal agents (26,233) are stopped at the prediction time, and only 15.6% of those (4,101) end the next 6 s within 2 m of where they stopped (15.5%, 4,065, stay within 2 m the whole time), so a model trained on them can learn that stopped means about to move. That fits the H6 pattern (right on focal agents, wrong on non-focal stopped ones), but no experiment here isolates it as the cause.
+Why this likely happens: 13.1% of training focal agents (26,233) are stopped at the prediction time, and only 15.6% of those (4,101) end the next 6 s within 2 m of where they stopped (15.5%, 4,065, stay within 2 m the whole time), so a model trained on them can learn that stopped means about to move ([census](reports/census/focal_stopped.json), `python scripts/census_focal_stopped.py --root data/pp`). That fits the H6 pattern (right on focal agents, wrong on non-focal stopped ones), but no experiment here isolates it as the cause.
 
 **Stage 3** is a sequential follow-up on the same 24,988 validation scenes that Stage 3a had already scored. It was registered after Stage 3a's results were known, so it is not an independent confirmation. It tested two fixes in a less privileged closed loop (no future speed cap, contact-based at-fault attribution), with 99.17% CIs across six comparisons ([results](reports/stage3/results.json)):
 
@@ -365,7 +365,7 @@ gh release download v1.4 -R yusufdxb/av2-city-shift -p exploratory-mechanism.tar
 (cd reports/mechanism && sha256sum -c SHA256SUMS) && python scripts/summarize_mechanism.py --seeds 0,1,2
 ```
 
-**Follow-ups A to E, release v1.5.** The local assets and their exact row-file locations are listed in the [release inventory](reports/followups/release_v1.5.json); [`prepare_followup_release.py`](scripts/prepare_followup_release.py) builds them under `runs/release-v1.5/`. A includes the production and parity tables with their `.report.json` files; E includes all parts and the stored stop-line diagnostics. The replay asset supplies B/C and D's Stage 3 and Stage 4 rows. Historical A and E runs have no validated manifests; this gap is recorded in the inventory rather than filled retrospectively. Checksums verify the bytes, not historical settings ([checksums](reports/followups/SHA256SUMS), [inventory](reports/followups/release_v1.5.json)).
+**Follow-ups A to E, release v1.5.** The release assets and their exact row-file locations are listed in the [release inventory](reports/followups/release_v1.5.json). A includes the production and parity tables with their `.report.json` files; E includes all parts and the stored stop-line diagnostics. The replay asset supplies B/C and D's Stage 3 and Stage 4 rows. Historical A and E runs have no validated manifests; this gap is recorded in the inventory rather than filled retrospectively. Checksums verify the bytes, not historical settings ([checksums](reports/followups/SHA256SUMS), [inventory](reports/followups/release_v1.5.json)).
 
 ```bash
 # first unpack the v1.1 and v1.2 tables above
@@ -408,7 +408,9 @@ PYTHONPATH=src python -m cityshift.analysis_stage3a --parquet evals/stage3a/per_
 scripts/run_stage3.sh data/raw/train data/raw/val data/pp data/pp_multi   # Stage 3: MULTI training, H7 to H9
 scripts/run_stage4.sh data/raw/train data/pp data/pp_multi                # Stage 4: MIX training, H10 to H13
 python -m cityshift.export_trt --root data/pp --ckpt runs/ALL/seed0/model.pt --out evals/deploy
-python scripts/bench_serving.py --help                                  # serving-path benchmark (see reports/serving)
+python scripts/bench_serving.py --raw data/raw/train --focal-root data/pp            # serving path -> reports/serving/serving_report.json
+python scripts/bench_serving_policies.py --raw data/raw/train --focal-root data/pp   # forecast policies -> serving_policies_report.json
+python scripts/parity_patch_skip.py --raw data/raw/train                             # PATCH vs PATCH-skip-inference parity
 # exploratory (not registered), after Stage 4: mechanism audit and planner sweep on the replication pool
 for s in 0 1 2; do PYTHONPATH=src python -m cityshift.mechanism --raw data/raw/train --seed $s \
   --out reports/mechanism/mechanism_audit_seed$s.json; done
