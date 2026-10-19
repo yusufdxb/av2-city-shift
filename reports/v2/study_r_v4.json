@@ -135,6 +135,7 @@
     "static": 0.0032,
     "log": 0.0035
   },
+  "log_collision_calibration_pass": true,
   "trim_fallback_share": 0.7391199463797676,
   "factorial_dose": {
     "GEO": 1383852,

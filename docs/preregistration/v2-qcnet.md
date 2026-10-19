@@ -103,3 +103,16 @@ inconclusive results are published with the same prominence.
 ## Deviations
 
 None at registration.
+
+2026-10-18 completion audit: the original open-loop runner skipped 1,978 planner agents that had no native QCNet
+forecast, including 1,586 stopped non-focal agents. The old analysis inner-joined survivors. The full registered
+agent cohort is now scored using the same single-CV, probability-one fallback specified for unavailable forecasts
+in the adapter/closed-loop policy. Those missing rows are reconstructed on the CPU from logged scenes; original
+native forecasts are unchanged. Native-only results remain available as a labelled sensitivity. The focal
+positive-control cohort was intact. This is a post-result scoring correction, not a new independent confirmation.
+
+The closed-loop run was interrupted after 3,000 of its fixed 6,000 scenes and is completed without selecting or
+changing the subset. Historical Q manifests did not record source or auxiliary small-model checkpoint hashes;
+prospective completion fingerprints and validated chunk memberships are provided separately and do not establish
+historical provenance retroactively. Missing-forecast counts are reported per arm; the earlier stopped-trigger
+denominator was not a valid selected-agent fraction and is removed.

@@ -1,4 +1,4 @@
-"""Stop-line compliance diagnostic for study E: replay every stored drive, count replans with no feasible candidate
+"""Stop-line compliance diagnostic: replay every stored drive, count replans with no feasible candidate
 and measure how far any drive passed the end of the logged route.
 
     CUDA_VISIBLE_DEVICES="" PYTHONPATH=src python scripts/diagnose_stopline.py --raw <train dir>
@@ -40,16 +40,26 @@ def diag(job):
 
 
 def main() -> None:
+    global COLS
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw", required=True)
     ap.add_argument("--parts", default="runs/followups/study_e")
     ap.add_argument("--out", default="reports/followups/study_e_stopline_diagnostics.json")
+    ap.add_argument("--columns", default=",".join(COLS), help="comma-separated arm prefixes, including seed suffixes")
+    ap.add_argument("--workers", type=int, default=20)
     args = ap.parse_args()
+    COLS = args.columns.split(",")
+    if args.workers < 1 or not all(COLS) or len(COLS) != len(set(COLS)):
+        ap.error("positive workers and distinct nonempty arm prefixes required")
     parts = sorted(glob.glob(os.path.join(args.parts, "part_*.parquet")))
     d = pd.concat([pd.read_parquet(p, columns=["scenario_id"] + [f"{c}_accels" for c in COLS]) for p in parts])
+    if d.scenario_id.duplicated().any():
+        raise ValueError("duplicate scenario IDs")
     jobs = [(os.path.join(args.raw, r["scenario_id"]), {c: list(r[f"{c}_accels"]) for c in COLS})
             for r in d.to_dict("records")]
-    with mp.get_context("fork").Pool(20) as pool:
+    if any(len(acc) != len(REPLANS) or not np.isin(acc, base.ACCELS).all() for _, arms in jobs for acc in arms.values()):
+        raise ValueError("stored accelerations must contain six valid planner choices")
+    with mp.get_context("fork").Pool(args.workers) as pool:
         rows = [x for xs in pool.imap(diag, jobs, chunksize=16) for x in xs]
     r = pd.DataFrame(rows, columns=["scenario_id", "arm", "infeasible_replans", "max_overshoot_m", "route_m"])
     g = r.assign(arm=r.arm.str.replace(r"_s\d", "", regex=True)).groupby("arm")

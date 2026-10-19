@@ -1,0 +1,65 @@
+{
+  "drives": 210000,
+  "drives_with_infeasible_replan": 0,
+  "infeasible_replans": 0,
+  "drives_past_route_end_gt_1cm": 0,
+  "max_overshoot_m": 0.0,
+  "short_routes_le_1m_drives": 45990,
+  "short_route_drives_past_end_gt_1cm": 0,
+  "by_arm": {
+    "ALL": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "GEO": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "PATCH": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "PROB": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "SHAM2": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "TRIM": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "cv": {
+      "drives": 10000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "oracle": {
+      "drives": 10000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "static": {
+      "drives": 10000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    }
+  }
+}

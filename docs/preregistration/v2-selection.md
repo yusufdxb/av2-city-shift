@@ -71,3 +71,10 @@ inconclusive). Negative and inconclusive results are published with the same pro
 ## Deviations
 
 None at registration.
+
+2026-10-18, before any Study S outcome was scored: the first SEL seed-0 training attempt had stopped at update
+54,600 without a checkpoint. It is retained as an interrupted attempt and restarted with the same seed and recipe;
+no outcome was used to select a run. The other five treatment/sham runs had not started. A reserve-specific scorer
+now verifies the registered ID digest and uses the unchanged Stage 3a input builder, memberships and metrics;
+the older general scorer intentionally accepted only development scenes from TRAIN. Analyses now require all
+three seeds per family and exactly matched agent/scenario cohorts before computing a verdict.

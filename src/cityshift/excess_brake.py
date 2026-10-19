@@ -23,7 +23,7 @@ import pandas as pd
 
 from . import closedloop as base
 from . import closedloop_v4 as v4
-from .analysis_v2 import R_ARMS, city_bootstrap, load_parts, summarise
+from .analysis_v2 import R_ARMS, city_bootstrap, json_values, load_parts, summarise
 from .closedloop import (ACCELS, CHECK_STEPS, DIMS, EGO_DIMS, END, MARGIN_M, PLAN_STEPS, REPLANS, boxes_overlap,
                          in_front, profiles)
 from .replay import replay_ego
@@ -95,11 +95,15 @@ def main() -> None:
     ap.add_argument("--parts", required=True)
     ap.add_argument("--harness", required=True, choices=("v4", "v2"))
     ap.add_argument("--out", required=True)
+    ap.add_argument("--flags-out", help="release the per-scenario excess-brake flags for independent analysis")
     ap.add_argument("--workers", type=int, default=16)
     args = ap.parse_args()
     _ROWS, _HARNESS, _RAW = load_parts(args.parts), args.harness, args.raw
     with mp.get_context("fork").Pool(args.workers) as pool:
         flags = pd.DataFrame(pool.map(_scene, range(len(_ROWS)), chunksize=16))
+    if args.flags_out:
+        os.makedirs(os.path.dirname(os.path.abspath(args.flags_out)), exist_ok=True)
+        flags.to_parquet(args.flags_out, index=False)
     data = pd.DataFrame({"city": flags.city, **{a: flags[[f"{a}_s{s}" for s in range(3)]].to_numpy(float).mean(1)
                                                  for a in R_ARMS}})
     eff = city_bootstrap(data, R_ARMS, lambda m: {f"{a}_reduction": (m["ALL"] - m[a]) / m["ALL"] for a in R_ARMS[1:]}
@@ -113,7 +117,7 @@ def main() -> None:
         e.pop("draws", None)
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w") as f:
-        json.dump(result, f, indent=2)
+        json.dump(json_values(result), f, indent=2, allow_nan=False)
         f.write("\n")
     print(json.dumps({k: v["point"] for k, v in result["effects"].items()}, indent=2))
 

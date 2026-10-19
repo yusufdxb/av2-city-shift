@@ -14,11 +14,11 @@ from __future__ import annotations
 
 import argparse
 import glob
-import hashlib
 import json
 import multiprocessing as mp
 import os
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -33,6 +33,7 @@ from .closedloop import REPLANS
 from .closedloop_v3 import _plan_calibrate, intervention
 from .multiagent_eval import memberships, score
 from .preprocess import FUT, OBJECT_TYPES
+from .run_manifest import file_sha256, run_settings, validate_manifest
 
 ARMS = ("QBASE", "QPATCH", "QSHAM2")  # QPATCH before QSHAM2: its per-replan dose is the sham's reference
 ANALYTIC = ("cv", "oracle", "static")
@@ -44,6 +45,26 @@ def validation_subset(raw: str) -> list[str]:
     """The registered closed-loop subset: a fixed-seed uniform draw of SUBSET_N validation scenario IDs."""
     ids = sorted(os.path.basename(d) for d in glob.glob(os.path.join(raw, "*")) if os.path.isdir(d))
     return sorted(np.random.default_rng(SUBSET_SEED).choice(ids, size=SUBSET_N, replace=False).tolist())
+
+
+def validate_q_parts(directory: str, ids: list[str], chunk: int, mode: str) -> None:
+    expected = {f"part_{i:05d}.parquet": ids[i:i + chunk] for i in range(0, len(ids), chunk)}
+    for part in Path(directory).glob("part_*.parquet"):
+        if part.name not in expected:
+            raise ValueError("unexpected Q part")
+        rows = pd.read_parquet(part)
+        if set(rows.scenario_id) != set(expected[part.name]):
+            raise ValueError("Q part does not match its expected scenario membership")
+        if mode == "open":
+            required = {"scenario_id", "agent_id", "predictor", "qcnet_missing", "miss", "min_fde", "min_ade"}
+            if not required <= set(rows) or rows.duplicated(["scenario_id", "agent_id"]).any():
+                raise ValueError("invalid open-loop Q part")
+        else:
+            required = {f"{a}_{m}" for a in ARMS + ("ALL_s0", "ALL_s1", "ALL_s2") + ANALYTIC
+                        for m in ("collision", "unnecessary_hard_brake", "accels")}
+            required |= {f"{a}_dose_by_replan" for a in ARMS}
+            if not required <= set(rows) or rows.scenario_id.tolist() != expected[part.name]:
+                raise ValueError("invalid closed-loop Q part")
 
 
 def _load(d: str):
@@ -71,14 +92,18 @@ def open_rows(pool, model, device, batch: int) -> list[dict]:
             sc = base._SCENES[k]
             for i, (focal, scored, planner) in members.items():
                 tid = sc.track_ids[i]
-                if tid not in pred:
-                    continue
-                traj, prob = pred[tid]
+                missing = tid not in pred
+                if missing:
+                    traj = np.repeat(base.cv_forecast(sc, i, base.HANDOFF)[None], 6, axis=0)
+                    prob = np.array([1., 0, 0, 0, 0, 0])
+                else:
+                    traj, prob = pred[tid]
                 valid = np.ones(FUT, bool) if focal else sc.valid[i, base.HANDOFF + 1:]
                 rows.append({"scenario_id": sc.scenario_id, "agent_id": tid, "city": sc.city,
                              "agent_type": OBJECT_TYPES[sc.types[i]], "focal": focal, "scored": scored,
                              "planner_relevant": planner, "n_valid": int(valid.sum()),
                              "speed": float(np.linalg.norm(sc.vel[i, base.HANDOFF])), "predictor": "QCNET",
+                             "qcnet_missing": missing,
                              "moving_mode_mass": float(prob[np.linalg.norm(traj[:, -1] - sc.pos[i, base.HANDOFF],
                                                                           axis=-1) > 2.0].sum())}
                             | score(traj, prob, sc.pos[i, base.HANDOFF + 1:], valid))
@@ -97,6 +122,7 @@ def _closed_job(job):
 def run_arm(pool, n: int, arm: str, model, device, batch: int, reference_dose: np.ndarray | None = None):
     egos = [v2.init_ego(base._SCENES[k]) for k in range(n)]
     trigger, substituted, missing = (np.zeros(n, np.int32) for _ in range(3))
+    selected = np.zeros(n, np.int32)
     dose = np.zeros((n, len(REPLANS)), np.int32)
     policy = {"QBASE": "ALL", "QPATCH": "PATCH", "QSHAM2": "SHAM2"}[arm]
     for r, t in enumerate(REPLANS):
@@ -106,6 +132,7 @@ def run_arm(pool, n: int, arm: str, model, device, batch: int, reference_dose: n
             preds.extend(qa.predict(model, [d for _, _, d in built[lo:lo + batch]], device))
         jobs = []
         for (k, agents, _), pred in zip(built, preds):
+            selected[k] += len(agents)
             sc = base._SCENES[k]
             traj = np.zeros((len(agents), 6, FUT, 2))
             prob = np.zeros((len(agents), 6))
@@ -127,6 +154,7 @@ def run_arm(pool, n: int, arm: str, model, device, batch: int, reference_dose: n
             egos[k] = ego
     scores = [base.score_sim(base._SCENES[k], egos[k]) | {"trigger_count": int(trigger[k]),
               "substituted_count": int(substituted[k]), "qcnet_missing_count": int(missing[k]),
+              "selected_agent_count": int(selected[k]),
               "dose_by_replan": dose[k].tolist()} for k in range(n)]  # fmt: skip
     return scores, dose
 
@@ -191,15 +219,22 @@ def main() -> None:
         v4.install()  # stop-line planner, inherited by the workers forked below
     ids = ids[:args.limit] if args.limit else ids
     os.makedirs(args.out_dir, exist_ok=True)
-    manifest = {"mode": args.mode, "scenarios": len(ids),
-                "ids_sha256": hashlib.sha256("\n".join(ids).encode()).hexdigest(),
-                "checkpoint_sha256": hashlib.sha256(open(args.ckpt, "rb").read()).hexdigest(),
-                "shims": shims, "chunk": args.chunk, "batch": args.batch, "limit": args.limit,
-                "torch": torch.__version__}
+    checkpoints = {"QCNET": args.ckpt}
+    if args.mode == "closed":
+        checkpoints.update({f"ALL_s{s}": f"{args.runs}/ALL/seed{s}/model.pt" for s in range(3)})
+    manifest = run_settings("closedloop_v4" if args.mode == "closed" else "open_stage3a", str(device), [0, 1, 2],
+                            args.ckpt, ids, args.raw, checkpoints, runner="study_q", mode=args.mode,
+                            shims=shims, chunk=args.chunk, batch=args.batch, limit=args.limit)
+    manifest.pop("pool_sha256")  # Q's cohort is generated by a fixed rule, not loaded from a pool file.
+    source = Path(__file__).parent
+    manifest["source_sha256"].update({f"{n}.py": file_sha256(source / f"{n}.py") for n in
+                                      ("qcnet_adapter", "multiagent_eval", "metrics", "baselines", "evaluate")})
+    external = Path(qa._qcnet_path(args.qcnet_root))
+    manifest["qcnet_source_sha256"] = {str(p.relative_to(external)): file_sha256(p)
+                                       for p in sorted(external.rglob("*.py"))}
     path = os.path.join(args.out_dir, "manifest.json")
-    if os.path.exists(path) and json.load(open(path)) != manifest:
-        raise SystemExit(f"refusing to resume: {path} has different settings")
-    json.dump(manifest, open(path, "w"), indent=2)
+    validate_manifest(path, manifest, sorted(glob.glob(os.path.join(args.out_dir, "part_*.parquet"))))
+    validate_q_parts(args.out_dir, ids, args.chunk, args.mode)
     ctx = mp.get_context("fork")
     start = time.time()
     global _QC

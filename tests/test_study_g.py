@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from cityshift import closedloop as base
 from cityshift.closedloop_v2 import init_ego
@@ -60,11 +61,17 @@ def test_mode_permutation_is_a_no_op_for_the_planner() -> None:
         assert base.plan(sc, ego, t, agents, traj, prob) == base.plan(sc, ego, t, agents, traj[:, order], prob[:, order])
 
 
-def test_geo_plus_prob_is_patch_for_the_planner() -> None:
+@pytest.mark.parametrize("speed", [0.0, 0.1, 0.49])
+def test_geo_plus_prob_at_the_original_mode_is_patch_for_the_planner(speed: float) -> None:
     sc, agents, t = scene(), [1, 2, 3], 49
+    sc.vel[1, :, 1] = speed
     ego = init_ego(sc)
     traj, prob = forecasts(sc, agents, t)
     both_traj, _, _, _, _ = intervention(sc, agents, t, "GEO", 0, traj.copy(), prob.copy())
-    both_traj, both_prob, _, _, _ = intervention(sc, agents, t, "PROB", 0, both_traj, prob.copy())
+    _, both_prob, _, _, _ = intervention(sc, agents, t, "PROB", 0, traj.copy(), prob.copy())
     patch_traj, patch_prob, _, _, _ = intervention(sc, agents, t, "PATCH", 0, traj.copy(), prob.copy())
+    for j, i in enumerate(agents[:2]):
+        k = most_stationary_mode(sc, i, t, traj[j])
+        np.testing.assert_allclose(both_traj[j, k], base.cv_forecast(sc, i, t))
+        assert both_prob[j, k] == 1
     assert base.plan(sc, ego, t, agents, both_traj, both_prob) == base.plan(sc, ego, t, agents, patch_traj, patch_prob)

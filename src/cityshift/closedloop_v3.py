@@ -94,8 +94,8 @@ def factorial(sc: Scene, agents: list[int], t: int, arm: str, traj: np.ndarray, 
     """v2 study G (docs/preregistration/v2-fresh-reserve.md), stopped selected agents only (PATCH's trigger).
 
     GEO replaces the most stationary mode's trajectory with constant velocity and keeps every probability; PROB keeps
-    every trajectory and puts probability one on the most stationary mode. Applying both is PATCH (one CV mode with
-    probability one; zero-probability modes carry no planner risk).
+    every trajectory and puts probability one on the most stationary mode. Combining both changes at the original
+    mode index is PATCH. Sequential calls can choose a different index after the geometry has changed.
     """
     n = 0
     for j, i in enumerate(agents):

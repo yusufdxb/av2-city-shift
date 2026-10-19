@@ -130,3 +130,10 @@ published with the same prominence.
 ## Deviations
 
 None at registration.
+
+2026-10-18 completion audit: the factorial identity control is clarified to apply both axis changes at the same
+mode index selected from the original forecast. Applying GEO and then reselecting a mode for PROB can change that
+index for nonzero speeds below 0.5 m/s; the previous test covered only zero speed. The corrected control covers
+nonzero stopped-agent velocities. The independently generated GEO, PROB and PATCH arms are unchanged, as are all
+registered estimands and decision rules. The interrupted secondary run resumes its exact historical source
+fingerprints; a later CLI extension for selecting Study S arms is not mixed into those chunks.

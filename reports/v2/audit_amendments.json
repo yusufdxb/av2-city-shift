@@ -1,0 +1,12 @@
+{
+  "independent": true,
+  "studies": [
+    "H",
+    "F"
+  ],
+  "draws": 10000,
+  "seed": 20261018,
+  "checks": 229,
+  "failures": [],
+  "pass": true
+}
