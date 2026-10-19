@@ -1,0 +1,53 @@
+{
+  "drives": 54000,
+  "drives_with_infeasible_replan": 0,
+  "infeasible_replans": 0,
+  "drives_past_route_end_gt_1cm": 0,
+  "max_overshoot_m": 0.0,
+  "short_routes_le_1m_drives": 11673,
+  "short_route_drives_past_end_gt_1cm": 0,
+  "by_arm": {
+    "ALL": {
+      "drives": 18000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "QBASE": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "QPATCH": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "QSHAM2": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "cv": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "oracle": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    },
+    "static": {
+      "drives": 6000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    }
+  }
+}

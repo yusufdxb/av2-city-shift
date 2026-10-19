@@ -1,0 +1,87 @@
+{
+  "scenarios": 6000,
+  "verdicts": {
+    "Q2 QPATCH": "uninterpretable",
+    "Q3 sham gap": "uninterpretable"
+  },
+  "effects": {
+    "QPATCH_reduction": {
+      "point": null,
+      "undefined_share": 1.0,
+      "ci9833": [
+        null,
+        null
+      ],
+      "ci95": [
+        null,
+        null
+      ]
+    },
+    "QSHAM2_reduction": {
+      "point": null,
+      "undefined_share": 1.0,
+      "ci9833": [
+        null,
+        null
+      ],
+      "ci95": [
+        null,
+        null
+      ]
+    },
+    "sham_gap": {
+      "point": null,
+      "undefined_share": 1.0,
+      "ci9833": [
+        null,
+        null
+      ],
+      "ci95": [
+        null,
+        null
+      ]
+    },
+    "QBASE_vs_ALL_relative": {
+      "point": -0.849380282867624,
+      "undefined_share": 0.0,
+      "ci9833": [
+        -0.8952472674018178,
+        -0.7957934187390059
+      ],
+      "ci95": [
+        -0.8873960509204716,
+        -0.807033997366439
+      ]
+    }
+  },
+  "brake_rates": {
+    "QBASE": 0.011,
+    "QPATCH": 0.0085,
+    "QSHAM2": 0.012666666666666666,
+    "ALL": 0.06194444444444444,
+    "cv": 0.015166666666666667,
+    "oracle": 0.008166666666666666,
+    "static": 0.015333333333333332
+  },
+  "brake_control_QBASE_over_oracle": 1.3469387755102042,
+  "brake_control_pass": false,
+  "q0_pass": true,
+  "sham_dose_ratio": 0.9999963782812772,
+  "QBASE_brake_events": 66.0,
+  "powered": false,
+  "qcnet_missing_counts": {
+    "QBASE": 2971,
+    "QPATCH": 2970,
+    "QSHAM2": 2969
+  },
+  "collisions_descriptive": {
+    "QBASE": 0.0013333333333333333,
+    "QPATCH": 0.0015,
+    "QSHAM2": 0.0015,
+    "ALL": 0.002277777777777778,
+    "cv": 0.0018333333333333333,
+    "oracle": 0.0011666666666666668,
+    "static": 0.0018333333333333333,
+    "log": 0.003
+  }
+}

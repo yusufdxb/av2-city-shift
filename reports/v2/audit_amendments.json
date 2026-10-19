@@ -6,7 +6,7 @@
   ],
   "draws": 10000,
   "seed": 20261018,
-  "checks": 229,
+  "checks": 1125,
   "failures": [],
   "pass": true
 }

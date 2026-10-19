@@ -1,0 +1,1122 @@
+{
+  "pass": true,
+  "requested_studies": [
+    "r-v4",
+    "r-v2",
+    "q-open",
+    "q-native",
+    "q-closed",
+    "s-open",
+    "s-closed",
+    "excess-v4",
+    "excess-v2"
+  ],
+  "all_supported_studies_requested": true,
+  "draws": 10000,
+  "chunk": 64,
+  "seed": 20261019,
+  "point_tolerance": 1e-09,
+  "interval_width_tolerance": 0.15,
+  "unsupported_checks": [
+    "H/F independent rederivation",
+    "excess-brake flag generation/replay correctness",
+    "raw forecast correctness",
+    "training execution and historical checkpoint/source provenance",
+    "physical driving safety"
+  ],
+  "studies": {
+    "r-v4": {
+      "pass": true,
+      "comparisons": 84,
+      "failures": [],
+      "independent": {
+        "scenarios": 10000,
+        "harness": "v4",
+        "decision_level": "ci9875",
+        "role": "primary",
+        "brake_rates": {
+          "ALL": 0.0554,
+          "PATCH": 0.0209,
+          "SHAM2": 0.0378,
+          "TRIM": 0.021366666666666662,
+          "GEO": 0.055233333333333336,
+          "PROB": 0.021833333333333333,
+          "cv": 0.0156,
+          "oracle": 0.0058,
+          "static": 0.0104
+        },
+        "collisions": {
+          "ALL": 0.0026666666666666666,
+          "PATCH": 0.0030666666666666663,
+          "SHAM2": 0.0032333333333333337,
+          "TRIM": 0.0029666666666666665,
+          "GEO": 0.0028333333333333327,
+          "PROB": 0.002799999999999999,
+          "cv": 0.0026,
+          "oracle": 0.0017,
+          "static": 0.0032,
+          "log": 0.0035
+        },
+        "brake_control_ALL_over_oracle": 9.551724137931036,
+        "brake_control_pass": true,
+        "sham_dose_ratio": 0.9999797770564928,
+        "seed_averaged_ALL_brake_events": 554.0,
+        "powered": true,
+        "verdicts": {
+          "R1 PATCH": "supported",
+          "R2 sham gap": "supported",
+          "R3 TRIM": "supported",
+          "G1 PROB/PATCH": "probability sufficient"
+        },
+        "log_collision_calibration_pass": true,
+        "factorial_dose": {
+          "GEO": 1383852,
+          "PROB": 1384584,
+          "PATCH": 1384566
+        },
+        "effects": {
+          "PATCH_reduction": {
+            "point": 0.6121096387074862,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.5557105260579153,
+              0.6640146278392887
+            ],
+            "ci95": [
+              0.567970131294415,
+              0.654297122082168
+            ]
+          },
+          "SHAM2_reduction": {
+            "point": 0.31889025988639036,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.2458209496019932,
+              0.38174231661438723
+            ],
+            "ci95": [
+              0.26183794389171944,
+              0.36939382897089745
+            ]
+          },
+          "TRIM_reduction": {
+            "point": 0.6028988577293649,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.5462397088968424,
+              0.6549931534638864
+            ],
+            "ci95": [
+              0.5582483743284757,
+              0.644108504123293
+            ]
+          },
+          "GEO_reduction": {
+            "point": 0.003430261255476482,
+            "undefined_share": 0.0,
+            "ci9875": [
+              -0.008488417127992018,
+              0.01605019459575806
+            ],
+            "ci95": [
+              -0.0060012209323050385,
+              0.012909786604547899
+            ]
+          },
+          "PROB_reduction": {
+            "point": 0.5972903961675825,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.54046695119294,
+              0.6487679239935812
+            ],
+            "ci95": [
+              0.5529834225543185,
+              0.6387900741237866
+            ]
+          },
+          "sham_gap": {
+            "point": 0.29321937882109583,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.219818036569957,
+              0.37278974926227954
+            ],
+            "ci95": [
+              0.23588724836521766,
+              0.35724723614082454
+            ]
+          },
+          "G_ratio_PROB_over_PATCH": {
+            "point": 0.9757898886036239,
+            "undefined_share": 0.0,
+            "ci9875": [
+              0.9496468756112755,
+              1.00766908468385
+            ],
+            "ci95": [
+              0.9551786985976805,
+              0.9996384200408717
+            ]
+          },
+          "interaction": {
+            "point": 0.01138898128442726,
+            "undefined_share": 0.0,
+            "ci9875": [
+              -0.01070653205285632,
+              0.03067902641324081
+            ],
+            "ci95": [
+              -0.005365476202815867,
+              0.026757047320594914
+            ]
+          }
+        }
+      }
+    },
+    "r-v2": {
+      "pass": true,
+      "comparisons": 100,
+      "failures": [],
+      "independent": {
+        "scenarios": 10000,
+        "harness": "v2",
+        "decision_level": "ci95",
+        "role": "secondary",
+        "brake_rates": {
+          "ALL": 0.0695,
+          "PATCH": 0.04566666666666666,
+          "SHAM2": 0.06796666666666665,
+          "TRIM": 0.046566666666666666,
+          "GEO": 0.0694,
+          "PROB": 0.04619999999999999,
+          "cv": 0.0452,
+          "oracle": 0.0171,
+          "static": 0.0446
+        },
+        "collisions": {
+          "ALL": 0.007866666666666666,
+          "PATCH": 0.009566666666666666,
+          "SHAM2": 0.016166666666666666,
+          "TRIM": 0.0095,
+          "GEO": 0.007999999999999998,
+          "PROB": 0.009733333333333333,
+          "cv": 0.0341,
+          "oracle": 0.0083,
+          "static": 0.0427,
+          "log": 0.0035
+        },
+        "brake_control_ALL_over_oracle": 4.064327485380117,
+        "brake_control_pass": true,
+        "sham_dose_ratio": 0.9999478997823369,
+        "seed_averaged_ALL_brake_events": 695.0,
+        "powered": true,
+        "verdicts": {
+          "R1 PATCH": "supported",
+          "R2 sham gap": "supported",
+          "R3 TRIM": "supported",
+          "G1 PROB/PATCH": "probability sufficient"
+        },
+        "log_collision_calibration_pass": true,
+        "factorial_dose": {
+          "GEO": 1381987,
+          "PROB": 1382047,
+          "PATCH": 1381952
+        },
+        "effects": {
+          "PATCH_reduction": {
+            "point": 0.3317979821831462,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.2790557303552141,
+              0.37973154861688974
+            ]
+          },
+          "SHAM2_reduction": {
+            "point": 0.012380308767057091,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.057355421608615086,
+              0.07156982429588826
+            ]
+          },
+          "TRIM_reduction": {
+            "point": 0.32248652268091954,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.270216308187311,
+              0.3698946064828932
+            ]
+          },
+          "GEO_reduction": {
+            "point": -0.0013412536860992013,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.010969076870495564,
+              0.007753678522134986
+            ]
+          },
+          "PROB_reduction": {
+            "point": 0.33227612692690905,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.2805963919649026,
+              0.3790289844755429
+            ]
+          },
+          "sham_gap": {
+            "point": 0.3194176734160891,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.2621731881201247,
+              0.38401721348397333
+            ]
+          },
+          "G_ratio_PROB_over_PATCH": {
+            "point": 1.001441071885419,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.9457310485676617,
+              1.0649630108732306
+            ]
+          },
+          "interaction": {
+            "point": 0.0008631089423363585,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.020686338314158594,
+              0.022833349825662517
+            ]
+          }
+        },
+        "collision_effects": {
+          "PATCH_collision_diff": {
+            "point": 0.0011356818159780236,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.00033164608213031476,
+              0.0026039431087036178
+            ]
+          },
+          "SHAM2_collision_diff": {
+            "point": 0.007348785419066439,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.005065412691189003,
+              0.009609508428413514
+            ]
+          },
+          "TRIM_collision_diff": {
+            "point": 0.0010909919878283889,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.00036295655047712097,
+              0.0025186752910269614
+            ]
+          },
+          "GEO_collision_diff": {
+            "point": 9.550194807027717e-05,
+            "undefined_share": 0.0,
+            "ci95": [
+              -0.0002618300061753025,
+              0.00047289466619128347
+            ]
+          },
+          "PROB_collision_diff": {
+            "point": 0.0013590557797555144,
+            "undefined_share": 0.0,
+            "ci95": [
+              0.00011015160443309857,
+              0.0026205054305401174
+            ]
+          }
+        }
+      }
+    },
+    "q-open": {
+      "pass": true,
+      "comparisons": 73,
+      "failures": [],
+      "independent": {
+        "focal": {
+          "n": 24988,
+          "minFDE6": 1.2526864920333287,
+          "minADE6": 0.7200929341058943,
+          "MR6": 0.1573955498639347,
+          "brier_minFDE6": 1.8739597667301948
+        },
+        "joined_agents": 318651,
+        "qcnet_rows": 318651,
+        "Q0_positive_control": {
+          "pass": true
+        },
+        "cohort": {
+          "reference_agents": 318651,
+          "omitted_agents": 0,
+          "native_only": false,
+          "fallback_agents": 1978
+        },
+        "stopped_all": {
+          "agents": 189892,
+          "miss_rates_city_equal": {
+            "QCNET": 0.022941943540752487,
+            "CV": 0.09464531768190454,
+            "ALL": 0.5246417156960642
+          },
+          "mean_moving_mode_mass": 0.09798443423245097,
+          "share_moving_mass_over_5pct": 0.2228371916668422,
+          "QCNET_minus_CV": {
+            "point": -0.07170337414115205,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.0742158876845694,
+              -0.06926308245219967
+            ],
+            "ci95": [
+              -0.0737296910815635,
+              -0.06972419054680938
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.5016997721553119,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.5064286259789924,
+              -0.4969950359618826
+            ],
+            "ci95": [
+              -0.5054509175556082,
+              -0.49791011892767056
+            ]
+          }
+        },
+        "stopped_complete_future": {
+          "agents": 114893,
+          "miss_rates_city_equal": {
+            "QCNET": 0.020081158677144252,
+            "CV": 0.09723226262349842,
+            "ALL": 0.7370941510146665
+          },
+          "mean_moving_mode_mass": 0.09135559684254958,
+          "share_moving_mass_over_5pct": 0.18748748835873377,
+          "QCNET_minus_CV": {
+            "point": -0.07715110394635416,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.08060619404242586,
+              -0.07375141540698063
+            ],
+            "ci95": [
+              -0.07994442114078744,
+              -0.07435972980913699
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.717012992337522,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.7218625833154276,
+              -0.7123192914626449
+            ],
+            "ci95": [
+              -0.7209205860699305,
+              -0.7131647455393026
+            ]
+          }
+        },
+        "moving_all": {
+          "agents": 68048,
+          "miss_rates_city_equal": {
+            "QCNET": 0.12294967556132952,
+            "CV": 0.6903063885959687,
+            "ALL": 0.29779576580049033
+          },
+          "QCNET_minus_CV": {
+            "point": -0.5673567130346391,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.5737068314362715,
+              -0.5611024425793356
+            ],
+            "ci95": [
+              -0.5724552148815321,
+              -0.5622329433159786
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.17484609023916078,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.17931278115700067,
+              -0.17045015767254734
+            ],
+            "ci95": [
+              -0.17848193026108064,
+              -0.17123611163094724
+            ]
+          }
+        },
+        "moving_complete_future": {
+          "agents": 33236,
+          "miss_rates_city_equal": {
+            "QCNET": 0.14208810271166952,
+            "CV": 0.8267748096320177,
+            "ALL": 0.30900370549549555
+          },
+          "QCNET_minus_CV": {
+            "point": -0.684686706920348,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.6927450262831176,
+              -0.6764370884818938
+            ],
+            "ci95": [
+              -0.6912648925660055,
+              -0.6779388808858215
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.16691560278382603,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.1731098422164801,
+              -0.1605800697430548
+            ],
+            "ci95": [
+              -0.1720294284126062,
+              -0.16175951428430266
+            ]
+          }
+        },
+        "Q1_verdict": "killed; QCNet better than CV-6 on stopped agents"
+      }
+    },
+    "q-native": {
+      "pass": true,
+      "comparisons": 73,
+      "failures": [],
+      "independent": {
+        "focal": {
+          "n": 24988,
+          "minFDE6": 1.2526864920333287,
+          "minADE6": 0.7200929341058943,
+          "MR6": 0.1573955498639347,
+          "brier_minFDE6": 1.8739597667301948
+        },
+        "joined_agents": 316673,
+        "qcnet_rows": 316673,
+        "Q0_positive_control": {
+          "pass": true
+        },
+        "cohort": {
+          "reference_agents": 318651,
+          "omitted_agents": 1978,
+          "native_only": true,
+          "fallback_agents": 0
+        },
+        "stopped_all": {
+          "agents": 188306,
+          "miss_rates_city_equal": {
+            "QCNET": 0.020285960252118273,
+            "CV": 0.09262099927135914,
+            "ALL": 0.5249688504730995
+          },
+          "mean_moving_mode_mass": 0.09864507867656146,
+          "share_moving_mass_over_5pct": 0.22454940363026138,
+          "QCNET_minus_CV": {
+            "point": -0.07233503901924086,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.07477630628462567,
+              -0.06989100987773719
+            ],
+            "ci95": [
+              -0.07434928400252724,
+              -0.07039018133501353
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.5046828902209812,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.5093919060891314,
+              -0.4999164838048665
+            ],
+            "ci95": [
+              -0.5085399814363271,
+              -0.5008378125647213
+            ]
+          }
+        },
+        "stopped_complete_future": {
+          "agents": 114582,
+          "miss_rates_city_equal": {
+            "QCNET": 0.019081684077501593,
+            "CV": 0.09644072902994383,
+            "ALL": 0.7374169500417559
+          },
+          "mean_moving_mode_mass": 0.09152500905928548,
+          "share_moving_mass_over_5pct": 0.18791782304375906,
+          "QCNET_minus_CV": {
+            "point": -0.07735904495244224,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.0808609362499737,
+              -0.07398055305863017
+            ],
+            "ci95": [
+              -0.08018283107303024,
+              -0.07457939763635864
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.7183352659642542,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.7230545126976803,
+              -0.7135815518669788
+            ],
+            "ci95": [
+              -0.7222567738495621,
+              -0.714496013343456
+            ]
+          }
+        },
+        "moving_all": {
+          "agents": 67811,
+          "miss_rates_city_equal": {
+            "QCNET": 0.12032928633880309,
+            "CV": 0.6908887062520249,
+            "ALL": 0.2965910605746771
+          },
+          "QCNET_minus_CV": {
+            "point": -0.5705594199132217,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.5765568268579757,
+              -0.5646787449848002
+            ],
+            "ci95": [
+              -0.5755869667114614,
+              -0.5656045473876747
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.17626177423587405,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.18061809219134872,
+              -0.17184749931698945
+            ],
+            "ci95": [
+              -0.17982542329254358,
+              -0.17264775416917066
+            ]
+          }
+        },
+        "moving_complete_future": {
+          "agents": 33196,
+          "miss_rates_city_equal": {
+            "QCNET": 0.14103710318316784,
+            "CV": 0.8267357005316024,
+            "ALL": 0.308571466095731
+          },
+          "QCNET_minus_CV": {
+            "point": -0.6856985973484347,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.6937586298515618,
+              -0.6777705219699293
+            ],
+            "ci95": [
+              -0.6921667602975465,
+              -0.67907347384783
+            ]
+          },
+          "QCNET_minus_ALL": {
+            "point": -0.16753436291256318,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.1739038369842906,
+              -0.16096851634066153
+            ],
+            "ci95": [
+              -0.17262572725770237,
+              -0.16227509072069735
+            ]
+          }
+        },
+        "Q1_verdict": "killed; QCNet better than CV-6 on stopped agents"
+      }
+    },
+    "q-closed": {
+      "pass": true,
+      "comparisons": 49,
+      "failures": [],
+      "independent": {
+        "scenarios": 6000,
+        "brake_rates": {
+          "QBASE": 0.011,
+          "QPATCH": 0.0085,
+          "QSHAM2": 0.012666666666666666,
+          "ALL": 0.06194444444444444,
+          "cv": 0.015166666666666667,
+          "oracle": 0.008166666666666666,
+          "static": 0.015333333333333332
+        },
+        "brake_control_pass": false,
+        "q0_pass": true,
+        "brake_control_QBASE_over_oracle": 1.3469387755102042,
+        "sham_dose_ratio": 0.9999963782812772,
+        "QBASE_brake_events": 66.0,
+        "powered": false,
+        "qcnet_missing_counts": {
+          "QBASE": 2971,
+          "QPATCH": 2970,
+          "QSHAM2": 2969
+        },
+        "verdicts": {
+          "Q2 QPATCH": "uninterpretable",
+          "Q3 sham gap": "uninterpretable"
+        },
+        "effects": {
+          "QPATCH_reduction": {
+            "point": null,
+            "undefined_share": 1.0,
+            "ci9833": [
+              null,
+              null
+            ],
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          "QSHAM2_reduction": {
+            "point": null,
+            "undefined_share": 1.0,
+            "ci9833": [
+              null,
+              null
+            ],
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          "sham_gap": {
+            "point": null,
+            "undefined_share": 1.0,
+            "ci9833": [
+              null,
+              null
+            ],
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          "QBASE_vs_ALL_relative": {
+            "point": -0.849380282867624,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.8956521873105611,
+              -0.79649749953963
+            ],
+            "ci95": [
+              -0.8882415605770662,
+              -0.8066079152308131
+            ]
+          }
+        }
+      }
+    },
+    "s-open": {
+      "pass": true,
+      "comparisons": 94,
+      "failures": [],
+      "independent": {
+        "stopped_nonfocal": {
+          "agents": 75463,
+          "miss_city_equal": {
+            "ALLR": 0.562296082959739,
+            "SEL": 0.07377395922899684,
+            "SELSHAM": 0.5755689000910704,
+            "CV": 0.09603765970476252
+          },
+          "SEL_minus_ALLR": {
+            "point": -0.48852212373074205,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.49665628577587034,
+              -0.48026582733780543
+            ],
+            "ci95": [
+              -0.49523484149088265,
+              -0.48177347647466795
+            ]
+          },
+          "SEL_minus_SELSHAM": {
+            "point": -0.5017949408620734,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.5097087423874441,
+              -0.4937093461459652
+            ],
+            "ci95": [
+              -0.5082684964450209,
+              -0.4952367206511519
+            ]
+          },
+          "SELSHAM_minus_ALLR": {
+            "point": 0.013272817131331383,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.010559361943816976,
+              0.015938242650273653
+            ],
+            "ci95": [
+              0.011040244479538911,
+              0.015473880754645486
+            ]
+          }
+        },
+        "moving_nonfocal": {
+          "agents": 27099,
+          "miss_city_equal": {
+            "ALLR": 0.29257510053863994,
+            "SEL": 0.2788934233226426,
+            "SELSHAM": 0.28264126894750047,
+            "CV": 0.6983630246669582
+          },
+          "SEL_minus_ALLR": {
+            "point": -0.013681677215997301,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.01794909004853224,
+              -0.0095163538042663
+            ],
+            "ci95": [
+              -0.017108261529133383,
+              -0.010281710886719022
+            ]
+          },
+          "SEL_minus_SELSHAM": {
+            "point": -0.0037478456248577854,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.008247203723818958,
+              0.0005388448977634755
+            ],
+            "ci95": [
+              -0.007370331803363398,
+              -0.00025006059705155406
+            ]
+          },
+          "SELSHAM_minus_ALLR": {
+            "point": -0.009933831591139516,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.014001121050338136,
+              -0.005956554943456927
+            ],
+            "ci95": [
+              -0.01326195454574072,
+              -0.006538238424536025
+            ]
+          }
+        },
+        "focal": {
+          "agents": 10000,
+          "miss_city_equal": {
+            "ALLR": 0.2270255146983516,
+            "SEL": 0.2615264017175433,
+            "SELSHAM": 0.2294578814691904,
+            "CV": 0.7951661702393417
+          },
+          "SEL_minus_ALLR": {
+            "point": 0.03450088701919169,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.027369185904411314,
+              0.041670732784628906
+            ],
+            "ci95": [
+              0.028731702369523257,
+              0.04046057043643238
+            ]
+          },
+          "SEL_minus_SELSHAM": {
+            "point": 0.032068520248352904,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.02472952569936459,
+              0.03954954892837277
+            ],
+            "ci95": [
+              0.026142178240208386,
+              0.038192559695992265
+            ]
+          },
+          "SELSHAM_minus_ALLR": {
+            "point": 0.002432366770838782,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.0036735299595402784,
+              0.008447309412350064
+            ],
+            "ci95": [
+              -0.0024876575971973457,
+              0.007322989342862936
+            ]
+          }
+        },
+        "focal_stopped": {
+          "agents": 1378,
+          "miss_city_equal": {
+            "ALLR": 0.2552085039897934,
+            "SEL": 0.4898568166697217,
+            "SELSHAM": 0.25795202816029544,
+            "CV": 0.848057883432697
+          },
+          "SEL_minus_ALLR": {
+            "point": 0.23464831267992828,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.20506013047990154,
+              0.2635281514135212
+            ],
+            "ci95": [
+              0.2105304319149238,
+              0.25813831028648476
+            ]
+          },
+          "SEL_minus_SELSHAM": {
+            "point": 0.2319047885094262,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.2009189195136067,
+              0.2616035000377063
+            ],
+            "ci95": [
+              0.20658523345381918,
+              0.2563934805300565
+            ]
+          },
+          "SELSHAM_minus_ALLR": {
+            "point": 0.0027435241705021144,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.015752324607743416,
+              0.021298224103323604
+            ],
+            "ci95": [
+              -0.01251245722673373,
+              0.017713688285072766
+            ]
+          }
+        },
+        "verdicts": {
+          "S1 SEL vs ALLR": "supported",
+          "S2 SEL vs SELSHAM": "supported"
+        }
+      }
+    },
+    "s-closed": {
+      "pass": true,
+      "comparisons": 27,
+      "failures": [],
+      "independent": {
+        "scenarios": 10000,
+        "brake_rates": {
+          "ALLR": 0.0554,
+          "SEL": 0.04956666666666666,
+          "SELSHAM": 0.0685,
+          "oracle": 0.0058
+        },
+        "brake_control_pass": true,
+        "powered": true,
+        "ALLR_brake_events": 554.0,
+        "verdicts": {
+          "S3 SEL braking": "killed"
+        },
+        "effects": {
+          "SEL_reduction": {
+            "point": 0.08567060410473872,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.004032882580133471,
+              0.15497149444516173
+            ],
+            "ci95": [
+              0.01995980278672877,
+              0.14244178491915058
+            ]
+          },
+          "SELSHAM_reduction": {
+            "point": -0.24958659544464665,
+            "undefined_share": 0.0,
+            "ci9833": [
+              -0.3496533184872435,
+              -0.16918992808270494
+            ],
+            "ci95": [
+              -0.3306085790490375,
+              -0.18221020819991196
+            ]
+          },
+          "SEL_minus_SELSHAM": {
+            "point": 0.3352571995493854,
+            "undefined_share": 0.0,
+            "ci9833": [
+              0.25190431765444704,
+              0.42706353740355035
+            ],
+            "ci95": [
+              0.267400272501018,
+              0.40895163457852474
+            ]
+          }
+        }
+      }
+    },
+    "excess-v4": {
+      "pass": true,
+      "comparisons": 33,
+      "failures": [],
+      "independent": {
+        "harness": "v4",
+        "scenarios": 10000,
+        "rates": {
+          "ALL": 0.0024333333333333334,
+          "PATCH": 0.0005,
+          "SHAM2": 0.0009,
+          "TRIM": 0.0005,
+          "GEO": 0.0024666666666666665,
+          "PROB": 0.0005,
+          "oracle": 0.0
+        },
+        "effects": {
+          "PATCH_reduction": {
+            "point": 0.7775132275132274,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              0.5760083419332646,
+              0.8971717171717172
+            ]
+          },
+          "SHAM2_reduction": {
+            "point": 0.6511904761904762,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              0.43970204178537525,
+              0.7784463869463869
+            ]
+          },
+          "TRIM_reduction": {
+            "point": 0.7775132275132274,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              0.5760083419332646,
+              0.8971717171717172
+            ]
+          },
+          "GEO_reduction": {
+            "point": -0.01388888888888895,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              -0.17310185185185184,
+              0.07090126848460186
+            ]
+          },
+          "PROB_reduction": {
+            "point": 0.7775132275132274,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              0.5760083419332646,
+              0.8971717171717172
+            ]
+          },
+          "sham_gap": {
+            "point": 0.12632275132275134,
+            "undefined_share": 0.021299999999999986,
+            "ci95": [
+              -0.0476074470192117,
+              0.32295138888888897
+            ]
+          }
+        },
+        "scope": "secondary descriptive flags; no verdict rederived"
+      }
+    },
+    "excess-v2": {
+      "pass": true,
+      "comparisons": 33,
+      "failures": [],
+      "independent": {
+        "harness": "v2",
+        "scenarios": 10000,
+        "rates": {
+          "ALL": 0.0019,
+          "PATCH": 0.0003,
+          "SHAM2": 0.001,
+          "TRIM": 0.0003,
+          "GEO": 0.0019,
+          "PROB": 0.0003,
+          "oracle": 0.0
+        },
+        "effects": {
+          "PATCH_reduction": {
+            "point": 0.8705128205128205,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              0.693778044871795,
+              0.9669705468142967
+            ]
+          },
+          "SHAM2_reduction": {
+            "point": 0.501602564102564,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              0.06957702020202021,
+              0.725
+            ]
+          },
+          "TRIM_reduction": {
+            "point": 0.8705128205128205,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              0.693778044871795,
+              0.9669705468142967
+            ]
+          },
+          "GEO_reduction": {
+            "point": 0.06481481481481484,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              -0.02213643790849668,
+              0.10087719298245613
+            ]
+          },
+          "PROB_reduction": {
+            "point": 0.8705128205128205,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              0.693778044871795,
+              0.9669705468142967
+            ]
+          },
+          "sham_gap": {
+            "point": 0.36891025641025643,
+            "undefined_share": 0.40180000000000005,
+            "ci95": [
+              0.1156634684759686,
+              0.7901851851851847
+            ]
+          }
+        },
+        "scope": "secondary descriptive flags; no verdict rederived"
+      }
+    }
+  }
+}

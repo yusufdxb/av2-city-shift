@@ -17,9 +17,11 @@ import gzip
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 
@@ -80,10 +82,10 @@ def copy(source, stage, relative):
 
 
 def archive(stage, output, label, metadata):
+    (stage / "V2-LICENSE-NOTICE.txt").write_text(NOTICE)
     inventory = {str(p.relative_to(stage)): {"bytes": p.stat().st_size, "sha256": sha(p)}
                  for p in sorted(stage.rglob("*")) if p.is_file()}
     write_json(stage / "provenance" / f"{label}-inventory.json", metadata | {"files": inventory})
-    (stage / "V2-LICENSE-NOTICE.txt").write_text(NOTICE)
     with output.open("wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", mtime=0, filename="") as zipped:
         with tarfile.open(fileobj=zipped, mode="w") as tar:
             for path in sorted(stage.rglob("*")):
@@ -145,12 +147,30 @@ def model_asset(stage):
     return inventory
 
 
+def audit_staged_tables(stage):
+    """Bind the release checks to the exact copies that enter the evidence archive."""
+    env = os.environ | {"OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
+    destination = stage / "provenance"
+    destination.mkdir(exist_ok=True)
+    commands = [
+        [sys.executable, str(ROOT / "scripts/audit_v2.py"), "--root", str(stage),
+         "--out", str(destination / "v2-staged-audit-decisions.json")],
+        [sys.executable, str(ROOT / "scripts/audit_v2_amendments.py"),
+         "--evals", str(stage / "evals"), "--coverage", str(stage / "runs/v2/coverage"),
+         "--empty-coverage", str(stage / "runs/v2/coverage_empty.parquet"),
+         "--reports", str(stage / "reports/v2"), "--out", str(destination / "v2-staged-audit-amendments.json")],
+    ]
+    for command in commands:
+        subprocess.run(command, cwd=ROOT, env=env, check=True)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", type=Path, default=ROOT / "runs/v2/release")
     ap.add_argument("--provenance", type=Path, required=True, help="reviewed completion provenance JSON")
     ap.add_argument("--paper", type=Path, required=True, help="finished report source and rendered main.pdf")
     args = ap.parse_args()
+    args.out, args.paper, args.provenance = args.out.resolve(), args.paper.resolve(), args.provenance.resolve()
     status = subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)
     if status.strip():
         ap.error("commit the reviewed source and reports before packaging")
@@ -190,6 +210,7 @@ def main():
         for path in sorted((ROOT / "reports/v2").glob("*.json")):
             copy(path, stage, path.relative_to(ROOT))
         write_json(stage / "provenance/v2-completion.json", provenance)
+        audit_staged_tables(stage)
         archive(stage, args.out / "av2-city-shift-v2-tables.tar.gz", "v2-tables", metadata)
 
         stage = temporary / "models"
@@ -211,7 +232,11 @@ def main():
     source_path = args.out / "av2-city-shift-v2-source.tar.gz"
     with source_path.open("wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", mtime=0, filename="") as zipped:
         shutil.copyfileobj(io.BytesIO(source), zipped)
-    assets = sorted(p for p in args.out.glob("av2-city-shift-v2-*") if p.is_file())
+    (args.out / "V2-LICENSE-NOTICE.txt").write_text(NOTICE)
+    assets = sorted(args.out / name for name in (
+        "av2-city-shift-v2-source.tar.gz", "av2-city-shift-v2-tables.tar.gz",
+        "av2-city-shift-v2-models.tar.gz", "av2-city-shift-v2-report-source.tar.gz",
+        "av2-city-shift-v2-report.pdf", "V2-LICENSE-NOTICE.txt"))
     sums = "".join(f"{sha(path)}  {path.name}\n" for path in assets)
     (args.out / "SHA256SUMS").write_text(sums)
     write_json(args.out / "manifest.json", metadata | {"assets": {p.name: {"bytes": p.stat().st_size, "sha256": sha(p)}

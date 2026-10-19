@@ -1,0 +1,17 @@
+{
+  "drives": 30000,
+  "drives_with_infeasible_replan": 0,
+  "infeasible_replans": 0,
+  "drives_past_route_end_gt_1cm": 0,
+  "max_overshoot_m": 0.0,
+  "short_routes_le_1m_drives": 6570,
+  "short_route_drives_past_end_gt_1cm": 0,
+  "by_arm": {
+    "ALL": {
+      "drives": 30000,
+      "infeasible": 0,
+      "past_end_gt_1cm": 0,
+      "max_overshoot_m": 0.0
+    }
+  }
+}

@@ -8,6 +8,7 @@ Confidence intervals use a fresh random seed and a 15%-of-interval-width Monte C
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -63,11 +64,16 @@ def audit_h(args, audit):
     city = original.city.to_numpy()
     audit.equal("H scenarios", len(original), 24988)
     assert not original.val_index.duplicated().any()
+    assert set(original.city) == set(CITIES)
+    assert hashlib.sha256("\n".join(sorted(original.scenario_id)).encode()).hexdigest() == (
+        "58b1110a8ffa2eead56e52f583a5655988b0a5e6c97031d4b3c750bc6e1fa625")
     tables = {}
     for c in CITIES:
         d = pd.read_parquet(root / f"LOCO-{c}.parquet")
         assert d.val_index.equals(original.val_index) and d.city.equals(original.city)
+        assert d.scenario_id.equals(original.scenario_id)
         assert np.isfinite(d[[f"s{s}_{m}" for s in range(3) for m in ("miss", "min_fde")]].to_numpy(float)).all()
+        assert np.isin(d[[f"s{s}_miss" for s in range(3)]], [0, 1]).all()
         assert np.isfinite(d.disagree.to_numpy(float)).all()
         errors = d[[f"s{s}_miss" for s in range(3)]].to_numpy(float).mean(axis=1)
         oracle = d[[f"s{s}_min_fde" for s in range(3)]].to_numpy(float).mean(axis=1)
@@ -152,12 +158,33 @@ def audit_f(args, audit):
     decisions = []
     for cell in report["cells"]:
         t, horizon, group = cell["replan"], cell["horizon_s"], cell["group"]
-        eligible = (a.replan == t) & ~a.focal & a[f"complete_{horizon}s"]
-        eligible &= (a.speed < .5) if group == "stopped" else (a.speed >= 2)
+        selected = (a.replan == t) & ~a.focal
+        selected &= (a.speed < .5) if group == "stopped" else (a.speed >= 2)
+        complete = a[f"complete_{horizon}s"]
+        eligible = selected & complete
         metric = f"miss_{horizon}s"
-        rates, draws = [], []
+        rates, draws, individual = [], [], {"ALL": [], "CV6": []}
+        assert {x["city"] for x in cell["per_city"]} == set(CITIES) and len(cell["per_city"]) == 6
         for city in CITIES:
             mask = eligible & (a.city == city)
+            saved = next(x for x in cell["per_city"] if x["city"] == city)
+            chosen = selected & (a.city == city)
+            label = f"F {t}/{horizon}/{group}/{city}"
+            counts = {"n_selected": int(chosen.sum()), "n_agents": int(mask.sum()),
+                      "n_scenarios": int(a.loc[mask, "scenario_id"].nunique()),
+                      "n_excluded": int((chosen & ~complete).sum())}
+            counts["excluded_share"] = counts["n_excluded"]/counts["n_selected"] if counts["n_selected"] else np.nan
+            for key, value in counts.items():
+                audit.equal(label+" "+key, value, saved[key])
+            for name, source in (("ALL", a), ("CV6", c)):
+                misses = source.loc[mask, metric].to_numpy(float)
+                fde = source.loc[mask, f"min_fde_{horizon}s"].to_numpy(float)
+                assert np.isfinite(misses).all() and ((misses >= 0) & (misses <= 1)).all()
+                assert np.isfinite(fde).all() and (fde >= 0).all()
+                mean = float(misses.mean()) if len(misses) else np.nan
+                individual[name].append(mean)
+                audit.equal(label+" miss_"+name, mean, saved["miss_"+name])
+                audit.equal(label+" min_fde_"+name, float(fde.mean()) if len(fde) else np.nan, saved["min_fde_"+name])
             frame = pd.DataFrame({"scenario_id": a.loc[mask, "scenario_id"],
                                   "difference": a.loc[mask, metric] - c.loc[mask, metric]})
             grouped = frame.groupby("scenario_id").difference.agg(["sum", "count"])
@@ -175,6 +202,8 @@ def audit_f(args, audit):
             draws.append(boot)
         point = float(np.mean(rates))
         label = f"F {t}/{horizon}/{group}"
+        for name in individual:
+            audit.equal(label+" city-equal miss_"+name, float(np.mean(individual[name])), cell["miss_"+name])
         audit.equal(label + " point", point, cell["difference_ALL_minus_CV6"])
         audit.equal(label + " eligible agents", int(eligible.sum()), cell["n_agents"])
         ci = audit.ci(label, np.mean(draws, axis=0), cell["ci95"], .95)
@@ -202,8 +231,8 @@ def main():
     ap.add_argument("--seed", type=int, default=20261018)
     ap.add_argument("--out", default="reports/v2/audit_amendments.json")
     args = ap.parse_args()
-    if args.draws < 1:
-        ap.error("positive draw count required")
+    if args.draws < 1 or args.seed < 0 or args.seed == 20261002:
+        ap.error("positive draw count and a fresh nonnegative seed are required")
     audit = Audit()
     for study in args.studies:
         {"H": audit_h, "F": audit_f}[study](args, audit)

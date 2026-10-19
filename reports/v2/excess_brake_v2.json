@@ -1,0 +1,64 @@
+{
+  "_note": "v2 study R secondary outcome (docs/preregistration/v2-fresh-reserve.md): excess hard brakes judged against logged futures; 95% intervals; seeds averaged, cities equal-weighted.",
+  "harness": "v2",
+  "scenarios": 10000,
+  "rates": {
+    "ALL": 0.0019,
+    "PATCH": 0.0003,
+    "SHAM2": 0.001,
+    "TRIM": 0.0003,
+    "GEO": 0.0019,
+    "PROB": 0.0003,
+    "oracle": 0.0
+  },
+  "effects": {
+    "PATCH_reduction": {
+      "point": 0.8705128205128205,
+      "undefined_share": 0.4014,
+      "ci95": [
+        0.6789501563108374,
+        0.9696969696969697
+      ]
+    },
+    "SHAM2_reduction": {
+      "point": 0.5016025641025641,
+      "undefined_share": 0.4014,
+      "ci95": [
+        0.053605575684380104,
+        0.7225980557540155
+      ]
+    },
+    "TRIM_reduction": {
+      "point": 0.8705128205128205,
+      "undefined_share": 0.4014,
+      "ci95": [
+        0.6789501563108374,
+        0.9696969696969697
+      ]
+    },
+    "GEO_reduction": {
+      "point": 0.06481481481481487,
+      "undefined_share": 0.4014,
+      "ci95": [
+        -0.019505718954248304,
+        0.10294117647058823
+      ]
+    },
+    "PROB_reduction": {
+      "point": 0.8705128205128205,
+      "undefined_share": 0.4014,
+      "ci95": [
+        0.6789501563108374,
+        0.9696969696969697
+      ]
+    },
+    "sham_gap": {
+      "point": 0.36891025641025643,
+      "undefined_share": 0.4014,
+      "ci95": [
+        0.11438100459482047,
+        0.7981770833333333
+      ]
+    }
+  }
+}

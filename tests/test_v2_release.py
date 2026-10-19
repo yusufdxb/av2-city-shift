@@ -3,6 +3,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import tarfile
 
 import pytest
@@ -49,3 +50,13 @@ def test_archive_inventory_and_reproducible_bytes(tmp_path):
         inventory = json.load(archive.extractfile("provenance/test-inventory.json"))
         assert inventory["files"]["rows.parquet"]["sha256"] == package.sha(stage / "rows.parquet")
         assert all(not member.name.startswith("/") and ".." not in Path(member.name).parts for member in archive)
+
+
+def test_staged_audit_rejects_unverified_rows_despite_saved_pass_flag(tmp_path):
+    saved = tmp_path / "reports/v2"
+    saved.mkdir(parents=True)
+    (saved / "audit_decisions.json").write_text('{"pass": true}')
+    with pytest.raises(subprocess.CalledProcessError):
+        package.audit_staged_tables(tmp_path)
+    actual = json.loads((tmp_path / "provenance/v2-staged-audit-decisions.json").read_text())
+    assert actual["pass"] is False

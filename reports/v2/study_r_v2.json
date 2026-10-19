@@ -1,0 +1,185 @@
+{
+  "harness": "v2",
+  "role": "secondary",
+  "decision_level": "ci95",
+  "scenarios": 10000,
+  "verdicts": {
+    "R1 PATCH": "supported",
+    "R2 sham gap": "supported",
+    "R3 TRIM": "supported",
+    "G1 PROB/PATCH": "probability sufficient"
+  },
+  "effects": {
+    "PATCH_reduction": {
+      "point": 0.3317979821831462,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.2789519818424696,
+        0.3798613994752366
+      ]
+    },
+    "SHAM2_reduction": {
+      "point": 0.012380308767057075,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.05927963782505981,
+        0.07381846240423623
+      ]
+    },
+    "TRIM_reduction": {
+      "point": 0.32248652268091954,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.2705894103793353,
+        0.3693216073666226
+      ]
+    },
+    "GEO_reduction": {
+      "point": -0.0013412536860992112,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.010974050103290996,
+        0.0077265899918732
+      ]
+    },
+    "PROB_reduction": {
+      "point": 0.332276126926909,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.28040465801698256,
+        0.3788753700847873
+      ]
+    },
+    "sham_gap": {
+      "point": 0.3194176734160891,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.26091038552964546,
+        0.38526525687616914
+      ]
+    },
+    "G_ratio_PROB_over_PATCH": {
+      "point": 1.0014410718854188,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.9434505230432354,
+        1.064511181765865
+      ]
+    },
+    "interaction": {
+      "point": 0.000863108942336424,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.020275598381225873,
+        0.023473300725783543
+      ]
+    }
+  },
+  "brake_rates": {
+    "ALL": 0.0695,
+    "PATCH": 0.04566666666666666,
+    "SHAM2": 0.06796666666666665,
+    "TRIM": 0.046566666666666666,
+    "GEO": 0.0694,
+    "PROB": 0.04619999999999999,
+    "cv": 0.0452,
+    "oracle": 0.0171,
+    "static": 0.0446
+  },
+  "brake_control_ALL_over_oracle": 4.064327485380117,
+  "brake_control_pass": true,
+  "sham_dose_ratio": 0.9999478997823369,
+  "seed_averaged_ALL_brake_events": 695.0,
+  "powered": true,
+  "collisions": {
+    "ALL": 0.007866666666666666,
+    "PATCH": 0.009566666666666666,
+    "SHAM2": 0.016166666666666666,
+    "TRIM": 0.0095,
+    "GEO": 0.007999999999999998,
+    "PROB": 0.009733333333333333,
+    "cv": 0.0341,
+    "oracle": 0.0083,
+    "static": 0.0427,
+    "log": 0.0035
+  },
+  "log_collision_calibration_pass": true,
+  "trim_fallback_share": 0.7316094158170096,
+  "factorial_dose": {
+    "GEO": 1381987,
+    "PROB": 1382047,
+    "PATCH": 1381952
+  },
+  "per_seed_reduction": {
+    "PATCH_s0": 0.3508245877061469,
+    "PATCH_s1": 0.2995529061102832,
+    "PATCH_s2": 0.3748326639892905,
+    "SHAM2_s0": 0.010494752623688042,
+    "SHAM2_s1": -0.041728763040238315,
+    "SHAM2_s2": 0.08969210174029452,
+    "TRIM_s0": 0.3088455772113943,
+    "TRIM_s1": 0.2980625931445604,
+    "TRIM_s2": 0.3775100401606426,
+    "GEO_s0": 0.007496251874062998,
+    "GEO_s1": 0.0,
+    "GEO_s2": -0.002677376171351886,
+    "PROB_s0": 0.31634182908545716,
+    "PROB_s1": 0.315946348733234,
+    "PROB_s2": 0.3694779116465863
+  },
+  "collision_effects": {
+    "PATCH_collision_diff": {
+      "point": 0.0011356818159780236,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.00031039326093249226,
+        0.0026005637031657415
+      ],
+      "margin": 0.003,
+      "status": "within harness margin"
+    },
+    "SHAM2_collision_diff": {
+      "point": 0.007348785419066439,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.005171522964883415,
+        0.009616878870730877
+      ],
+      "margin": 0.003,
+      "status": "not established"
+    },
+    "TRIM_collision_diff": {
+      "point": 0.0010909919878283889,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.0003268305224279341,
+        0.0025409849209146822
+      ],
+      "margin": 0.003,
+      "status": "within harness margin"
+    },
+    "GEO_collision_diff": {
+      "point": 9.550194807027717e-05,
+      "undefined_share": 0.0,
+      "ci95": [
+        -0.00026179330856165064,
+        0.0004748409616467016
+      ],
+      "margin": 0.003,
+      "status": "within harness margin"
+    },
+    "PROB_collision_diff": {
+      "point": 0.0013590557797555144,
+      "undefined_share": 0.0,
+      "ci95": [
+        0.00011473940828831447,
+        0.00264236869230105
+      ],
+      "margin": 0.003,
+      "status": "within harness margin"
+    }
+  },
+  "static_over_ALL_collisions": 5.427966101694916,
+  "collision_control_pass": true,
+  "collision_scope": "secondary harness only; does not establish collision safety"
+}
